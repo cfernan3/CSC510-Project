@@ -88,7 +88,7 @@ modify questions
 Preconditions: None
 
 Normal flow:
-1. User selects the option to create a new standup bot in the slack group.
+1. User selects the option to create a new whatbot in the slack group.
 2. User supplies a unique name for the bot. (Bot name is the same as the standup name)
 3. User adds participants to the standup.
 4. User configures the standup duration. (time when standup begins, time when the standup is closed and shared with with all participants)
@@ -110,19 +110,19 @@ Alternative flows:
 Preconditions: It's time for starting the standup.
 
 Normal flow:  
-1. Standup bot will inform the user that the standup has started.
-2. Standup bot will prompt the user to respond when ready.
+1. Whatbot will inform the user that the standup has started.
+2. Whatbot will prompt the user to respond when ready.
 3. User responds to the start message.
-4. Standup bot will ask a question.
+4. Whatbot will ask a question.
 5. User will respond to the question, or enter the skip question command.
 6. Steps 4 and 5 are repeated till all configured questions have been asked.
 7. User is asked if he wants to redo all the questions, or submit his answers.
 8. User proceeds with submit.
-9. Standup bot notifies the user that his responses have been saved.
+9. Whatbot notifies the user that his responses have been saved.
 
 Alternative flows:  
 8A. User decides to redo all questions.  
-	1. Standup bot indiactes to the user that the process will be repeated.  
+	1. Whatbot indicates to the user that the process will be repeated.  
 	2. The use case returns to step 4.  
 
 
@@ -132,41 +132,41 @@ Alternative flows:
 Preconditions: Standup to be edited exists.
 
 Normal flow:  
-[Subflow 1]. User wants to edit the standup duration.  
-	i. User sends a command to the Standup bot to modify the standup duration.  
-   	ii. Standup bot asks the user to provide a new duration.  
+[Subflow 1]. User wants to edit the standup schedule.  
+	i. User sends a command to the Whatbot to modify the standup duration.  
+   	ii. Whatbot asks the user to provide a new duration.  
    	iii. User responds with the new duration in minutes.  
-   	iv. Standup bot confirms the new duration.  
+   	iv. Whatbot confirms the new duration.  
 
 [Subflow 2]. User wants to add/edit a reminder before the standup closes.  
-	i. User sends a command to the Standup bot to modify the reminder.  
-	ii. Standup bot asks the user to provide a new time for the reminder.  
+	i. User sends a command to the Whatbot to modify the reminder.  
+	ii. Whatbot asks the user to provide a new time for the reminder.  
 	iii. User responds with a new time for the reminder.  
-	iv. Standup bot confirms the new reminder time.  
+	iv. Whatbot confirms the new reminder time.  
 
 [Subflow 3]. User(admin) wants to edit the participants for the standup.  
-	i. User(admin) sends a command to the Standup bot to modify the members in the standup group.  
-	ii. Standup bot asks the user(admin) wants to add or delete a participant.  
+	i. User(admin) sends a command to the Whatbot to modify the members in the standup group.  
+	ii. Whatbot asks the user(admin) wants to add or delete a participant.  
 	iii. User(admin) responds with the name of the participant.  
-	iv. Standup bot confirms the new participant.  
+	iv. Whatbot confirms the new participant.  
 
 [Subflow 4]. User(admin) wants to edit the standup questions.  
-	i. User(admin) sends a command to the Standup bot to modify questions.  
-	ii. Standup bot asks the user(admin) to provide a new set of questions.  
+	i. User(admin) sends a command to the Whatbot to modify questions.  
+	ii. Whatbot asks the user(admin) to provide a new set of questions.  
 	iii. User(admin) responds with the new questions.  
-	iv. Standup bot confirms the new questions.  
+	iv. Whatbot confirms the new questions.  
 
 Alternative flows:  
-[S1, S2, S3, S4] If the user enters an invalid input then the Standup bot responds with an error message and terminates the subflow.
+[S1, S2, S3, S4] If the user enters an invalid input then the Whatbot responds with an error message and terminates the subflow.
 
 
 ### **Design Sketches**
-* **Wireframe**
+**Wireframe**
 
 
 
 
-* __**Storyboard**__
+ __**Storyboard**__
 
 ![storyboard](https://media.github.ncsu.edu/user/6391/files/72a676a2-9f9f-11e7-9afa-835033b141c8)
 
