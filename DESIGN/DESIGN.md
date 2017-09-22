@@ -55,9 +55,9 @@ Normal flow:
 9. Standup bot notifies the user that his responses have been saved.
 
 Alternative flows:  
-8A. User decides to redo all questions.
-	1. Standup bot indiactes to the user that the process will be repeated.
-	2. The use case returns to step 4.
+8A. User decides to redo all questions.  
+	1. Standup bot indiactes to the user that the process will be repeated.  
+	2. The use case returns to step 4.  
 
 
 
@@ -68,9 +68,9 @@ Preconditions: Standup to be edited exists.
 Normal flow:  
 [Subflow 1]. User wants to edit the standup duration.  
 	i. User sends a command to the Standup bot to modify the standup duration.  
-	ii. Standup bot asks the user to provide a new duration.  
-	iii. User responds with the new duration in minutes.  
-	iv. Standup bot confirms the new duration.  
+   	ii. Standup bot asks the user to provide a new duration.  
+   	iii. User responds with the new duration in minutes.  
+   	iv. Standup bot confirms the new duration.  
 
 [Subflow 2]. User wants to add/edit a reminder before the standup closes.  
 	i. User sends a command to the Standup bot to modify the reminder.  
