@@ -50,36 +50,38 @@ In future, we may allow the creator to configure other options such as a custom 
 For now, we are enabling editing for the set of questions, standup schedule, and participants. In future, we may add the option to edit the standup report delivery method.
 
 * Is there a way to filter out standup updates for a participant for a specified date range?  
-No. We are not persisting the standup reports for now.
+No. This feature is out-of-scope for now.
 
-Examples of chat commands to interact with the bot:
+#### User interaction:
+Whatbot will understand basic chat commands to perform the following operations.
 ```
-//schedule new standup or move existing one  
-schedule standup <time> [days]	 
+Schedule a new standup or move an existing one: schedule standup  
+Whatbot will then prompt for entering the days, duration, participants, and question set.	 
 
-//schedule a reminder for 'x' minutes prior to the report submission 
-reminder <x>	
+Schedule a reminder for x minutes prior to the report submission:  reminder [x], set reminder [x], etc
+If the user has not supplied the time, Whatbot will prompt for it.
 	
-//modify the participants
-add | remove participant @<user1>, ..., @userN | @<user-group> | #<channel> | all
+Modify participants: add/remove participant [participant-list]
+The participant-list can be a combination of the following:
+	1. list of users: @<user1>, ..., @<userN>
+	2. specific user group: @<user-group-name> 
+	3. specific channel: #<channel-name>
+	4. all users from the slack group: all
+If the user has not supplied the partcipant-list, Whatbot will prompt for it.
 
-//cancel the standup for today (for deleting the standup, delete the bot)
-cancel standup	 
+Cancel the standup for today: cancel standup
+(for deleting the standup, delete the bot)	 
 
-//pause standup for x days
-pause standup <x>
+Pause standup for x days: pause standup [x], pause standup for <x> days, etc
+If the user has not supplied the days, Whatbot will prompt for it.
 	
-//resume a standup that has been paused
-resume standup
+Resume a standup that has been paused: resume standup
 
-//show when the standup is scheduled for
-show schedule
+Show when the standup is scheduled for: show schedule
 
-//skip answering a question during standup
-skip question
+Skip answering a question during standup: skip
 
-//replace all standup questions with a new set of questions
-modify questions	
+Replace all standup questions with a new set of questions: modify | update | change | replace questions questions	
 ```
 
 ### **Use Cases**
@@ -134,9 +136,9 @@ Preconditions: Standup to be edited exists.
 Normal flow:  
 [Subflow 1]. User wants to edit the standup schedule.  
 	i. User sends a command to the Whatbot to modify the standup duration.  
-   	ii. Whatbot asks the user to provide a new duration.  
-   	iii. User responds with the new duration in minutes.  
-   	iv. Whatbot confirms the new duration.  
+   	ii. Whatbot asks the user to provide a new schedule.  
+   	iii. User responds with a set of days and the time window.  
+   	iv. Whatbot confirms the new schedule.  
 
 [Subflow 2]. User wants to add/edit a reminder before the standup closes.  
 	i. User sends a command to the Whatbot to modify the reminder.  
@@ -144,16 +146,16 @@ Normal flow:
 	iii. User responds with a new time for the reminder.  
 	iv. Whatbot confirms the new reminder time.  
 
-[Subflow 3]. User(admin) wants to edit the participants for the standup.  
-	i. User(admin) sends a command to the Whatbot to modify the members in the standup group.  
-	ii. Whatbot asks the user(admin) wants to add or delete a participant.  
-	iii. User(admin) responds with the name of the participant.  
-	iv. Whatbot confirms the new participant.  
+[Subflow 3]. User wants to edit the participants for the standup.  
+	i. User sends a command to the Whatbot to add/remove participant(s).  
+	ii. Whatbot prompts for a list of participant(s).  
+	iii. User responds with the list of participant(s).  
+	iv. Whatbot acknowledges the changes.  
 
-[Subflow 4]. User(admin) wants to edit the standup questions.  
-	i. User(admin) sends a command to the Whatbot to modify questions.  
-	ii. Whatbot asks the user(admin) to provide a new set of questions.  
-	iii. User(admin) responds with the new questions.  
+[Subflow 4]. User wants to edit the standup questions.  
+	i. User sends a command to the Whatbot to modify questions.  
+	ii. Whatbot asks the user to provide a new set of questions.  
+	iii. User responds with the new questions.  
 	iv. Whatbot confirms the new questions.  
 
 Alternative flows:  
@@ -164,27 +166,15 @@ Alternative flows:
 **Wireframe**
 
 
-
-
  __**Storyboard**__
 
 ![storyboard 2](https://media.github.ncsu.edu/user/6391/files/d170a57a-9fbf-11e7-9d72-cb247dac658e)
 
-
-
-
-
-
 ### **Architecture Design**
 
 #### **Constraints**  
-
-1. Slack: 
-	* There isn't a need to invite the bot to any channel. 
-	* A single bot handles a single standup. A new standup would be handled by a new instance of the bot.
-	* Every user interacts through direct messages with the bot and not through a dedicated channel.
-	* Only the creator of the bot can modify the configurations of the bot.
-	
-2. Email:
-	* The collected standup information is not persistent since the bot consolidates all the reports internally and discards the data after sending emails to all stakeholders.
+* There isn't a need to invite the bot to any channel. 
+* A single bot handles a single standup. A new standup would be handled by a new instance of the bot.
+* Every user interacts through direct messages with the bot and not through a dedicated channel.
+* Only the creator of the bot can modify the configurations of the bot.
 	
