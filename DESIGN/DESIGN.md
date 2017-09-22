@@ -171,7 +171,8 @@ Alternative flows:
 ![Storyboard](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/DESIGN/Storyboard.jpg)
 
 ### **Architecture Design**
-![architecture](https://media.github.ncsu.edu/user/6391/files/fc766490-9fcd-11e7-94f8-17b692e17cbf)
+![architecturepattern](https://media.github.ncsu.edu/user/6391/files/471a861a-9fcf-11e7-8e61-328d14ffd52c)
+
 
 #### **Constraints**  
 * There isn't a need to invite the bot to any channel. 
