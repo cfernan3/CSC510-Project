@@ -168,7 +168,7 @@ Alternative flows:
 
  __**Storyboard**__
 
-![storyboard 2](https://media.github.ncsu.edu/user/6391/files/d170a57a-9fbf-11e7-9d72-cb247dac658e)
+![Storyboard](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/DESIGN/Storyboard.jpg)
 
 ### **Architecture Design**
 
