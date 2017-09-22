@@ -17,6 +17,81 @@ Another case is when the project manager or team member is not in office, and ca
 
 
 ### **Use Cases**
+#### 1) Create a new standup
+
+Preconditions:  
+None
+
+Normal flow:
+1. User selects the option to create a new standup bot in the slack group.
+2. User supplies a unique name for the bot. (Bot name is the same as the standup name)
+3. User adds participants to the standup.
+4. User configures the standup duration. (time when standup begins, time when the standup is closed and shared with with all participants)
+5. User accepts the default standup questions. 
+6. The bot indiactes to the user that a new standup has been created. 
+
+Alternative flows:  
+2A. The bot name is not unique.  
+	1. Slack will prompt the user to select a different bot name.  
+	2. The use case continues.  
+
+5A. The user does not accept the default standup questions.  
+	1. User supplies his custome standup questions.  
+	2. Use case returns to step 6.  
+
+#### 2) Edit the configuration of an existing standup
+
+Preconditions:  
+Standup to be edited exists.
+
+Normal flow:
+Subflow 1. User wants to edit the standup duration.
+User sends a command to the Standup bot to modify the standup duration.
+Standup bot asks the user to provide a new duration.
+User responds with the new duration in minutes.
+Standup bot confirms the new duration.
+
+Subflow 2. User wants to add/edit a reminder before the standup closes.
+User sends a command to the Standup bot to modify the reminder.
+Standup bot asks the user to provide a new time for the reminder.
+User responds with a new time for the reminder.
+Standup bot confirms the new reminder time.
+
+Subflow 3. User wants to edit the participants for the standup.
+User sends a command to the Standup bot to modify the members in the standup group.
+Standup bot asks the user wants to add or delete a participant.
+User responds with the name of the participant.
+Standup bot confirms the new participant.
+
+Subflow 4. User wants to edit the standup questions.
+User sends a command to the Standup bot to modify questions.
+Standup bot asks the user to provide a new set of questions.
+User responds with the new question
+Standup bot confirms the new duration.
+
+Alternative flows:  
+[S1, S2, S3, S4] If the user enters an invalid input then the Standup bot responds with an error message and terminates the subflow.
+
+#### 3) Standup session with a user
+
+Preconditions:  
+It's time for starting the standup.
+
+Normal flow:  
+1. Standup bot will inform the user that the standup has started.
+2. Standup bot will prompt the user to respond when ready.
+3. User responds to the start message.
+4. Standup bot will ask a question.
+5. User will respond to the question, or enter the skip question command.
+6. Steps 4 and 5 are repeated till all configured questions have been asked.
+7. User is asked if he wants to redo all the questions, or submit his answers.
+8. User proceeds with submit.
+9. Standup bot notifies the user that his responses have been saved.
+
+Alternative flows:  
+8A. User decides to redo all questions.
+	1. Standup bot indiactes to the user that the process will be repeated.
+	2. The use case returns to step 4.
 
 
 ### **Design Sketches**
