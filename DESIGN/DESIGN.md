@@ -25,7 +25,7 @@ Another case is when the project manager or team member is not in office, and ca
 
 
 
-* **Storyboard**
+* __**Storyboard**__
 
 ![storyboard](https://media.github.ncsu.edu/user/6391/files/72a676a2-9f9f-11e7-9afa-835033b141c8)
 
