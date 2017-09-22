@@ -177,4 +177,5 @@ Alternative flows:
 * A single bot handles a single standup. A new standup would be handled by a new instance of the bot.
 * Every user interacts through direct messages with the bot and not through a dedicated channel.
 * Only the creator of the bot can modify the configurations of the bot.
+* A Google account needs to be created for the bot, so it can send the report email via gmail and store the standup updates on google sheets.
 	
