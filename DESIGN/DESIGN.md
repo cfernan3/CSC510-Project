@@ -85,8 +85,7 @@ modify questions
 ### **Use Cases**
 #### 1) Create a new standup
 
-Preconditions:  
-None
+Preconditions: None
 
 Normal flow:
 1. User selects the option to create a new standup bot in the slack group.
@@ -108,8 +107,7 @@ Alternative flows:
 
 #### 2) Standup session with a user
 
-Preconditions:  
-It's time for starting the standup.
+Preconditions: It's time for starting the standup.
 
 Normal flow:  
 1. Standup bot will inform the user that the standup has started.
@@ -123,45 +121,43 @@ Normal flow:
 9. Standup bot notifies the user that his responses have been saved.
 
 Alternative flows:  
-8A. User decides to redo all questions.
-	1. Standup bot indiactes to the user that the process will be repeated.
-	2. The use case returns to step 4.
+8A. User decides to redo all questions.  
+	1. Standup bot indiactes to the user that the process will be repeated.  
+	2. The use case returns to step 4.  
 
 
 
 #### 3) Edit the configuration of an existing standup
 
-Preconditions:  
-Standup to be edited exists.
+Preconditions: Standup to be edited exists.
 
-Normal flow:
-Subflow 1. User wants to edit the standup duration.
-User sends a command to the Standup bot to modify the standup duration.
-Standup bot asks the user to provide a new duration.
-User responds with the new duration in minutes.
-Standup bot confirms the new duration.
+Normal flow:  
+[Subflow 1]. User wants to edit the standup duration.  
+	i. User sends a command to the Standup bot to modify the standup duration.  
+   	ii. Standup bot asks the user to provide a new duration.  
+   	iii. User responds with the new duration in minutes.  
+   	iv. Standup bot confirms the new duration.  
 
-Subflow 2. User wants to add/edit a reminder before the standup closes.
-User sends a command to the Standup bot to modify the reminder.
-Standup bot asks the user to provide a new time for the reminder.
-User responds with a new time for the reminder.
-Standup bot confirms the new reminder time.
+[Subflow 2]. User wants to add/edit a reminder before the standup closes.  
+	i. User sends a command to the Standup bot to modify the reminder.  
+	ii. Standup bot asks the user to provide a new time for the reminder.  
+	iii. User responds with a new time for the reminder.  
+	iv. Standup bot confirms the new reminder time.  
 
-Subflow 3. User(admin) wants to edit the participants for the standup.
-User(admin) sends a command to the Standup bot to modify the members in the standup group.
-Standup bot asks the user(admin) wants to add or delete a participant.
-User(admin) responds with the name of the participant.
-Standup bot confirms the new participant.
+[Subflow 3]. User(admin) wants to edit the participants for the standup.  
+	i. User(admin) sends a command to the Standup bot to modify the members in the standup group.  
+	ii. Standup bot asks the user(admin) wants to add or delete a participant.  
+	iii. User(admin) responds with the name of the participant.  
+	iv. Standup bot confirms the new participant.  
 
-Subflow 4. User(admin) wants to edit the standup questions.
-User(admin) sends a command to the Standup bot to modify questions.
-Standup bot asks the user(admin) to provide a new set of questions.
-User(admin) responds with the new question
-Standup bot confirms the new duration.
+[Subflow 4]. User(admin) wants to edit the standup questions.  
+	i. User(admin) sends a command to the Standup bot to modify questions.  
+	ii. Standup bot asks the user(admin) to provide a new set of questions.  
+	iii. User(admin) responds with the new questions.  
+	iv. Standup bot confirms the new questions.  
 
 Alternative flows:  
 [S1, S2, S3, S4] If the user enters an invalid input then the Standup bot responds with an error message and terminates the subflow.
-
 
 
 ### **Design Sketches**
@@ -179,3 +175,14 @@ Alternative flows:
 
 ### **Architecture Design**
 
+#### **Constraints**  
+
+1. Slack: 
+	* There isn't a need to invite the bot to any channel. 
+	* A single bot handles a single standup. A new standup would be handled by a new instance of the bot.
+	* Every user interacts through direct messages with the bot and not through a dedicated channel.
+	* Only the creator of the bot can modify the configurations of the bot.
+	
+2. Email:
+	* The collected standup information is not persistent since the bot consolidates all the reports internally and discards the data after sending emails to all stakeholders.
+	
