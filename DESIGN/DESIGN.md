@@ -39,40 +39,8 @@ Alternative flows:
 	1. User supplies his custome standup questions.  
 	2. Use case returns to step 6.  
 
-#### 2) Edit the configuration of an existing standup
 
-Preconditions:  
-Standup to be edited exists.
-
-Normal flow:
-Subflow 1. User wants to edit the standup duration.
-User sends a command to the Standup bot to modify the standup duration.
-Standup bot asks the user to provide a new duration.
-User responds with the new duration in minutes.
-Standup bot confirms the new duration.
-
-Subflow 2. User wants to add/edit a reminder before the standup closes.
-User sends a command to the Standup bot to modify the reminder.
-Standup bot asks the user to provide a new time for the reminder.
-User responds with a new time for the reminder.
-Standup bot confirms the new reminder time.
-
-Subflow 3. User wants to edit the participants for the standup.
-User sends a command to the Standup bot to modify the members in the standup group.
-Standup bot asks the user wants to add or delete a participant.
-User responds with the name of the participant.
-Standup bot confirms the new participant.
-
-Subflow 4. User wants to edit the standup questions.
-User sends a command to the Standup bot to modify questions.
-Standup bot asks the user to provide a new set of questions.
-User responds with the new question
-Standup bot confirms the new duration.
-
-Alternative flows:  
-[S1, S2, S3, S4] If the user enters an invalid input then the Standup bot responds with an error message and terminates the subflow.
-
-#### 3) Standup session with a user
+#### 2) Standup session with a user
 
 Preconditions:  
 It's time for starting the standup.
@@ -92,6 +60,42 @@ Alternative flows:
 8A. User decides to redo all questions.
 	1. Standup bot indiactes to the user that the process will be repeated.
 	2. The use case returns to step 4.
+
+
+
+#### 3) Edit the configuration of an existing standup
+
+Preconditions:  
+Standup to be edited exists.
+
+Normal flow:
+Subflow 1. User wants to edit the standup duration.
+User sends a command to the Standup bot to modify the standup duration.
+Standup bot asks the user to provide a new duration.
+User responds with the new duration in minutes.
+Standup bot confirms the new duration.
+
+Subflow 2. User wants to add/edit a reminder before the standup closes.
+User sends a command to the Standup bot to modify the reminder.
+Standup bot asks the user to provide a new time for the reminder.
+User responds with a new time for the reminder.
+Standup bot confirms the new reminder time.
+
+Subflow 3. User(admin) wants to edit the participants for the standup.
+User(admin) sends a command to the Standup bot to modify the members in the standup group.
+Standup bot asks the user(admin) wants to add or delete a participant.
+User(admin) responds with the name of the participant.
+Standup bot confirms the new participant.
+
+Subflow 4. User(admin) wants to edit the standup questions.
+User(admin) sends a command to the Standup bot to modify questions.
+Standup bot asks the user(admin) to provide a new set of questions.
+User(admin) responds with the new question
+Standup bot confirms the new duration.
+
+Alternative flows:  
+[S1, S2, S3, S4] If the user enters an invalid input then the Standup bot responds with an error message and terminates the subflow.
+
 
 
 ### **Design Sketches**
