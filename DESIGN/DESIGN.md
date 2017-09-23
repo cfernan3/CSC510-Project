@@ -26,6 +26,7 @@ We propose to deploy a documentation bot that interacts with team members, recor
 The bot directly messages the participant on slack at the configured time on all configured days. This eliminates the creation of a common channel solely for the purpose of conducting standup, and prevents all participants from getting a notification every time someone posts an update. 
 
 * How are multiple standups within the same slack group handled?  
+Each project within the same slack group has its own standup.
 A new bot should be created for every standup.
 
 * How are participants added to or removed from a standup?  
@@ -172,15 +173,15 @@ Alternative flows:
 
 #### Components  
 
-***Slack:*** All users interact with the bot using the Slack messaging platform.
+*Slack:* All users interact with the bot using the Slack messaging platform.
 
-*Bot Engine:* This is a central hub to synchronize the state of all the agents in the bot. The engine also acts as a communication channel between the agents. The bot engine also stores the configurations pertaining to the standup group.
+*Bot Engine:* This is a central hub to synchronize the state of all the agents in the bot. The engine also acts as a communication channel between the agents. The bot engine also stores the configurations pertaining to the standup group. It keeps track of the state of the standup for each participant.
 
-*Interaction Agent:* The bot interacts with Slack Platform using the Interaction Agent. This agent helps in forming and parsing the RTM and Event APIs between the Slack platform.	
+*Interaction Agent:* The bot interacts with Slack Platform using the Interaction Agent. This agent invokes the SLACK APIs to facilitate interaction between the user and the bot.	
 
 *Reporting Agent:* The purpose of the agent is to form an email based on the report saved by the Storage Agent and uses Gmail APIs to send emails.
 
-*Scheduling Agent:* This agent maintains the timing related configurations. This includes the time when the Standup would happen and also when the report would be sent to all stakeholders. 
+*Scheduling Agent:* This agent initiates and maintains the standup session on the configured days, during the configured time window, and also sends a reminder to users hwo haven't recorded their updates, before the standup closes.
 
 *Storage Agent:* This agent collects the status pouring in from multiple users and consolidates the data to be written to Google Sheets. The agent interacts directly with the Google Sheets using REST APIs.
 
