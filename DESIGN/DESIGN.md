@@ -127,8 +127,6 @@ Alternative flows:
 	1. Whatbot indicates to the user that the process will be repeated.  
 	2. The use case returns to step 4.  
 
-
-
 #### 3) Edit the configuration of an existing standup
 
 Preconditions: Standup to be edited exists.
@@ -172,8 +170,8 @@ Alternative flows:
 ### **Architecture Design**
 ![architecturepattern](https://media.github.ncsu.edu/user/6391/files/471a861a-9fcf-11e7-8e61-328d14ffd52c)
 
-**Components**  
-<br>
+#### Components  
+
 ***Slack:*** All users interact with the bot using the Slack messaging platform.
 
 *Bot Engine:* This is a central hub to synchronize the state of all the agents in the bot. The engine also acts as a communication channel between the agents. The bot engine also stores the configurations pertaining to the standup group.
@@ -186,8 +184,27 @@ Alternative flows:
 
 *Storage Agent:* This agent collects the status pouring in from multiple users and consolidates the data to be written to Google Sheets. The agent interacts directly with the Google Sheets using REST APIs.
 
+#### Design Pattern
 
-#### **Constraints**  
+**Space Reactor**  
+Whatbot is based on a space reactor bot design pattern.
+A Space Reactor bot has the following characteristics.
+
+* Reacts to messages:
+Whatbot responds to chat commands, performs the corresponding action, and sends back an output/acknowledgement to the user. Examples of cases when the bot reacts to user input: creating a standup, conducting a standup session, etc
+
+* Knows who it is talking to:
+The bot knows about all the standup participants, and will respond to them accordingly. For example, only the creator of a standup will be allowed to edit the standup parameters later. Other users will be denied.
+
+* Remembers what was previously said:
+The bot knows the status of an ongoing standup session. For each user, it knows which questions have already been answered and which are pending. 
+
+* Knows where it is being addressed:
+The bot is not part of any channel. It directly communicates with all users. Thus the bot does not need to keep track of the state of conversations going on in multiple channels. 
+In future versions, if slack channels are added as a report delivery methods, then the bot will track their states.
+
+
+### Constraints
 * There isn't a need to invite the bot to any channel. 
 * A single bot handles a single standup. A new standup would be handled by a new instance of the bot.
 * Every user interacts through direct messages with the bot and not through a dedicated channel.
