@@ -163,6 +163,8 @@ Alternative flows:
 
 ### **Design Sketches**
 **Wireframe**
+![Wireframe](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/DESIGN/Wireframe.png)
+
 
  __**Storyboard**__
 
