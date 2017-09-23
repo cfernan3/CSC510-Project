@@ -174,7 +174,7 @@ Alternative flows:
 
 **Components**  
 <br>
-*Slack:* All users interact with the bot using the Slack messaging platform.
+***Slack:*** All users interact with the bot using the Slack messaging platform.
 
 *Bot Engine:* This is a central hub to synchronize the state of all the agents in the bot. The engine also acts as a communication channel between the agents. The bot engine also stores the configurations pertaining to the standup group.
 
