@@ -171,7 +171,7 @@ Alternative flows:
 ![Storyboard](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/DESIGN/Storyboard.jpg)
 
 ### **Architecture Design**
-![architecturepattern](https://media.github.ncsu.edu/user/6391/files/471a861a-9fcf-11e7-8e61-328d14ffd52c)
+![architecturepattern](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/DESIGN/ArchitecturePattern.png)
 
 #### Components  
 
