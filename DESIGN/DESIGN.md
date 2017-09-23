@@ -165,13 +165,26 @@ Alternative flows:
 ### **Design Sketches**
 **Wireframe**
 
-
  __**Storyboard**__
 
 ![Storyboard](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/DESIGN/Storyboard.jpg)
 
 ### **Architecture Design**
 ![architecturepattern](https://media.github.ncsu.edu/user/6391/files/471a861a-9fcf-11e7-8e61-328d14ffd52c)
+
+**Components**  
+<br>
+*Slack:* All users interact with the bot using the Slack messaging platform.
+
+*Bot Engine:* This is a central hub to synchronize the state of all the agents in the bot. The engine also acts as a communication channel between the agents. The bot engine also stores the configurations pertaining to the standup group.
+
+*Interaction Agent:* The bot interacts with Slack Platform using the Interaction Agent. This agent helps in forming and parsing the RTM and Event APIs between the Slack platform.	
+
+*Reporting Agent:* The purpose of the agent is to form an email based on the report saved by the Storage Agent and uses Gmail APIs to send emails.
+
+*Scheduling Agent:* This agent maintains the timing related configurations. This includes the time when the Standup would happen and also when the report would be sent to all stakeholders. 
+
+*Storage Agent:* This agent collects the status pouring in from multiple users and consolidates the data to be written to Google Sheets. The agent interacts directly with the Google Sheets using REST APIs.
 
 
 #### **Constraints**  
