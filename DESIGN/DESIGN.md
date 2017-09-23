@@ -22,11 +22,11 @@ We propose to deploy a documentation bot that interacts with team members, recor
 
 #### Bot Design Considerations:
 
-* How are multiple standups within the same slack group handled?  
-A new bot should be created for every standup.
-
 * How does the bot interact with each participant?  
 The bot directly messages the participant on slack at the configured time on all configured days. This eliminates the creation of a common channel solely for the purpose of conducting standup, and prevents all participants from getting a notification every time someone posts an update. 
+
+* How are multiple standups within the same slack group handled?  
+A new bot should be created for every standup.
 
 * How are participants added to or removed from a standup?  
 The creator has the following options while selecting users to be added/removed:
