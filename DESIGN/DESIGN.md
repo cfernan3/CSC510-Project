@@ -186,9 +186,9 @@ Alternative flows:
 
 #### Design Pattern
 
-**Space Reactor**  
-Whatbot is based on a space reactor bot design pattern.
-A Space Reactor bot has the following characteristics.
+**Space Responder**  
+Whatbot is based on a space responder bot design pattern.
+A Space Responder bot has the following characteristics.
 
 * Reacts to messages:
 Whatbot responds to chat commands, performs the corresponding action, and sends back an output/acknowledgement to the user. Examples of cases when the bot reacts to user input: creating a standup, conducting a standup session, etc
