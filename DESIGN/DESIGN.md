@@ -216,5 +216,5 @@ In future versions, if slack channels are added as a report delivery methods, th
 
 #### References
 
-[Bot Design Patterns](http://willschenk.com/bot-design-patterns)
+[Bot Design Patterns](http://willschenk.com/bot-design-patterns)  
 [StoryboardThat](http://www.storyboardthat.com/)	
