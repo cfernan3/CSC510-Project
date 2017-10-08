@@ -9,3 +9,5 @@
 
 
 ### Design https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/DESIGN/DESIGN.md
+
+### Design_Revied https://github.ncsu.edu/nedsouza/CSC510-Project/tree/master/DESIGN_Revised
