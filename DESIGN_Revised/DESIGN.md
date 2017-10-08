@@ -123,10 +123,10 @@ Normal flow:
 9. Whatbot notifies the user that his responses have been saved.
 
 Alternative flows:  
-3A. User clicks on 'SNOOZE' button.
-	1. Whatbot sends a reminder message to the user in 15 minutes containing the buttons so that the user can complete the standup.
-3B. User clicks on 'IGNORE' button.
-	1. The users input is not taken.
+3A. User clicks on 'SNOOZE' button.  
+	1. Whatbot sends a reminder message to the user in 15 minutes containing the buttons so that the user can complete the standup.  
+3B. User clicks on 'IGNORE' button.  
+	1. The user is excluded from that day's standup report.  
 8A. User decides to redo all questions.  
 	1. Whatbot indicates to the user that the process will be repeated.  
 	2. The use case returns to step 4.  
