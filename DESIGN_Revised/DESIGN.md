@@ -2,7 +2,7 @@
 
 ### **Problem Statement**
 
-Stand-up meeting is an integral part of any technology project team. Everyday each team member  answers a set of questions viz. what have they been working on, what’s next, any problems being faced etc. 
+A stand-up meeting is an integral part of any technology project team using agile processing. Everyday each team member  answers a set of questions regarding what they have been working on, what’s next, any problems being faced etc. 
 
 Now, imagine a team of 10 members. The project manager asks the same set of questions to each member sequentially . Assuming that each team member takes about 2-3 mins to answer the questions asked by the Project Manager. Hence, the Stand-up meeting would take minimum of 20 mins. 
 
@@ -13,7 +13,7 @@ Another case is when the project manager or team member is not in office, and ca
 
 ### **Bot Description**
 
-We propose to deploy a documentation bot that interacts with team members, records their updates, and generates a consolidated email which is sent to all stakeholders.
+We propose to deploy a process/agile bot that interacts with team members, records their updates, and generates a consolidated email which is sent to all stakeholders.
 
 #### Bot Features:
 * Creation of online standup meetings  
@@ -44,8 +44,7 @@ Standup days and time window need to be configured by the creator.
 For each standup day, the bot will start the standup session with each participant at the configured start time, and share all updates at the configured end time. The standup will close after the end time, and no responses will be recorded after that. If the user fails to respond during the window, his updates will be empty for that day. There will be an option to configure a reminder for users who haven’t posted their updates, before the standup closes.
 
 * How is the standup report shared with everyone?  
-For now the standup is shared with all participants through a consolidated email.
-In future, we may allow the creator to configure other options such as a custom channel, or hosting it online on a website.
+The standup is shared with all participants through a consolidated email and is also shared on the project channel.
 
 * Which standup configurations can be edited later?  
 For now, we are enabling editing for the set of questions, standup schedule, and participants. In future, we may add the option to edit the standup report delivery method.
@@ -114,8 +113,8 @@ Preconditions: It's time for starting the standup.
 
 Normal flow:  
 1. Whatbot will inform the user that the standup has started.
-2. Whatbot will prompt the user to respond when ready.
-3. User responds to the start message.
+2. Whatbot will offer the user 3 options i.e 'START', 'SNOOZE' and 'IGNORE'.
+3. User clicks on the 'START' button.
 4. Whatbot will ask a question.
 5. User will respond to the question, or enter the skip question command.
 6. Steps 4 and 5 are repeated till all configured questions have been asked.
@@ -124,6 +123,10 @@ Normal flow:
 9. Whatbot notifies the user that his responses have been saved.
 
 Alternative flows:  
+3A. User clicks on 'SNOOZE' button.
+	1. Whatbot sends a reminder message to the user in 15 minutes containing the buttons so that the user can complete the standup.
+3B. User clicks on 'IGNORE' button.
+	1. The users input is not taken.
 8A. User decides to redo all questions.  
 	1. Whatbot indicates to the user that the process will be repeated.  
 	2. The use case returns to step 4.  
@@ -168,7 +171,7 @@ Alternative flows:
 
  __**Storyboard**__
 
-![Storyboard](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/DESIGN/Storyboard.jpg)
+![Storyboard](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/DESIGN_Revised/Storyboard.jpg)
 
 ### **Architecture Design**
 ![architecturepattern](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/DESIGN/ArchitecturePattern.png)
