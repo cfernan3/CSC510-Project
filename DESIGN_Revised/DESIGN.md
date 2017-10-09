@@ -13,7 +13,7 @@ Another case is when the project manager or team member is not in office, and ca
 
 ### **Bot Description**
 
-We propose to deploy a process/agile bot that interacts with team members, records their updates, and generates a consolidated email which is sent to all stakeholders.
+We propose to deploy a process/agile bot that interacts with team members, records their updates, and generates a consolidated report which is shared with all stakeholders.
 
 #### Bot Features:
 * Creation of online standup meetings  
@@ -44,19 +44,19 @@ Standup days and time window need to be configured by the creator.
 For each standup day, the bot will start the standup session with each participant at the configured start time, and share all updates at the configured end time. The standup will close after the end time, and no responses will be recorded after that. If the user fails to respond during the window, his updates will be empty for that day. There will be an option to configure a reminder for users who haven’t posted their updates, before the standup closes.
 
 * How is the standup report shared with everyone?  
-The standup is shared with all participants through a consolidated email and is also shared on the project channel.
+The standup can be shared with all participants either through a consolidated email or a dedicated standup channel.
 
 * Which standup configurations can be edited later?  
-For now, we are enabling editing for the set of questions, standup schedule, and participants. In future, we may add the option to edit the standup report delivery method.
+For now, we are enabling editing for the set of questions, standup schedule, participants, and the standup report delivery method.
 
 * Is there a way to filter out standup updates for a participant for a specified date range?  
-No. This feature is out-of-scope for now.
+No. This feature is out-of-scope.
 
 #### User interaction:
 Whatbot will understand basic chat commands to perform the following operations.
 ```
 Schedule a new standup or move an existing one: schedule standup  
-Whatbot will then prompt for entering the days, duration, participants, and question set.	 
+Whatbot will then prompt for entering the days, duration, participants, question set, and report delivery method.	 
 
 Schedule a reminder for x minutes prior to the report submission:  reminder [x], set reminder [x], etc
 If the user has not supplied the time, Whatbot will prompt for it.
@@ -94,8 +94,11 @@ Normal flow:
 2. User supplies a unique name for the bot. (Bot name is the same as the standup name)
 3. User adds participants to the standup.
 4. User configures the standup duration. (time when standup begins, time when the standup is closed and shared with with all participants)
-5. User accepts the default standup questions. 
-6. The bot indiactes to the user that a new standup has been created. 
+5. User accepts the default standup questions.
+6. User selects dedicated channel as the report delivery method.
+7. User supplies the name of the channel.
+8. The bot is already a member of the dedicated channel, and the report delivery channel is successfully configured.
+9. The bot indicates to the user that a new standup has been created. 
 
 Alternative flows:  
 2A. The bot name is not unique.  
@@ -105,14 +108,21 @@ Alternative flows:
 5A. The user does not accept the default standup questions.  
 	1. User supplies his custome standup questions.  
 	2. Use case returns to step 6.  
-
+	
+6A. The user selects a different report delivery method.
+	1. User selects email.
+	2. Use case returns to step 9.
+	
+8A. The user selects a non-existent channel or the bot is not a member of the specified channel.
+	1. The user is prompted to first add the bot to the channel, and supply a valid channel name again.
+	2. Use case returns to step 7.
 
 #### 2) Standup session with a user
 
 Preconditions: It's time for starting the standup.
 
 Normal flow:  
-1. Whatbot will inform the user that the standup has started.
+1. Whatbot will inform the user that the standup window has started.
 2. Whatbot will offer the user 3 options i.e 'START', 'SNOOZE' and 'IGNORE'.
 3. User clicks on the 'START' button.
 4. Whatbot will ask a question.
@@ -124,9 +134,13 @@ Normal flow:
 
 Alternative flows:  
 3A. User clicks on 'SNOOZE' button.  
-	1. Whatbot sends a reminder message to the user in 15 minutes containing the buttons so that the user can complete the standup.  
+	1. Whatbot sends a reminder message to the user in 10 minutes. 
+	2. The use case returns to step 2.
+	
 3B. User clicks on 'IGNORE' button.  
-	1. The user is excluded from that day's standup report.  
+	1. The user is notified that he is excluded from that day's standup report.
+	2. The use case exits.
+	
 8A. User decides to redo all questions.  
 	1. Whatbot indicates to the user that the process will be repeated.  
 	2. The use case returns to step 4.  
@@ -159,9 +173,21 @@ Normal flow:
 	ii. Whatbot asks the user to provide a new set of questions.  
 	iii. User responds with the new questions.  
 	iv. Whatbot confirms the new questions.  
+	
+[Subflow 5]. User wants to edit the standup report delivery method.  
+	i. User sends a command to the Whatbot to change the report delivery method from email to channel.  
+	ii. User supplies the name of the channel.  
+	iii. The bot is already a member of the dedicated channel, and the report delivery channel is successfully configured.  
+	Alternate Subflow 5:  
+	iA. User sends a command to the Whatbot to change the report delivery method from channel to email.  
+	1. Standup report delivery method is changed to email.  
+	2. Use case exits.  
+	iiiA. The user selects a non-existent channel or the bot is not a member of the specified channel.  
+	1. The user is prompted to first add the bot to the channel, and supply a valid channel name again.  
+	2. Use case returns to step ii.   
 
 Alternative flows:  
-[S1, S2, S3, S4] If the user enters an invalid input then the Whatbot responds with an error message and terminates the subflow.
+[S1, S2, S3, S4, S5] If the user enters an invalid input then the Whatbot responds with an error message and terminates the subflow.
 
 
 ### **Design Sketches**
@@ -206,12 +232,11 @@ The bot knows about all the standup participants, and will respond to them accor
 The bot knows the status of an ongoing standup session. For each user, it knows which questions have already been answered and which are pending. 
 
 * Knows where it is being addressed:
-The bot is not part of any channel. It directly communicates with all users. Thus the bot does not need to keep track of the state of conversations going on in multiple channels. 
-In future versions, if slack channels are added as a report delivery methods, then the bot will track their states.
+The bot conducts standups through direct messages to the users. The bot can only be part of the report delivery channel. Thus it does not need to keep track of the state of conversations going on in multiple channels. 
 
 
 #### Constraints
-* There isn't a need to invite the bot to any channel. 
+* The bot needs to be a part of atmost one channel (report delivery channel). There isn't a need to invite it to multiple channels. 
 * A single bot handles a single standup. A new standup would be handled by a new instance of the bot.
 * Every user interacts through direct messages with the bot and not through a dedicated channel.
 * Only the creator of the bot can modify the configurations of the bot.
