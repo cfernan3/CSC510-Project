@@ -1,6 +1,7 @@
 var Botkit = require('botkit');
-var Forecast = require('forecast.io');
-var options = {APIKey:process.env.FORECASTTOKEN};
+// var Forecast = require('forecast.io');
+//var options = {APIKey:process.env.FORECASTTOKEN};
+var S_token = "xoxb-255934448881-OeZzEyEaaLhBHPNxJxTnxIgb"
 //var forecast = new Forecast(options);
 
 //var childProcess = require("child_process");
@@ -13,7 +14,7 @@ var controller = Botkit.slackbot({
 
 // connect the bot to a stream of messages
 controller.spawn({
-  token: process.env.SLACKTOKEN,
+  token: S_token,
 }).startRTM()
 
 // give the bot something to listen for.
