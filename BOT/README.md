@@ -106,6 +106,8 @@ Alternative flows:
 
 
 ### Mocking Service Component  
+We are using Google REST API to store the answers we receive from the whatbot. For now we are mocking the storage of this data. When generating a report we are using mock data to simulate retrieval of answers from the Google Sheet and publish it to the Slack channel.
+We intend to use Gmail REST API to send out an email to each member of the standup session. For now we are mocking this by returning success to the bot.
 
 ### Bot Implementation  
 
