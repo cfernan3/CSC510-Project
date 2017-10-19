@@ -18,13 +18,24 @@ const slackInteractiveMessages = require('@slack/interactive-messages');
 
 const cloneDeep = require('lodash.clonedeep');
 const bot = require('./modules/bot');
+var sched = require('node-cron');
 
 
 // --- Slack Events ---
 const slackEvents = slackEventsAPI.createSlackEventAdapter(process.env.SLACK_VERIFICATION_TOKEN);
-
+/* Not needed for now
 slackEvents.on('team_join', (event) => {
   bot.introduceToUser(event.user.id);
+});
+*/
+
+
+// Scheduling code created
+sched.schedule('0 9 * * 1,2,3,4,5', function(){
+  //console.log('running a task every minute');
+  //condoel.log("Test");
+  //bot.sendMessage("D7JBPKD8B","Calvin is awesome");
+  bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
 });
 
 //------Replace by scheduling code------ 
@@ -67,11 +78,15 @@ slackMessages.action('standup:start', (payload, respond) => {
   // action is not yet complete).
   var optionName = payload.actions[0].name;
   console.log(optionName);
+  console.log(payload);
+  const channel = payload.channel.id;
+  console.log(payload.channel);
   
   if (optionName=="Start")
   {
       var updatedMessage = acknowledgeActionFromMessage(payload.original_message, 'standup:start',
                                                       'I\'m getting the standup started.');
+    
   }
    else if (optionName=="Snooze")
   {
@@ -83,6 +98,7 @@ slackMessages.action('standup:start', (payload, respond) => {
       var updatedMessage = acknowledgeActionFromMessage(payload.original_message, 'standup:start',
                                                       'See you tomorrow');
   }
+  console.log(updatedMessage);
   return updatedMessage;
 });
 

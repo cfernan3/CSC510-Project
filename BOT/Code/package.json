@@ -1,7 +1,16 @@
 {
   "name": "whatbot",
   "version": "1.0.0",
-  "keywords": ["bot","whatbot","csc510","Nirav Dsouza","Calvin Fernando","Sharmn Lalani", "Ronald Joseph","Bharat Mukheja"],
+  "keywords": [
+    "bot",
+    "whatbot",
+    "csc510",
+    "Nirav Dsouza",
+    "Calvin Fernando",
+    "Sharmn Lalani",
+    "Ronald Joseph",
+    "Bharat Mukheja"
+  ],
   "url": "https://github.ncsu.edu/nedsouza/CSC510-Project/",
   "private": true,
   "description": "Slack Agile Bot",
@@ -17,15 +26,17 @@
     "eslint-plugin-import": "^2.2.0"
   },
   "dependencies": {
-    "@slack/client": "^3.9.0",
+    "@slack/client": "^3.14.1",
     "@slack/events-api": "^1.0.1",
-    "@slack/interactive-messages": "^0.1.1",
-    "axios": "^0.16.1",
-    "body-parser": "^1.17.1",
+    "@slack/interactive-messages": "^0.2.0",
+    "axios": "^0.16.2",
+    "body-parser": "^1.18.2",
     "dotenv": "^4.0.0",
     "express": "^4.16.2",
     "lodash.clonedeep": "^4.5.0",
     "lodash.map": "^4.6.0",
-    "normalize-port": "^1.0.0"
+    "normalize-port": "^1.0.0",
+    "node-cron": "^1.2.1",
+    "sleep": "^5.1.1"
   }
 }
