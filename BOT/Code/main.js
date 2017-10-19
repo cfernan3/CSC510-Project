@@ -41,39 +41,66 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
       {
           pattern: bot.utterances.yes,
           callback: function(response, convo) {
-              convo.ask('Ok! Give me all the questions and say DONE to finish!!', [
-                {
-                  pattern: 'done',
-                  callback: function(response, convo) {
-                    console.log("Finished receiving questions");
-                    convo.next();
-                  }
-                },
-                {
-                  default: true,
-                  callback: function(response, convo) {
-                    var str = response.text;
-                    console.log('str=', str);
-                    // convo.silentRepeat();
-                    convo.next();
-                  }
-                }
-              ]);
-              // convo.next();
-          }
+            console.log('Entered the yes utterance');
+            convo.gotoThread('askNewSet');
+            }
+            // convo.next();
       },
       {
           pattern: bot.utterances.no,
           default: true,
           callback: function(response, convo) {
               console.log('Ok! We will proceed with the default question set.');
-              convo.say('Ok! We will proceed with the default question set.');
-              convo.next();
+              convo.transitionTo('continueQuestions', 'Ok! We will proceed with the default question set.');
           }
       }
     ]);
+
+    console.log('Asking the new set');
+    convo.addQuestion('Ok! Give me all the questions and say DONE to finish!!', [
+      {
+        pattern: 'done',
+        callback: function(response, convo) {
+          console.log("Finished receiving questions");
+          convo.gotoThread('continueQuestions');
+        }
+      },
+      {
+        default: true,
+        callback: function(response, convo) {
+          var str = response.text;
+          console.log('str=', str);
+          convo.silentRepeat();
+          // convo.next();
+        }
+      }
+    ], {}, 'askNewSet');
+
+    convo.addQuestion('Do you wish to post the report to a slack Channel?', [
+      {
+        pattern: bot.utterances.yes,
+        callback: function(response, convo) {
+          convo.gotoThread('channelQuestion');
+        }
+      },
+      {
+        pattern: bot.utterances.no,
+        default: true,
+        callback: function(response, convo) {
+          convo.gotoThread('lastStatement');
+        }
+      }
+    ], {}, 'continueQuestions');
+
+    convo.addQuestion('Enter the slack Channel.', function (response, convo) {
+      var channel = response.text;
+      console.log('channel= ', channel);
+      convo.gotoThread('lastStatement');
+    }, {}, 'channelQuestion');
+
+    convo.addMessage('Awesome! Your Standup is configured successfully!', 'lastStatement');
     console.log('I\'m out');
     // convo.say('I\'m out');
-  });
+  }); // startConversation Ends
 
 }); // hears 'schedule' ends
