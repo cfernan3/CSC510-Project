@@ -1,5 +1,6 @@
 var Botkit = require('botkit');
 
+/*
 var controller = Botkit.slackbot({
   debug: false
 });
@@ -8,10 +9,127 @@ var controller = Botkit.slackbot({
 controller.spawn({
   token: process.env.SLACKTOKEN,
 }).startRTM()
+*/
+
+
+var controller = Botkit.slackbot({
+  debug: false,
+  interactive_replies: true, // tells botkit to send button clicks into conversations
+}).configureSlackApp(
+  {
+    clientId: process.env.clientId,
+    clientSecret: process.env.clientSecret,
+    // Set scopes as needed. https://api.slack.com/docs/oauth-scopes
+    scopes: ['bot'],
+  }
+);
+
+// Setup for the Webserver - REQUIRED FOR INTERACTIVE BUTTONS
+controller.setupWebserver(process.env.port,function(err,webserver) {
+  controller.createWebhookEndpoints(controller.webserver);
+
+  controller.createOauthEndpoints(controller.webserver,function(err,req,res) {
+    if (err) {
+      res.status(500).send('ERROR: ' + err);
+    } else {
+      res.send('Success!');
+    }
+  });
+});
+
+// to make sure we don't connect to the RTM twice for the same team
+var _bots = {};
+function trackBot(bot) {
+  _bots[bot.config.token] = bot;
+}
+
+controller.on('create_bot',function(bot,config) {
+
+  if (_bots[bot.config.token]) {
+    // already online! do nothing.
+  } else {
+    bot.startRTM(function(err) {
+
+      if (!err) {
+        trackBot(bot);
+      }
+
+      bot.startPrivateConversation({user: config.createdBy},function(err,convo) {
+        if (err) {
+          console.log(err);
+        } else {
+          convo.say('I am a bot that has just joined your team');
+        }
+      });
+
+    });
+  }
+
+});
 
 controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], function(bot,message) {
   bot.startConversation(message, function(err, convo) {
-    //
+
+
+    convo.ask({
+        attachments:[
+            {
+                title: 'Do you want to proceed?',
+                callback_id: '123',
+                attachment_type: 'default',
+                actions: [
+                    {
+                        "name":"yes",
+                        "text": "Yes",
+                        "value": "yes",
+                        "type": "button",
+                    },
+                    {
+                        "name":"no",
+                        "text": "No",
+                        "value": "no",
+                        "type": "button",
+                    }
+                ]
+            }
+        ]
+    },[
+        {
+            pattern: "yes",
+            callback: function(reply, convo) {
+                console.log("button yes clicked");
+                convo.say('FABULOUS!');
+                convo.next();
+                // do something awesome here.
+            }
+        },
+        {
+            pattern: "no",
+            callback: function(reply, convo) {
+                console.log("button no clicked");
+                convo.say('Too bad');
+                convo.next();
+            }
+        },
+        {
+            default: true,
+            callback: function(reply, convo) {
+                console.log("wooops");
+                // do nothing
+            }
+        }
+    ]);
+
+
+
+
+
+
+
+
+
+
+
     convo.ask('Let\'s begin configuring a new standup.\n What time would you like to start the standup?', function (response, convo) {
       var startTime = response.text;
       console.log('startTime=', startTime);
