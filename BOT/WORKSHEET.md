@@ -6,10 +6,12 @@
 
 ### Week 1 : 3rd Oct to 8th Oct  
   
-|   | Deliverable | Description | Issues/Tasks | Team Members | Estimated Date | Actual Date |
-|---|-------------|-------------|--------------|--------------|----------------|-------------|
-| 1 | Use Case Refinement | Discussing use cases and adding corrections | #1  | All | 4th Oct | 6th Oct |
-| 2 | Planning | Discussing task breakup and brainstorming | #2  | All | 4th Oct | 6th Oct |
+|   | Deliverable       | Tasks                       | Issues | Team Members | Estimated Date | Actual Date |
+|---|-------------------|-----------------------------|--------|--------------|----------------|-------------|
+| 1 | Design Refinement | Refining use case           |        | All          | 4th Oct        | 6th Oct     |
+|   |                   | Refining constraints        |        | All          | 4th Oct        | 6th Oct     |
+|   |                   | Edit storyboard & wireframe |        | All          | 4th Oct        | 6th Oct     |
+| 2 | Planning          | Discuss task breakup        |        | All          | 4th Oct        | 6th Oct     |
   
 ### Week 2 : 9th Oct to 15th Oct   
 
