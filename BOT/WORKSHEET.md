@@ -10,7 +10,7 @@
 |---|-------------------|-----------------------------|--------|-----------------------|----------------|-------------|
 | 1 | Design Refinement | Refining use case           |        | Sharmin, Ronald       | 4th Oct        | 6th Oct     |
 |   |                   | Refining constraints        |        | Sharmin, Ronald       | 4th Oct        | 6th Oct     |
-|   |                   | Edit storyboard & wireframe |        | Clavin, Nirav, Bharat | 4th Oct        | 6th Oct     |
+|   |                   | Edit storyboard & wireframe | #4, #5 | Clavin, Nirav, Bharat | 4th Oct        | 6th Oct     |
 | 2 | Planning          | Discuss task breakup        |        | All                   | 4th Oct        | 6th Oct     |
   
 ### Week 2 : 9th Oct to 15th Oct   
@@ -26,7 +26,8 @@
 
 |   | Deliverable      | Tasks | Issues | Team Members | Estimated Date | Actual Date |
 |---|----------------------------------------------|---------------------------------------------------|--|-----------------|----------|----------|
-| 1 | Standup config                               | Configure a new standup                           |  | Sharmin, Ronald | 21st Oct | 21st Oct |
+| 1 | Standup config                               | Configure a new standup                           |
+[#6](https://github.ncsu.edu/nedsouza/CSC510-Project/issues/6)                                            | Sharmin, Ronald | 21st Oct | 21st Oct |
 |   |                                              | Edit standup config                               |  | Sharmin, Ronald | 22nd Oct | 22nd Oct |
 | 2 | Standup session                              | Trigger the standup at configured time            |  | Calvin, Nirav   |          |          |
 | 3 | Mocking                                      | Create mock standup config for conducting standup |  | Sharmin, Ronald | 21st Oct | 21st Oct |
