@@ -76,10 +76,6 @@ controller.on('create_bot',function(bot,config) {
 controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], function(bot,message) {
   bot.startConversation(message, function(err, convo) {
 
-
-
-
-
     convo.addMessage({text:"Let's begin configuring a new standup.", action:'askStartTime'}, 'default');
 
     convo.addQuestion('What time would you like to start the standup?', function (response, convo) {
@@ -134,6 +130,7 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
       {
           pattern: bot.utterances.yes,
           callback: function(response, convo) {
+            standupConfig.questions = [];
             console.log('Default questions not accepted');
             convo.gotoThread('askNewSet');
           }
@@ -162,8 +159,8 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
         callback: function(response, convo) {
           console.log('questions entered =', response.text);
           var questions = response.text.split('\n');
-          for(q in questions)
-            standupConfig.questions.push(q);
+          for(var i = 0; i < questions.length; i++)
+            standupConfig.questions.push(questions[i]);
           convo.silentRepeat();
         }
       }
@@ -173,7 +170,8 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
     convo.addQuestion({
     attachments:[
         {
-            title: 'How do you want to share the standup report with others?',
+            pretext: "How do you want to share the standup report with others?",
+            title: "Select one option.",
             callback_id: '123',
             attachment_type: 'default',
             actions: [
@@ -193,7 +191,6 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
         }
     ]},
 
-
     function (response, convo) {
         if(response.text == "email") {
           standupConfig.reportMedium = "email";
@@ -201,36 +198,23 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
         } else {
           convo.gotoThread('channelQuestion');
         }
-    }
+    }, {}, 'continueQuestions');
 
-    /*[
 
-      {
-        pattern: bot.utterances.yes,
-        callback: function(response, convo) {
-          convo.gotoThread('channelQuestion');
-        }
-      },
-      {
-        pattern: bot.utterances.no,
-        default: true,
-        callback: function(response, convo) {
-          standupConfig.reportMedium = "email";
-          convo.gotoThread('lastStatement');
-        }
+    convo.addQuestion('Which slack channel do you want to use? E.g. #general', function (response, convo) {
+      // TODO: check if the given channel is a valid channel
+      var chan = response.text;
+      var i = chan.indexOf('#');
+      if(i != -1) {  // TODO: handle else
+        standupConfig.reportChannel = chan.substr(i).split('|')[0];
+        console.log('channel = ', standupConfig.reportChannel);
       }
-    ]*/, {}, 'continueQuestions');
-
-
-    convo.addQuestion('Enter the slack Channel.', function (response, convo) {
-      var channel = response.text;
-      console.log('channel= ', channel);
       convo.gotoThread('lastStatement');
     }, {}, 'channelQuestion');
 
     convo.beforeThread('lastStatement', function(convo, next) {
       console.log('New standup config complete');
-      fs.writeFile('./mock.json', JSON.stringify(standupConfig), (err) => {
+      fs.writeFile('./mock_config.json', JSON.stringify(standupConfig), (err) => {
          if (err) throw err;
        });
       next();
@@ -238,6 +222,5 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
 
     convo.addMessage('Awesome! Your Standup is configured successfully!', 'lastStatement');
 
-    // convo.next();
   }); // startConversation Ends
 }); // hears 'schedule' ends
