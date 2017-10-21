@@ -24,5 +24,12 @@
 
 ### Week 3 : 16th Oct to 22nd Oct    
 
-|   | Deliverable | Description | Issues/Tasks | Team Members | Estimated Date | Actual Date |
-|---|-------------|-------------|--------------|--------------|----------------|-------------|
+|   | Deliverable      | Tasks | Issues | Team Members | Estimated Date | Actual Date |
+|---|----------------------------------------------|---------------------------------------------------|--|-----------------|----------|----------|
+| 1 | Standup config                               | Configure a new standup                           |  | Sharmin, Ronald | 21st Oct | 21st Oct |
+|   |                                              | Edit standup config                               |  | Sharmin, Ronald | 22nd Oct | 22nd Oct |
+| 2 | Standup session                              | Trigger the standup at configured time            |  | Calvin, Nirav   |          |          |
+| 3 | Mocking                                      | Create mock standup config for conducting standup |  | Sharmin, Ronald | 21st Oct | 21st Oct |
+|   |                                              | Create mock standup data for reporting module     |  | Calvin, Nirav   |          |          |
+| 4 | Reporting                                    | Compile the standup report from mock answers      |  |                 |          |          |
+| 5 | Selenium testing Use Case 1: Standup session | test standup start, ignore, and snooze buttons    |  | Calvin, Nirav   |          |          |
