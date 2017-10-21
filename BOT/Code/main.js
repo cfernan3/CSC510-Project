@@ -1,16 +1,24 @@
 var Botkit = require('botkit');
+var chrono = require('chrono-node');
+var fs = require('fs');
 
-/*
-var controller = Botkit.slackbot({
-  debug: false
-});
+function StandupConfig(){
+  this.startTimeHours = 0;
+  this.startTimeMins = 0;
+  this.endTimeHours = 0;
+  this.endTimeMins = 0;
+  this.questions = ["What did you accomplish yesterday?", "What will you work on today",
+                    "Is there anything blocking your progress?"];  // should have aleast 1 question
+  this.participants = [];
+  this.reportMedium = "channel";  // default medium is channel
+  this.reportChannel = "";
+}
 
-// connect the bot to a stream of messages
-controller.spawn({
-  token: process.env.SLACKTOKEN,
-}).startRTM()
-*/
+var standupConfig = new StandupConfig();
 
+var defaultQuestions = "\t" + standupConfig.questions[0];
+for(var i = 1; i < standupConfig.questions.length; i++)
+  defaultQuestions += "\n\t" + standupConfig.questions[i];
 
 var controller = Botkit.slackbot({
   debug: false,
@@ -58,124 +66,90 @@ controller.on('create_bot',function(bot,config) {
         if (err) {
           console.log(err);
         } else {
-          convo.say('I am a bot that has just joined your team');
+          convo.say("Hello! I'm here to organise your standup. Let me know when you want to schedule one.");
         }
       });
-
     });
   }
-
 });
 
 controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], function(bot,message) {
   bot.startConversation(message, function(err, convo) {
 
 
-    convo.ask({
-        attachments:[
-            {
-                title: 'Do you want to proceed?',
-                callback_id: '123',
-                attachment_type: 'default',
-                actions: [
-                    {
-                        "name":"yes",
-                        "text": "Yes",
-                        "value": "yes",
-                        "type": "button",
-                    },
-                    {
-                        "name":"no",
-                        "text": "No",
-                        "value": "no",
-                        "type": "button",
-                    }
-                ]
-            }
-        ]
-    },[
-        {
-            pattern: "yes",
-            callback: function(reply, convo) {
-                console.log("button yes clicked");
-                convo.say('FABULOUS!');
-                convo.next();
-                // do something awesome here.
-            }
-        },
-        {
-            pattern: "no",
-            callback: function(reply, convo) {
-                console.log("button no clicked");
-                convo.say('Too bad');
-                convo.next();
-            }
-        },
-        {
-            default: true,
-            callback: function(reply, convo) {
-                console.log("wooops");
-                // do nothing
-            }
-        }
-    ]);
 
 
 
+    convo.addMessage({text:"Let's begin configuring a new standup.", action:'askStartTime'}, 'default');
+
+    convo.addQuestion('What time would you like to start the standup?', function (response, convo) {
+      console.log('Start time entered =', response.text);
+
+      var startTime = chrono.parseDate(response.text)
+      if (startTime != null) {
+        standupConfig.startTimeHours = startTime.getHours();
+        standupConfig.startTimeMins = startTime.getMinutes();
+        console.log("Start time = " + standupConfig.startTimeHours + ":" + standupConfig.startTimeMins);
+        convo.gotoThread('askEndTime');
+      }
+      else {
+        console.log("Start time not entered correctly");
+        convo.transitionTo('askStartTime', "I'm sorry. I didn't understand you. Please give a single time value in a 12 hour clock format.\n\
+        You can say things like 10 AM or 12:15pm.");
+      }
+    }, {}, 'askStartTime');
 
 
+    convo.addQuestion('When would you like the standup to end?', function (response, convo) {
+      console.log('End time entered =', response.text);
+
+      var endTime = chrono.parseDate(response.text)
+      if (endTime != null) {
+        standupConfig.endTimeHours = endTime.getHours();
+        standupConfig.endTimeMins = endTime.getMinutes();
+        console.log("End time = " + standupConfig.endTimeHours + ":" + standupConfig.endTimeMins);
+        convo.gotoThread('askParticipants');
+      }
+      else {
+        console.log("End time not entered correctly");
+        convo.transitionTo('askEndTime', "I'm sorry. I didn't understand you. Please give a single time value in a 12 hour clock format.\n\
+        You can say things like 10 AM or 12:15pm.");
+      }
+    }, {}, 'askEndTime');
 
 
-
-
-
-
-    convo.ask('Let\'s begin configuring a new standup.\n What time would you like to start the standup?', function (response, convo) {
-      var startTime = response.text;
-      console.log('startTime=', startTime);
-      convo.next();
-    });
-
-    convo.ask('When would you like the standup to end?', function (response, convo) {
-      var endTime = response.text;
-      console.log('endTime=', endTime);
-      convo.next();
-    });
-
-    // TODO: Mix and match
-    convo.ask('Who would you like to invite for the standup session?\n You may enter it in the following ways:\n\
+    convo.addQuestion('Who would you like to invite for the standup session?\n You may enter it in the following ways:\n\
           1. list of users: @<user1>, ..., @<userN>\n \
           2. specific user group: @<user-group-name> \n \
-          3. specific channel: #<channel-name>\n \
-          4. all users from the slack group: all', function (response, convo) {
+          3. specific channel: #<channel-name>', function (response, convo) {
       var participants = response.text;
       console.log('participants=', participants);
 
-      convo.next();
-    });
+      convo.gotoThread('askQuestionSet');
+    }, {}, 'askParticipants');
 
-    // TODO: How to know when all questions are done?
-    convo.ask('Following are the default questions.\n Would you like to give your own question set?', [
+
+    convo.addQuestion('Following are the default questions.\n' + defaultQuestions +
+    '\nWould you like to give your own question set?', [
       {
           pattern: bot.utterances.yes,
           callback: function(response, convo) {
-            console.log('Entered the yes utterance');
+            console.log('Default questions not accepted');
             convo.gotoThread('askNewSet');
-            }
-            // convo.next();
+          }
       },
       {
           pattern: bot.utterances.no,
           default: true,
           callback: function(response, convo) {
-              console.log('Ok! We will proceed with the default question set.');
-              convo.transitionTo('continueQuestions', 'Ok! We will proceed with the default question set.');
+            console.log('Ok! We will proceed with the default question set.');
+            convo.transitionTo('continueQuestions', 'Ok! We will proceed with the default question set.');
           }
       }
-    ]);
+    ], {}, 'askQuestionSet');
 
-    console.log('Asking the new set');
-    convo.addQuestion('Ok! Give me all the questions and say DONE to finish!!', [
+
+    convo.addQuestion('Ok! Give me all the questions, each on a new line, and say DONE to finish.', [
       {
         pattern: 'done',
         callback: function(response, convo) {
@@ -186,15 +160,51 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
       {
         default: true,
         callback: function(response, convo) {
-          var str = response.text;
-          console.log('str=', str);
+          console.log('questions entered =', response.text);
+          var questions = response.text.split('\n');
+          for(q in questions)
+            standupConfig.questions.push(q);
           convo.silentRepeat();
-          // convo.next();
         }
       }
     ], {}, 'askNewSet');
 
-    convo.addQuestion('Do you wish to post the report to a slack Channel?', [
+
+    convo.addQuestion({
+    attachments:[
+        {
+            title: 'How do you want to share the standup report with others?',
+            callback_id: '123',
+            attachment_type: 'default',
+            actions: [
+                {
+                    "name":"email",
+                    "text": "Email",
+                    "value": "email",
+                    "type": "button",
+                },
+                {
+                    "name":"channel",
+                    "text": "Slack channel",
+                    "value": "channel",
+                    "type": "button",
+                }
+            ]
+        }
+    ]},
+
+
+    function (response, convo) {
+        if(response.text == "email") {
+          standupConfig.reportMedium = "email";
+          convo.gotoThread('lastStatement');
+        } else {
+          convo.gotoThread('channelQuestion');
+        }
+    }
+
+    /*[
+
       {
         pattern: bot.utterances.yes,
         callback: function(response, convo) {
@@ -205,10 +215,12 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
         pattern: bot.utterances.no,
         default: true,
         callback: function(response, convo) {
+          standupConfig.reportMedium = "email";
           convo.gotoThread('lastStatement');
         }
       }
-    ], {}, 'continueQuestions');
+    ]*/, {}, 'continueQuestions');
+
 
     convo.addQuestion('Enter the slack Channel.', function (response, convo) {
       var channel = response.text;
@@ -216,9 +228,16 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
       convo.gotoThread('lastStatement');
     }, {}, 'channelQuestion');
 
-    convo.addMessage('Awesome! Your Standup is configured successfully!', 'lastStatement');
-    console.log('I\'m out');
-    // convo.say('I\'m out');
-  }); // startConversation Ends
+    convo.beforeThread('lastStatement', function(convo, next) {
+      console.log('New standup config complete');
+      fs.writeFile('./mock.json', JSON.stringify(standupConfig), (err) => {
+         if (err) throw err;
+       });
+      next();
+    });
 
+    convo.addMessage('Awesome! Your Standup is configured successfully!', 'lastStatement');
+
+    // convo.next();
+  }); // startConversation Ends
 }); // hears 'schedule' ends
