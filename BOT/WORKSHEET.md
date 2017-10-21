@@ -6,21 +6,21 @@
 
 ### Week 1 : 3rd Oct to 8th Oct  
   
-|   | Deliverable       | Tasks                       | Issues | Team Members | Estimated Date | Actual Date |
-|---|-------------------|-----------------------------|--------|--------------|----------------|-------------|
-| 1 | Design Refinement | Refining use case           |        | All          | 4th Oct        | 6th Oct     |
-|   |                   | Refining constraints        |        | All          | 4th Oct        | 6th Oct     |
-|   |                   | Edit storyboard & wireframe |        | All          | 4th Oct        | 6th Oct     |
-| 2 | Planning          | Discuss task breakup        |        | All          | 4th Oct        | 6th Oct     |
+|   | Deliverable       | Tasks                       | Issues | Team Members          | Estimated Date | Actual Date |
+|---|-------------------|-----------------------------|--------|-----------------------|----------------|-------------|
+| 1 | Design Refinement | Refining use case           |        | Sharmin, Ronald       | 4th Oct        | 6th Oct     |
+|   |                   | Refining constraints        |        | Sharmin, Ronald       | 4th Oct        | 6th Oct     |
+|   |                   | Edit storyboard & wireframe |        | Clavin, Nirav, Bharat | 4th Oct        | 6th Oct     |
+| 2 | Planning          | Discuss task breakup        |        | All                   | 4th Oct        | 6th Oct     |
   
 ### Week 2 : 9th Oct to 15th Oct   
 
-|   | Deliverable | Description | Issues/Tasks | Team Members | Estimated Date | Actual Date |
-|---|-------------|-------------|--------------|--------------|----------------|-------------|
-| 1 | Brainstorm Standup configurations (Use Case 1) | Discuss how the configurations will be presented to the user and stored  | #1  | Sharmin, Ronald | 9th Oct | 12th Oct  |
-| 2 | Create the bot  | Create and install bot on Slack | #2  | Calvin, Nirav  | 12th Oct | 14th Oct |
-| 3 | Add Start, Snooze and Ignore button | Implement Slack buttons to for initiating session | #3 |Calvin, Nirav | 12th Oct | 14th Oct |
-| 4 | Implement Configuration | Implement configuration of question set | #4  | Sharmin, Ronald | 12th Oct |  |
+|   | Deliverable      | Tasks | Issues | Team Members | Estimated Date | Actual Date |
+|---|------------------|-----------------------------------------------------------|--|-----------------|----------|----------|
+| 1 | Standup config   | Brainstorm how to store the config                        |  | Sharmin, Ronald | 12th Oct | 12th Oct |
+| 2 | Standup session  | Create and integrate a Slack app                          |  | Calvin, Nirav   | 12th Oct | 14th Oct |
+|   |                  | Add start, ignore, snooze options                         |  | Calvin, Nirav   | 12th Oct | 15th Oct |
+| 3 | Mocking          | Create mock user+channel data for configuring the standup |  | Sharmin, Ronald | 12th Oct | 14th Oct |
 
 ### Week 3 : 16th Oct to 22nd Oct    
 
