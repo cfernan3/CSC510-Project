@@ -41,7 +41,7 @@ rule.hour = 9;
 rule.minute = 0;
  
 var j = schedule.scheduleJob(rule, function(){
-  //console.log('Today is recognized by Rebecca Black!');
+  
 
 
 //console.log('running a task every minute');
