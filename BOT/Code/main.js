@@ -124,6 +124,38 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
       var participants = response.text;
       console.log('participants=', participants);
 
+      var reg = /<(.*?)>/g;
+      var result;
+      var objUsers = JSON.parse(fs.readFileSync('mock_users.json', 'utf8'));
+
+      while((result = reg.exec(participants)) !== null) {
+          if (result[1].charAt(0) == '@') { // This is a user
+            for (key in objUsers.users) {
+              if (objUsers.users[key] == result[1].substr(1)) {
+                console.log("Found user ", result[1]);
+                // Add this user to the json file.
+                standupConfig.participants.push(result[1].substr(1));
+                console.log("Adding ", (result[1].substr(1)));
+                break;
+              }
+            }
+          } else if (result[1].charAt(0) == '#') { // This is a channel
+            for (key in objUsers.channels) {
+              var channel_key = Object.keys(objUsers.channels[key])[0];
+              var channel_id = result[1].substr(1,9);
+              if (channel_key == channel_id) {
+                // Add all users to the json file.
+                console.log("Found channel ", channel_id);
+                for (i in (objUsers.channels[key])[channel_id]) {
+                  standupConfig.participants.push((objUsers.channels[key])[channel_id][i]);
+                  console.log("Adding ", ((objUsers.channels[key])[channel_id][i]));
+                }
+                break;
+              }
+            }
+          }
+      }
+
       convo.gotoThread('askQuestionSet');
     }, {}, 'askParticipants');
 
