@@ -69,6 +69,27 @@ const bot = {
                 console.log('Message sent: ', res);
             }
         });
+    },
+    //Function to send report to the channel
+    sendReport(channel_id, user_id, report_json) {
+        // Send message using Slack Web Client
+        var token = process.env.SLACK_API_TOKEN || ''
+        var web = new WebClient(token);
+        console.log(report_json);
+        console.log(channel_id);
+        var report = "{0} has submitted his report. His reponses are as follows-\n\n".format(user_id);
+        for(var que in report_json){
+            report += "Q: {0}\n".format(que);
+            report += "A: {0}\n".format(report_json[que]);
+        }
+        this.web.chat.postMessage(channel_id, JSON>stringify(report_json), function (err, res) {
+            if (err) {
+                console.log('Error:', err);
+            } else {
+                console.log('Message sent: ', res);
+            }
+        });
     }
 }
 module.exports = bot;
+
