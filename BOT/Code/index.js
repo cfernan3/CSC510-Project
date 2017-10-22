@@ -134,6 +134,28 @@ function question1(payload){
         console.log(`${standupQuestions[0]}:${answer}`);
         convo.gotoThread('askSecondQue');
       }
+      else {
+        console.log("Question not entered correctly");
+        convo.transitionTo('askFirstQue', "I'm sorry. I didn't understand you. Please give a proper answer.");
+      }
+    }, {}, 'askSecondQue');
+
+
+    convo.addMessage({text:standupQuestions[1], action:'askSecondQue'}, 'default');
+
+    convo.addQuestion(standupQuestions[1], function (response, convo) {
+      console.log('Second question answered =', response.text);
+
+      var answer = response.text;
+      if (answer != null) {
+        responseAnswers[standupQuestions[1]] = answer;
+        console.log(`${standupQuestions[1]}:${answer}`);
+        convo.gotoThread('askThirdQue');
+      }
+      else {
+        console.log("Question not entered correctly");
+        convo.transitionTo('askSecondQue', "I'm sorry. I didn't understand you. Please give a proper answer.");
+      }
     }, {}, 'askSecondQue');
 
 
