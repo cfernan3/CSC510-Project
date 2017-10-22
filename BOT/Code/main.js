@@ -10,7 +10,7 @@ function StandupConfig(){
   this.endTimeMins = 0;
   this.questions = ["What did you accomplish yesterday?", "What will you work on today",
                     "Is there anything blocking your progress?"];  // should have aleast 1 question
-  this.participants = [];
+  this.participants = [];  // TODO: makse sure there are no duplicates
   this.reportMedium = "channel";  // default medium is channel
   this.reportChannel = "";
   this.creator = "";
@@ -76,6 +76,10 @@ controller.on('create_bot',function(bot,config) {
   }
 });
 
+/*
+************************ Configuring a new standup**********************************
+*/
+
 controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], function(bot,message) {
   bot.startConversation(message, function(err, convo) {
 
@@ -102,7 +106,7 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
     convo.addQuestion('When would you like the standup to end?', function (response, convo) {
       console.log('End time entered =', response.text);
 
-      var endTime = chrono.parseDate(response.text)
+      var endTime = chrono.parseDate(response.text)  // TODO: check that end time > start time
       if (endTime != null) {
         standupConfig.endTimeHours = endTime.getHours();
         standupConfig.endTimeMins = endTime.getMinutes();
@@ -121,41 +125,9 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
           1. list of users: @<user1>, ..., @<userN>\n \
           2. specific user group: @<user-group-name> \n \
           3. specific channel: #<channel-name>', function (response, convo) {
-      var participants = response.text;
-      console.log('participants=', participants);
 
-      var reg = /<(.*?)>/g;
-      var result;
-      var objUsers = JSON.parse(fs.readFileSync('mock_users.json', 'utf8'));
-
-      while((result = reg.exec(participants)) !== null) {
-          if (result[1].charAt(0) == '@') { // This is a user
-            for (key in objUsers.users) {
-              if (objUsers.users[key] == result[1].substr(1)) {
-                console.log("Found user ", result[1]);
-                // Add this user to the json file.
-                standupConfig.participants.push(result[1].substr(1));
-                console.log("Adding ", (result[1].substr(1)));
-                break;
-              }
-            }
-          } else if (result[1].charAt(0) == '#') { // This is a channel
-            for (key in objUsers.channels) {
-              var channel_key = Object.keys(objUsers.channels[key])[0];
-              var channel_id = result[1].substr(1,9);
-              if (channel_key == channel_id) {
-                // Add all users to the json file.
-                console.log("Found channel ", channel_id);
-                for (i in (objUsers.channels[key])[channel_id]) {
-                  standupConfig.participants.push((objUsers.channels[key])[channel_id][i]);
-                  console.log("Adding ", ((objUsers.channels[key])[channel_id][i]));
-                }
-                break;
-              }
-            }
-          }
-      }
-
+      console.log('participants=', response.text);
+      config.addParticipants(response.text, standupConfig);
       convo.gotoThread('askQuestionSet');
     }, {}, 'askParticipants');
 
@@ -166,7 +138,7 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
           pattern: bot.utterances.yes,
           callback: function(response, convo) {
             standupConfig.questions = [];
-            console.log('Default questions not accepted');
+            console.log('Default questions not accepted.');
             convo.gotoThread('askNewSet');
           }
       },
@@ -174,8 +146,8 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
           pattern: bot.utterances.no,
           default: true,
           callback: function(response, convo) {
-            console.log('Ok! We will proceed with the default question set.');
-            convo.transitionTo('continueQuestions', 'Ok! We will proceed with the default question set.');
+            console.log('Default question set accepted.');
+            convo.transitionTo('askReportMedium', 'Ok! We will proceed with the default question set.');
           }
       }
     ], {}, 'askQuestionSet');
@@ -186,75 +158,44 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
         pattern: 'done',
         callback: function(response, convo) {
           console.log("Finished receiving questions");
-          convo.gotoThread('continueQuestions');
+          convo.gotoThread('askReportMedium');
         }
       },
       {
         default: true,
         callback: function(response, convo) {
           console.log('questions entered =', response.text);
-          var questions = response.text.split('\n');
-          for(var i = 0; i < questions.length; i++)
-            standupConfig.questions.push(questions[i]);
+          config.parseQuestions(response.text, standupConfig);
           convo.silentRepeat();
         }
       }
     ], {}, 'askNewSet');
 
 
-    convo.addQuestion({
-    attachments:[
-        {
-            pretext: "How do you want to share the standup report with others?",
-            title: "Select one option.",
-            callback_id: '123',
-            attachment_type: 'default',
-            actions: [
-                {
-                    "name":"email",
-                    "text": "Email",
-                    "value": "email",
-                    "type": "button",
-                },
-                {
-                    "name":"channel",
-                    "text": "Slack channel",
-                    "value": "channel",
-                    "type": "button",
-                }
-            ]
-        }
-    ]},
-
+    convo.addQuestion(config.reportMediumButtons,
     function (response, convo) {
         if(response.text == "email") {
           standupConfig.reportMedium = "email";
+          standupConfig.reportChannel = "";
           convo.gotoThread('lastStatement');
         } else {
-          convo.gotoThread('channelQuestion');
+          standupConfig.reportMedium = "channel";
+          convo.addQuestion('Which slack channel do you want to use? E.g. #general', function (response, convo) {
+            config.parseReportChannel(response.text, standupConfig);
+            convo.gotoThread('lastStatement');
+          }, {}, 'askReportMedium');
+
+          convo.next();
         }
-    }, {}, 'continueQuestions');
+    }, {}, 'askReportMedium');
 
-
-    convo.addQuestion('Which slack channel do you want to use? E.g. #general', function (response, convo) {
-      // TODO: check if the given channel is a valid channel
-      // TODO: check if the bot is a member of the given channel
-      var chan = response.text;
-      var i = chan.indexOf('#');
-      if(i != -1) {  // TODO: handle else
-        standupConfig.reportChannel = chan.substr(i).split('|')[0];
-        console.log('channel = ', standupConfig.reportChannel);
-      }
-      convo.gotoThread('lastStatement');
-    }, {}, 'channelQuestion');
 
     convo.beforeThread('lastStatement', function(convo, next) {
       console.log('New standup config complete');
-      fs.writeFile('./mock_config.json', JSON.stringify(standupConfig), (err) => {
-         if (err) throw err;
-       });
+      writeToConfigFile();
       next();
     });
+
 
     convo.addMessage('Awesome! Your Standup is configured successfully!', 'lastStatement');
 
@@ -262,7 +203,13 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
 }); // hears 'schedule' ends
 
 
+/*
+************************ Editing an existing standup**********************************
+*/
+
 controller.hears(['modify', 'change', 'update', 'reschedule'],['direct_mention', 'direct_message'], function(bot,message) {
+  // TODO: check that standup exists
+
   bot.startConversation(message, function(err, convo) {
 
   // TODO: check that the user is allowed to modify config
@@ -270,13 +217,154 @@ controller.hears(['modify', 'change', 'update', 'reschedule'],['direct_mention',
 
     function (response, convo) {
       switch (response.text) {
-        case "Start Time":
-          console.log("Updating standup start time.")
+        case "startTime":
+          convo.gotoThread('editStartTime');
+          break;
+        case "endTime":
+          convo.gotoThread('editEndTime');
+          break;
+        case "participants":
+          convo.gotoThread('editParticipants');
+          break;
+        case "questionSet":
+          standupConfig.questions = [];
+          convo.gotoThread('editQuestionSet');
+          break;
+        case "reportMedium":
+          convo.gotoThread('editReportMedium');
           break;
         default:
-
+          convo.next();
       }
     });
 
+    convo.addQuestion('What time would you like to start the standup?', function (response, convo) {
+      console.log('Start time entered =', response.text);
+
+      var startTime = chrono.parseDate(response.text)
+      if (startTime != null) {
+        standupConfig.startTimeHours = startTime.getHours();
+        standupConfig.startTimeMins = startTime.getMinutes();
+        console.log("Start time = " + standupConfig.startTimeHours + ":" + standupConfig.startTimeMins);
+        convo.addMessage("All set! I have updated the start time to " + standupConfig.startTimeHours +
+                          ":" + standupConfig.startTimeMins + ".", 'editStartTime');
+
+        writeToConfigFile();
+        convo.next();
+      }
+      else {
+        console.log("Start time not entered correctly");
+        convo.transitionTo('editStartTime', "I'm sorry. I didn't understand you. Please give a single time value in a 12 hour clock format.\n\
+        You can say things like 10 AM or 12:15pm.");
+      }
+    }, {}, 'editStartTime');
+
+
+    convo.addQuestion('When would you like the standup to end?', function (response, convo) {
+      console.log('End time entered =', response.text);
+
+      var endTime = chrono.parseDate(response.text)  // TODO: check that end time > start time
+      if (endTime != null) {
+        standupConfig.endTimeHours = endTime.getHours();
+        standupConfig.endTimeMins = endTime.getMinutes();
+        console.log("End time = " + standupConfig.endTimeHours + ":" + standupConfig.endTimeMins);
+        convo.addMessage("All set! I have updated the end time to " + standupConfig.endTimeHours +
+                          ":" + standupConfig.endTimeMins + ".", 'editEndTime');
+
+        writeToConfigFile();
+        convo.next();
+      }
+      else {
+        console.log("End time not entered correctly");
+        convo.transitionTo('editEndTime', "I'm sorry. I didn't understand you. Please give a single time value in a 12 hour clock format.\n\
+        You can say things like 10 AM or 12:15pm.");
+      }
+    }, {}, 'editEndTime');
+
+
+    convo.addQuestion(config.modifyUserButtons, function (response, convo) {
+      switch (response.text) {
+        case "addUsers":  // TODO: let the user know which users were successfully added.
+          convo.addQuestion('Who would you like to invite for the standup session?\n You may enter it in the following ways:\n\
+                1. list of users: @<user1>, ..., @<userN>\n \
+                2. specific user group: @<user-group-name> \n \
+                3. specific channel: #<channel-name>', function (response, convo) {
+            console.log('participants to add =', response.text);
+            config.addParticipants(response.text, standupConfig);
+            convo.addMessage("All set! I have updated the participants", 'editParticipants');
+            convo.next();
+          }, {}, 'editParticipants');
+          convo.next();
+          break;
+        case "removeUsers":
+          convo.addQuestion('Who would you like to remove from the standup session?\n You may enter it as a list of users: @<user1>, ..., @<userN>',
+          function (response, convo) {
+            console.log('participants to remove =', response.text);
+            config.removeParticipants(response.text, standupConfig);
+            convo.addMessage("All set! I have updated the participants", 'editParticipants');
+            convo.next();
+          }, {}, 'editParticipants');
+          convo.next();
+          break;
+        default:
+          convo.next();
+      }
+
+      writeToConfigFile();
+    }, {}, 'editParticipants');
+
+
+    convo.addQuestion('Ok! Give me all the questions, each on a new line, and say DONE to finish.', [
+      {
+        pattern: 'done',
+        callback: function(response, convo) {
+          console.log("Finished receiving questions");
+          convo.addMessage("All set! I have updated the standup questions.", 'editQuestionSet');
+
+          writeToConfigFile();
+          convo.next();
+        }
+      },
+      {
+        default: true,
+        callback: function(response, convo) {
+          console.log('questions entered =', response.text);
+          config.parseQuestions(response.text, standupConfig);
+          convo.silentRepeat();
+        }
+      }
+    ], {}, 'editQuestionSet');
+
+
+    convo.addQuestion(config.reportMediumButtons,
+    function (response, convo) {
+        if(response.text == "email") {
+          standupConfig.reportMedium = "email";
+          standupConfig.reportChannel = "";
+          convo.addMessage("All set! Standup reports will now be emailed to all participants.", 'editReportMedium');
+
+          writeToConfigFile();
+          convo.next();
+        } else {
+          standupConfig.reportMedium = "channel";
+          convo.addQuestion('Which slack channel do you want to use? E.g. #general', function (response, convo) {
+            config.parseReportChannel(response.text, standupConfig);
+            convo.addMessage("All set! Standup reports will now be posted to your channel.", 'editReportMedium');
+
+            writeToConfigFile();
+            convo.next();
+          }, {}, 'editReportMedium');
+
+          convo.next();
+        }
+    }, {}, 'editReportMedium');
+
   }); // startConversation Ends
 }); // hears 'schedule' ends
+
+
+var writeToConfigFile = function() {
+  fs.writeFile('./mock_config.json', JSON.stringify(standupConfig), (err) => {
+     if (err) throw err;
+   });
+}
