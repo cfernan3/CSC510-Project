@@ -1,4 +1,138 @@
 
+
+/*
+#########################################################
+                      References
+https://github.com/slackapi/sample-message-menus-node
+https://api.slack.com/
+https://docs.npmjs.com/files/package.json
+#########################################################
+*/
+require('dotenv').config();
+
+const http = require('http');
+const express = require('express');
+const bodyParser = require('body-parser');
+const normalizePort = require('normalize-port');
+const delay = require('delay');
+
+const slackEventsAPI = require('@slack/events-api');
+const slackInteractiveMessages = require('@slack/interactive-messages');
+
+const cloneDeep = require('lodash.clonedeep');
+const bot = require('./modules/bot');
+//var sched = require('node-cron');
+//var sleep = require('sleep');
+var schedule = require('node-schedule')
+var Botkit = require('botkit')
+
+// --- Slack Events ---
+const slackEvents = slackEventsAPI.createSlackEventAdapter(process.env.SLACK_VERIFICATION_TOKEN);
+/* Not needed for now
+slackEvents.on('team_join', (event) => {
+  bot.introduceToUser(event.user.id);
+});
+*/
+
+var controller = Botkit.slackbot({
+  debug: true,
+});
+var bkit = controller.spawn({
+  token: process.env.SLACK_BOT_TOKEN,
+}).startRTM();
+
+
+// Scheduling code created
+//sched.schedule(' * * * *',function(){
+//var j = schedule.scheduleJob('* * * * *', function()  {
+var rule = new schedule.RecurrenceRule();                      //Reference:https://www.npmjs.com/package/node-schedule
+//rule.dayOfWeek = [0, new schedule.Range(1, 4)];
+rule.dayOfWeek = [0,1,2,3,4,5,6];            
+rule.hour = 04;
+rule.minute = 27;
+ 
+var j = schedule.scheduleJob(rule, function(){
+  
+
+
+//console.log('running a task every minute');
+  //condoel.log("Test");
+  //bot.sendMessage("D7JBPKD8B","Calvin is awesome");
+  //bot.sendMessage("D7JBPKD8B","Calvin is awesome");
+  bot.sendMessage("D7LJ7H9U4",bot.introduceToUser("U7LJ7GXBN"))
+  bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
+});
+
+/*
+//------Replace by scheduling code------ 
+slackEvents.on('message', (event) => {
+  console.log("Event Received");
+  // Filter out messages from this bot itself or updates to messages
+  if (event.subtype === 'bot_message' || event.subtype === 'message_changed') {
+    return;
+  }
+  bot.handleDirectMessage(event);
+});
+*/
+
+
+
+// --- Slack Interactive Messages ---
+const slackMessages =
+  slackInteractiveMessages.createMessageAdapter(process.env.SLACK_VERIFICATION_TOKEN);
+
+// Helper functions
+
+function findAttachment(message, actionCallbackId) {
+  return message.attachments.find(a => a.callback_id === actionCallbackId);
+}
+
+function acknowledgeActionFromMessage(originalMessage, actionCallbackId, ackText) {
+  const message = cloneDeep(originalMessage);
+  const attachment = findAttachment(message, actionCallbackId);
+  delete attachment.actions;
+  attachment.text = `:white_check_mark: ${ackText}`;
+  return message;
+}
+
+function findSelectedOption(originalMessage, actionCallbackId, selectedValue) {
+  const attachment = findAttachment(originalMessage, actionCallbackId);
+  return attachment.actions[0].options.find(o => o.value === selectedValue);
+}
+
+// --- Bot QnA ---
+
+function question1(payload){
+
+  var message = { type: 'direct_message',
+  channel: payload.channel[0].id,
+  user: "U7LJ7GXBN",
+  text: 'what',
+  ts: '1508659403.000009',
+  source_team: 'T6XGVUQB1',
+  team: 'T6XGVUQB1',
+  raw_message:
+   { type: 'message',
+     channel: 'D7N1MQV44',
+     user: 'U6XAYQ6B0',
+     text: '<@U7LJ7GXBN> what',
+     ts: '1508659403.000009',
+     source_team: 'T6XGVUQB1',
+     team: 'T6XGVUQB1' } 
+    }
+
+  bkit.startConversation(message, function(err, convo) {
+    var standupQuestions = ["What is your name.","Where do you live?","What do you do for living?"];
+    var responseAnswers = {};
+    convo.addMessage({text:standupQuestions[0], action:'askFirstQue'}, 'default');
+    convo.addQuestion(standupQuestions[0], function (response, convo) {
+      console.log('First question answered =', response.text);
+ 
+      var answer = response.text;
+      if (answer != null) {
+        responseAnswers[standupQuestions[0]] = answer;
+        console.log(`${standupQuestions[0]}:${answer}`);
+        convo.gotoThread('askSecondQue');
       }
     }, {}, 'askSecondQue');
  
