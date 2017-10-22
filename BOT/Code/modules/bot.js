@@ -80,7 +80,7 @@ const bot = {
         var report_json = channel_json["standup"];
         console.log(report_json);
         console.log(channel_id);
-        var report = `${user_id} has submitted his report. His reponses are as follows-\n\n`;
+        var report = `${user_id} has submitted his report. The reponses are as follows-\n\n`;
         for(var que in report_json){
             report += `Q: ${que}\n`;
             report += `A: ${report_json[que]}\n\n`;
