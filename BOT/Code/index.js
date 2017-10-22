@@ -12,6 +12,7 @@ const http = require('http');
 const express = require('express');
 const bodyParser = require('body-parser');
 const normalizePort = require('normalize-port');
+const delay = require('delay');
 
 const slackEventsAPI = require('@slack/events-api');
 const slackInteractiveMessages = require('@slack/interactive-messages');
@@ -21,6 +22,7 @@ const bot = require('./modules/bot');
 //var sched = require('node-cron');
 //var sleep = require('sleep');
 var schedule = require('node-schedule')
+var Botkit = require('botkit')
 
 // --- Slack Events ---
 const slackEvents = slackEventsAPI.createSlackEventAdapter(process.env.SLACK_VERIFICATION_TOKEN);
@@ -29,16 +31,21 @@ slackEvents.on('team_join', (event) => {
   bot.introduceToUser(event.user.id);
 });
 */
-
+var controller = Botkit.slackbot({
+  debug: true,
+});
+var bkit = controller.spawn({
+  token: process.env.SLACK_API_TOKEN,
+}).startRTM();
 
 // Scheduling code created
 //sched.schedule(' * * * *',function(){
 //var j = schedule.scheduleJob('* * * * *', function()  {
 var rule = new schedule.RecurrenceRule();                      //Reference:https://www.npmjs.com/package/node-schedule
 //rule.dayOfWeek = [0, new schedule.Range(1, 4)];
-rule.dayOfWeek = [1,2,3,4,5];            
-rule.hour = 9;
-rule.minute = 0;
+rule.dayOfWeek = [0,1,2,3,4,5,6];            
+rule.hour = 02;
+rule.minute = 24;
  
 var j = schedule.scheduleJob(rule, function(){
   //console.log('Today is recognized by Rebecca Black!');
@@ -52,7 +59,7 @@ var j = schedule.scheduleJob(rule, function(){
   bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
 });
 
-
+/*
 //------Replace by scheduling code------ 
 slackEvents.on('message', (event) => {
   console.log("Event Received");
@@ -62,6 +69,9 @@ slackEvents.on('message', (event) => {
   }
   bot.handleDirectMessage(event);
 });
+*/
+
+
 
 // --- Slack Interactive Messages ---
 const slackMessages =
@@ -86,45 +96,117 @@ function findSelectedOption(originalMessage, actionCallbackId, selectedValue) {
   return attachment.actions[0].options.find(o => o.value === selectedValue);
 }
 
+// --- Bot QnA ---
+
+function question1(payload){
+
+  var message = { 
+    text: 'C7HTHUL3B has submitted his report. His reponses are as follows-\n\nQ: Who came first?\nA: Nobody! Both were sleeping.\n\n',
+    username: payload.user[0].name,      
+    type: 'message',
+    ts: '1508651605.000038' 
+  }
+
+  bkit.startConversation(message, function(err, convo) {
+    var standupQuestions = ["What is your name.","Where do you live?","What do you do for living?"];
+    var responseAnswers = {};
+    convo.addMessage({text:standupQuestions[0], action:'askFirstQue'}, 'default');
+    convo.addQuestion(standupQuestions[0], function (response, convo) {
+      console.log('First question answered =', response.text);
+ 
+      var answer = response.text;
+      if (answer != null) {
+        responseAnswers[standupQuestions[0]] = answer;
+        console.log(`${standupQuestions[0]}:${answer}`);
+        convo.gotoThread('askSecondQue');
+      }
+      else {
+        console.log("Question not entered correctly");
+        convo.transitionTo('askFirstQue', "I'm sorry. I didn't understand you. Please give a proper answer.");
+      }
+    }, {}, 'askSecondQue');
+ 
+ 
+    convo.addMessage({text:standupQuestions[1], action:'askSecondQue'}, 'default');
+ 
+    convo.addQuestion(standupQuestions[1], function (response, convo) {
+      console.log('Second question answered =', response.text);
+ 
+      var answer = response.text;
+      if (answer != null) {
+        responseAnswers[standupQuestions[1]] = answer;
+        console.log(`${standupQuestions[1]}:${answer}`);
+        convo.gotoThread('askThirdQue');
+      }
+      else {
+        console.log("Question not entered correctly");
+        convo.transitionTo('askSecondQue', "I'm sorry. I didn't understand you. Please give a proper answer.");
+      }
+    }, {}, 'askSecondQue');
+ 
+ 
+    convo.addMessage({text:standupQuestions[2], action:'askThirdQue'}, 'default');
+ 
+    convo.addQuestion(standupQuestions[1], function (response, convo) {
+      console.log('Third question answered =', response.text);
+ 
+      var answer = response.text;
+      if (answer != null) {
+        responseAnswers[standupQuestions[1]] = answer;
+        console.log(`${standupQuestions[1]}:${answer}`);
+        convo.gotoThread('askThirdQue');
+      }
+      else {
+        console.log("Question not entered correctly");
+        convo.transitionTo('askThirdQue', "I'm sorry. I didn't understand you. Please give a proper answer.");
+      }
+    }, {}, 'askThirdQue');
+ 
+  
+  convo.beforeThread('lastStatement', function(convo) {
+      console.log('Standup complete');
+    });
+ 
+    convo.addMessage('Awesome! Your Standup is complete!', 'lastStatement');
+ 
+  }); // startConversation Ends
+}
+
+
+
 // Action handling
 
 slackMessages.action('standup:start', (payload, respond) => {
   // Create an updated message that acknowledges the user's action (even if the result of that
   // action is not yet complete).
   var optionName = payload.actions[0].name;
-  console.log(optionName);
+  //console.log(optionName);
   console.log(payload);
   const channel = payload.channel.id;
-  console.log(payload.channel);
+  //console.log(payload.channel);
   
   if (optionName=="Start")
   {
-      var updatedMessage = acknowledgeActionFromMessage(payload.original_message, 'standup:start',
+    var updatedMessage = acknowledgeActionFromMessage(payload.original_message, 'standup:start',
                                                       'I\'m getting the standup started.');
-    
+    question1(payload);
   }
    else if (optionName=="Snooze")
   {
       var updatedMessage = acknowledgeActionFromMessage(payload.original_message, 'standup:start',
                                                       'I will remind you in 15 minutes');
-      /*async function init(){
-       console.log(1)
-      await sleep(1000)
-      bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"));
-        }
-      function sleep(ms){
-          return new Promise(resolve=>{
-        setTimeout(resolve,ms)
-    })
-}*/
-      
-    
+  delay(6000)         //While deploying change t0 900000
+  .then(() => {
+      //console.log("Test")
+      bot.sendMessage(channel,bot.introduceToUser(payload.user[0].id))
+  });
   }
    else
   {
       var updatedMessage = acknowledgeActionFromMessage(payload.original_message, 'standup:start',
                                                       'See you tomorrow');
   }
+  console.log("\n Updated Message \n")
   console.log(updatedMessage);
   return updatedMessage;
 });
