@@ -291,7 +291,9 @@ controller.hears(['modify', 'change', 'update', 'reschedule'],['direct_mention',
                 3. specific channel: #<channel-name>', function (response, convo) {
             console.log('participants to add =', response.text);
             config.addParticipants(response.text, standupConfig);
+            //console.log(standupConfig.participants);
             convo.addMessage("All set! I have updated the participants", 'editParticipants');
+            writeToConfigFile();
             convo.next();
           }, {}, 'editParticipants');
           convo.next();
@@ -301,7 +303,9 @@ controller.hears(['modify', 'change', 'update', 'reschedule'],['direct_mention',
           function (response, convo) {
             console.log('participants to remove =', response.text);
             config.removeParticipants(response.text, standupConfig);
+            //console.log(standupConfig.participants);
             convo.addMessage("All set! I have updated the participants", 'editParticipants');
+            writeToConfigFile();
             convo.next();
           }, {}, 'editParticipants');
           convo.next();
@@ -309,8 +313,6 @@ controller.hears(['modify', 'change', 'update', 'reschedule'],['direct_mention',
         default:
           convo.next();
       }
-
-      writeToConfigFile();
     }, {}, 'editParticipants');
 
 
