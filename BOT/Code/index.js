@@ -29,7 +29,7 @@ slackEvents.on('team_join', (event) => {
   bot.introduceToUser(event.user.id);
 });
 */
-bot.sendReport("C7HTHUL3B","C7HTHUL3B",{"Who came first?":"Nobody! Both were sleeping."});
+bot.sendReport({"channel_id":"C7HTHUL3B","user_id":"C7HTHUL3B","standup":{"Who came first?":"Nobody! Both were sleeping."}});
 
 // Scheduling code created
 //sched.schedule(' * * * *',function(){
