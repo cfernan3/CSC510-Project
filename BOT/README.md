@@ -115,13 +115,10 @@ We intend to use Gmail REST API to send out an email to each member of the stand
 
 ### Selenium Testing  
 
-### Task Tracking  
+### Stories, Tasks, and Task Tracking  
 
 https://trello.com/b/c9BAsFYW/milestone2
-
-##### Week 1  
-
-#### Stories and Tasks  
+https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/WORKSHEET.md
 
 ### Screencast
 
