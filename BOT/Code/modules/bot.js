@@ -71,10 +71,13 @@ const bot = {
         });
     },
     //Function to send report to the channel
-    sendReport(channel_id, user_id, report_json) {
+    sendReport(channel_json) {
         // Send message using Slack Web Client
         var token = process.env.SLACK_API_TOKEN || ''
         var web = new WebClient(token);
+        var channel_id = channel_json["channel_id"];
+        var user_id = channel_json["user_id"];
+        var report_json = channel_json["standup"];
         console.log(report_json);
         console.log(channel_id);
         var report = `${user_id} has submitted his report. His reponses are as follows-\n\n`;
