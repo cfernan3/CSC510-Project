@@ -31,12 +31,14 @@ slackEvents.on('team_join', (event) => {
   bot.introduceToUser(event.user.id);
 });
 */
+
 var controller = Botkit.slackbot({
   debug: true,
 });
 var bkit = controller.spawn({
   token: process.env.SLACK_API_TOKEN,
 }).startRTM();
+
 
 // Scheduling code created
 //sched.schedule(' * * * *',function(){
@@ -48,7 +50,7 @@ rule.hour = 02;
 rule.minute = 24;
  
 var j = schedule.scheduleJob(rule, function(){
-  //console.log('Today is recognized by Rebecca Black!');
+  
 
 
 //console.log('running a task every minute');
