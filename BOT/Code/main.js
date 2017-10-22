@@ -1,6 +1,7 @@
 var Botkit = require('botkit');
 var chrono = require('chrono-node');
 var fs = require('fs');
+var config = require('./modules/config.js')
 
 function StandupConfig(){
   this.startTimeHours = 0;
@@ -12,6 +13,7 @@ function StandupConfig(){
   this.participants = [];
   this.reportMedium = "channel";  // default medium is channel
   this.reportChannel = "";
+  this.creator = "";
 }
 
 var standupConfig = new StandupConfig();
@@ -62,6 +64,7 @@ controller.on('create_bot',function(bot,config) {
         trackBot(bot);
       }
 
+      standupConfig.creator = config.createdBy;
       bot.startPrivateConversation({user: config.createdBy},function(err,convo) {
         if (err) {
           console.log(err);
@@ -203,6 +206,7 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
 
     convo.addQuestion('Which slack channel do you want to use? E.g. #general', function (response, convo) {
       // TODO: check if the given channel is a valid channel
+      // TODO: check if the bot is a member of the given channel
       var chan = response.text;
       var i = chan.indexOf('#');
       if(i != -1) {  // TODO: handle else
@@ -221,6 +225,26 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
     });
 
     convo.addMessage('Awesome! Your Standup is configured successfully!', 'lastStatement');
+
+  }); // startConversation Ends
+}); // hears 'schedule' ends
+
+
+controller.hears(['modify', 'change', 'update', 'reschedule'],['direct_mention', 'direct_message'], function(bot,message) {
+  bot.startConversation(message, function(err, convo) {
+
+  // TODO: check that the user is allowed to modify config
+    convo.ask(config.modifyStandupButtons,
+
+    function (response, convo) {
+      switch (response.text) {
+        case "Start Time":
+          console.log("Updating standup start time.")
+          break;
+        default:
+
+      }
+    });
 
   }); // startConversation Ends
 }); // hears 'schedule' ends
