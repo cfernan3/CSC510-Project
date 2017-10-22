@@ -30,9 +30,9 @@
     "lodash.map": "^4.6.0",
     "normalize-port": "^1.0.0",
     "node-cron": "^1.2.1",
-    "sleep": "^5.1.1"
+    "sleep": "^5.1.1",
     "botkit": "^0.5.8",
-    "slackbots": "^0.5.1"
+    "slackbots": "^0.5.1",
     "node-schedule": "^1.2.5"
   }
 }
