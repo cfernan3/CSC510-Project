@@ -26,8 +26,7 @@
 
 |   | Deliverable      | Tasks | Issues | Team Members | Estimated Date | Actual Date |
 |---|----------------------------------------------|---------------------------------------------------|--|-----------------|----------|----------|
-| 1 | Standup config                               | Configure a new standup                           |
-[#6](https://github.ncsu.edu/nedsouza/CSC510-Project/issues/6)                                            | Sharmin, Ronald | 21st Oct | 21st Oct |
+| 1 | Standup config                               | Configure a new standup                           |#6| Sharmin, Ronald | 21st Oct | 21st Oct |
 |   |                                              | Edit standup config                               |  | Sharmin, Ronald | 22nd Oct | 22nd Oct |
 | 2 | Standup session                              | Trigger the standup at configured time            |  | Calvin, Nirav   |          |          |
 | 3 | Mocking                                      | Create mock standup config for conducting standup |  | Sharmin, Ronald | 21st Oct | 21st Oct |
@@ -43,6 +42,6 @@
 |   | Standup session                              |Conduct standup using mock config                  |  | Calvin, Nirav   |          |          |
 | 2 | Reporting                                    | Post report to configured channel                 |  |                 |          |          |
 | 3 | Selenium testing Use Case 1: New standup     | test new standup creation                         |  | Sharmin, Ronald |          |          |
-|   | Selenium testing Use Case 2: Standup session | test all questions have been asked and answered   |  |                 |          |          |
+|   | Selenium testing Use Case 2: Standup session | test all questions have been asked and answered   |  | Calvin, Nirav   |          |          |
 |   | Selenium testing Use Case 2: Standup session | test report sharing on channel                    |  |                 |          |          |
 |   | Selenium testing Use Case 3: Edit standup    | test editing standup config                       |  | Sharmin, Ronald |          |          |
