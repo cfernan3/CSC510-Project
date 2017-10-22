@@ -18,8 +18,9 @@ const slackInteractiveMessages = require('@slack/interactive-messages');
 
 const cloneDeep = require('lodash.clonedeep');
 const bot = require('./modules/bot');
-var sched = require('node-cron');
-
+//var sched = require('node-cron');
+//var sleep = require('sleep');
+var schedule = require('node-schedule')
 
 // --- Slack Events ---
 const slackEvents = slackEventsAPI.createSlackEventAdapter(process.env.SLACK_VERIFICATION_TOKEN);
@@ -31,12 +32,26 @@ slackEvents.on('team_join', (event) => {
 
 
 // Scheduling code created
-sched.schedule('0 9 * * 1,2,3,4,5', function(){
-  //console.log('running a task every minute');
+//sched.schedule(' * * * *',function(){
+//var j = schedule.scheduleJob('* * * * *', function()  {
+var rule = new schedule.RecurrenceRule();                      //Reference:https://www.npmjs.com/package/node-schedule
+//rule.dayOfWeek = [0, new schedule.Range(1, 4)];
+rule.dayOfWeek = [1,2,3,4,5];            
+rule.hour = 9;
+rule.minute = 0;
+ 
+var j = schedule.scheduleJob(rule, function(){
+  //console.log('Today is recognized by Rebecca Black!');
+
+
+//console.log('running a task every minute');
   //condoel.log("Test");
   //bot.sendMessage("D7JBPKD8B","Calvin is awesome");
+  //bot.sendMessage("D7JBPKD8B","Calvin is awesome");
+  bot.sendMessage("D7LJ7H9U4",bot.introduceToUser("U7LJ7GXBN"))
   bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
 });
+
 
 //------Replace by scheduling code------ 
 slackEvents.on('message', (event) => {
@@ -92,6 +107,18 @@ slackMessages.action('standup:start', (payload, respond) => {
   {
       var updatedMessage = acknowledgeActionFromMessage(payload.original_message, 'standup:start',
                                                       'I will remind you in 15 minutes');
+      /*async function init(){
+       console.log(1)
+      await sleep(1000)
+      bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"));
+        }
+      function sleep(ms){
+          return new Promise(resolve=>{
+        setTimeout(resolve,ms)
+    })
+}*/
+      
+    
   }
    else
   {
