@@ -77,12 +77,12 @@ const bot = {
         var web = new WebClient(token);
         console.log(report_json);
         console.log(channel_id);
-        var report = "{0} has submitted his report. His reponses are as follows-\n\n".format(user_id);
+        var report = `${user_id} has submitted his report. His reponses are as follows-\n\n`;
         for(var que in report_json){
-            report += "Q: {0}\n".format(que);
-            report += "A: {0}\n".format(report_json[que]);
+            report += `Q: ${que}\n`;
+            report += `A: ${report_json[que]}\n\n`;
         }
-        this.web.chat.postMessage(channel_id, JSON>stringify(report_json), function (err, res) {
+        this.web.chat.postMessage(channel_id, report, function (err, res) {
             if (err) {
                 console.log('Error:', err);
             } else {
