@@ -95,4 +95,3 @@ const bot = {
     }
 }
 module.exports = bot;
-
