@@ -34,20 +34,19 @@ The creator has the following options while selecting users to be added/removed:
 	1. Select specified users.
 	2. Select specified user-groups.
 	3. Select all users from the specified channel.
-	4. Select all users from the slack group.
 
 * What set of questions will the bot ask for each standup?  
 The creator can either use the default set of questions (What did you do yesterday? What will you do today? Is there anything blocking you?), or define his own questions.
 
 * When will these questions be asked?  
-Standup days and time window need to be configured by the creator. 
-For each standup day, the bot will start the standup session with each participant at the configured start time, and share all updates at the configured end time. The standup will close after the end time, and no responses will be recorded after that. If the user fails to respond during the window, his updates will be empty for that day. There will be an option to configure a reminder for users who haven’t posted their updates, before the standup closes.
+Standup time window need to be configured by the creator. 
+For each standup day (Monday to Friday), the bot will start the standup session with each participant at the configured start time, and share all updates at the configured end time. The standup will close after the end time, and no responses will be recorded after that. If the user fails to respond during the window, his updates will be empty for that day. There will be an option to configure a reminder for users who haven’t posted their updates, before the standup closes.
 
 * How is the standup report shared with everyone?  
 The standup can be shared with all participants either through a consolidated email or a dedicated standup channel.
 
 * Which standup configurations can be edited later?  
-For now, we are enabling editing for the set of questions, standup schedule, participants, and the standup report delivery method.
+Ee are enabling editing for the set of questions, standup schedule, participants, and the standup report delivery method.
 
 * Is there a way to filter out standup updates for a participant for a specified date range?  
 No. This feature is out-of-scope.
@@ -56,10 +55,7 @@ No. This feature is out-of-scope.
 Whatbot will understand basic chat commands to perform the following operations.
 ```
 Schedule a new standup or move an existing one: schedule standup  
-Whatbot will then prompt for entering the days, duration, participants, question set, and report delivery method.	 
-
-Schedule a reminder for x minutes prior to the report submission:  reminder [x], set reminder [x], etc
-If the user has not supplied the time, Whatbot will prompt for it.
+Whatbot will then prompt for entering the duration, participants, question set, and report delivery method.	 
 	
 Modify participants: add/remove participant [participant-list]
 The participant-list can be a combination of the following:
@@ -72,14 +68,7 @@ If the user has not supplied the partcipant-list, Whatbot will prompt for it.
 Cancel the standup for today: cancel standup
 (for deleting the standup, delete the bot)	 
 
-Pause standup for x days: pause standup [x], pause standup for <x> days, etc
-If the user has not supplied the days, Whatbot will prompt for it.
-	
-Resume a standup that has been paused: resume standup
-
 Show when the standup is scheduled for: show schedule
-
-Skip answering a question during standup: skip
 
 Replace all standup questions with a new set of questions: modify | update | change | replace questions questions	
 ```
@@ -153,7 +142,7 @@ Normal flow:
 [Subflow 1]. User wants to edit the standup schedule.  
 	i. User sends a command to the Whatbot to modify the standup duration.  
    	ii. Whatbot asks the user to provide a new schedule.  
-   	iii. User responds with a set of days and the time window.  
+   	iii. User responds with a new time window.  
    	iv. Whatbot confirms the new schedule.  
 
 [Subflow 2]. User wants to add/edit a reminder before the standup closes.  
@@ -237,8 +226,8 @@ The bot conducts standups through direct messages to the users. The bot can only
 
 #### Constraints
 * The bot needs to be a part of atmost one channel (report delivery channel). There isn't a need to invite it to multiple channels. 
-* A single bot handles a single standup. A new standup would be handled by a new instance of the bot.
-* Every user interacts through direct messages with the bot and not through a dedicated channel.
+* A single bot handles a single standup.
+* Every user interacts with the bot through direct messages.
 * Only the creator of the bot can modify the configurations of the bot.
 * A Google account needs to be created for the bot, so it can send the report email via gmail and store the standup updates on google sheets.
 
