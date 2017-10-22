@@ -70,7 +70,7 @@ Normal flow:
 [Subflow 1]. User wants to edit the standup schedule.  
 	i. User sends a command to the Whatbot to modify the standup duration.  
    	ii. Whatbot asks the user to provide a new schedule.  
-   	iii. User responds with a set of days and the time window.  
+   	iii. User responds with a new time window.  
    	iv. Whatbot confirms the new schedule.  
 
 [Subflow 2]. User wants to add/edit a reminder before the standup closes.  
