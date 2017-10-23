@@ -62,7 +62,6 @@ var j = schedule.scheduleJob(rule, function(){
   bot.sendMessage("D7LJ7H9U4",bot.introduceToUser("U7LJ7GXBN"))
   bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
 });
-
 /*
 //------Replace by scheduling code------
 slackEvents.on('message', (event) => {
@@ -104,25 +103,28 @@ function findSelectedOption(originalMessage, actionCallbackId, selectedValue) {
 
 function question1(payload){
 
-  var message = { type: 'direct_message',
-  channel: payload.channel[0].id,
-  user: "U7LJ7GXBN",
-  text: 'what',
-  ts: '1508659403.000009',
+ var message = { type: 'direct_message',
+  channel: 'D7MSLM35H',
+  user: 'U74535JLB',
+  text: 'hello',
+  ts: '1508794897.000490',
   source_team: 'T6XGVUQB1',
   team: 'T6XGVUQB1',
   raw_message:
    { type: 'message',
-     channel: 'D7N1MQV44',
-     user: 'U6XAYQ6B0',
-     text: '<@U7LJ7GXBN> what',
-     ts: '1508659403.000009',
+     channel: 'D7MSLM35H',
+     user: 'U74535JLB',
+     text: 'hello',
+     ts: '1508794897.000490',
      source_team: 'T6XGVUQB1',
-     team: 'T6XGVUQB1' }
-    }
+     team: 'T6XGVUQB1' },
+  _pipeline: { stage: 'receive' }};
+  if(payload=={}){
+    payload = message
+}
 
-  bkit.startConversation(message, function(err, convo) {
-    var standupQuestions = ["What is your name.","Where do you live?","What do you do for living?"];
+  bkit.startPrivateConversation(payload, function(err, convo) {
+    var standupQuestions = ["What is your name?","Where do you live?","What do you do for living?"];
     var responseAnswers = {};
     convo.addMessage({text:standupQuestions[0], action:'askFirstQue'}, 'default');
     convo.addQuestion(standupQuestions[0], function (response, convo) {
@@ -138,7 +140,7 @@ function question1(payload){
         console.log("Question not entered correctly");
         convo.transitionTo('askFirstQue', "I'm sorry. I didn't understand you. Please give a proper answer.");
       }
-    }, {}, 'askSecondQue');
+  }, {}, 'askFirstQue');
 
 
     convo.addMessage({text:standupQuestions[1], action:'askSecondQue'}, 'default');
@@ -255,9 +257,9 @@ var bkit = controller.spawn({
 
       var answer = response.text;
       if (answer != null) {
-        responseAnswers[standupQuestions[1]] = answer;
-        console.log(`${standupQuestions[1]}:${answer}`);
-        convo.gotoThread('askThirdQue');
+        responseAnswers[standupQuestions[2]] = answer;
+        console.log(`${standupQuestions[2]}:${answer}`);
+        convo.gotoThread('lastStatement');
       }
       else {
         console.log("Question not entered correctly");
