@@ -114,6 +114,7 @@ We intend to use Gmail REST API to send out an email to each member of the stand
 ### Bot Implementation  
 
 ### Selenium Testing  
+Please find the Selenium test Maven folder [here](Selenium).
 
 ### Stories, Tasks, and Task Tracking  
 
@@ -121,4 +122,7 @@ https://trello.com/b/c9BAsFYW/milestone2
 https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/WORKSHEET.md
 
 ### Screencast
+Please find the screen casts below:
+1. [Creating a new standup](UseCase1_CreateNewStandup.mp4)
 
+2. [Editing an existing standup](UseCase3_EditStandup.mp4)
