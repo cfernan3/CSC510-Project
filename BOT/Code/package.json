@@ -18,13 +18,6 @@
   "scripts": {
     "start": "node index.js"
   },
-  "author": "Nirav Dsouza <nedsouza@ncsu.edu>",
-  "license": "BSD-3-Clause",
-  "devDependencies": {
-    "eslint": "^3.19.0",
-    "eslint-config-airbnb-base": "^11.1.3",
-    "eslint-plugin-import": "^2.2.0"
-  },
   "dependencies": {
     "@slack/client": "^3.14.1",
     "@slack/events-api": "^1.0.1",
@@ -38,5 +31,7 @@
     "normalize-port": "^1.0.0",
     "node-cron": "^1.2.1",
     "sleep": "^5.1.1"
+    "botkit": "^0.5.8",
+    "slackbots": "^0.5.1"
   }
 }
