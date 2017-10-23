@@ -41,6 +41,6 @@
 | 1 | Standup session                              | Trigger the standup post snooze                   |  | Calvin, Nirav   |          |          |
 |   | Standup session                              |Conduct standup using mock config                  |  | Calvin, Nirav   |          |          |
 | 2 | Selenium testing Use Case 1: New standup     | test new standup creation                         |  | Sharmin, Ronald | 23 Oct   | 23 Oct   |
-|   | Selenium testing Use Case 2: Standup session | (Contd.) test ongoing standup session             |  | Calvin, Nirav   | 25 Oct   |          |
-|   | Selenium testing Use Case 2: Standup session | test report sharing on channel                    |  | Bharat          |          |          |
-|   | Selenium testing Use Case 3: Edit standup    | test editing standup config                       |  | Sharmin, Ronald | 23 Oct   | 23 Oct   |
+| 3 | Selenium testing Use Case 2: Standup session | (Contd.) test ongoing standup session             |  | Calvin, Nirav   | 25 Oct   |          |
+|   |                                              | test report sharing on channel                    |  | Bharat          |          |          |
+| 4 | Selenium testing Use Case 3: Edit standup    | test editing standup config                       |  | Sharmin, Ronald | 23 Oct   | 23 Oct   |
