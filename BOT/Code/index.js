@@ -101,9 +101,9 @@ function findSelectedOption(originalMessage, actionCallbackId, selectedValue) {
 
 // --- Bot QnA ---
 
-function question1(payload){
+function question1(message){
 
- var message = { type: 'direct_message',
+ var payload = { type: 'direct_message',
   channel: 'D7MSLM35H',
   user: 'U74535JLB',
   text: 'hello',
@@ -119,8 +119,8 @@ function question1(payload){
      source_team: 'T6XGVUQB1',
      team: 'T6XGVUQB1' },
   _pipeline: { stage: 'receive' }};
-  if(payload=={}){
-    payload = message
+  if(message=={}){
+    message = payload;
 }
 
   bkit.startPrivateConversation(payload, function(err, convo) {
