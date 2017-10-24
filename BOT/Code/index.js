@@ -122,11 +122,11 @@ function question1(message){
   if(message=={}){
     message = payload;
 }
-
+var standupQuestions = ["What is your name?","Where do you live?","What do you do for living?"];
+var responseAnswers = {};
   bkit.startPrivateConversation(payload, function(err, convo) {
-    var standupQuestions = ["What is your name?","Where do you live?","What do you do for living?"];
-    var responseAnswers = {};
-    convo.addMessage({text:standupQuestions[0], action:'askFirstQue'}, 'default');
+
+    convo.addMessage({action:'askFirstQue'}, 'default');
     convo.addQuestion(standupQuestions[0], function (response, convo) {
       console.log('First question answered =', response.text);
 
@@ -143,9 +143,7 @@ function question1(message){
   }, {}, 'askFirstQue');
 
 
-    convo.addMessage({text:standupQuestions[1], action:'askSecondQue'}, 'default');
-
-    convo.addQuestion(standupQuestions[1], function (response, convo) {
+  convo.addQuestion(standupQuestions[1], function (response, convo) {
       console.log('Second question answered =', response.text);
 
       var answer = response.text;
@@ -161,7 +159,7 @@ function question1(message){
     }, {}, 'askSecondQue');
 
 
-    convo.addMessage({text:standupQuestions[2], action:'askThirdQue'}, 'default');
+
 
     convo.addQuestion(standupQuestions[1], function (response, convo) {
       console.log('Third question answered =', response.text);
@@ -268,12 +266,20 @@ var bkit = controller.spawn({
     }, {}, 'askThirdQue');
 
 
-  convo.beforeThread('lastStatement', function(convo) {
-      console.log('Standup complete');
-    });
+    //convo.addMessage({text:'Awesome! Your Standup is complete!'}, 'lastStatement');
+    convo.addQuestion("Press 'y' to redo the standup, else press any other key to save.", function (response, convo) {
+      console.log('Last Statement =', response.text);
 
-    convo.addMessage('Awesome! Your Standup is complete!', 'lastStatement');
-
+      var answer = response.text;
+      if (answer != 'y') {
+        console.log(`Standup Complete`);
+        bot.sendReport({"channel_id":"C7HTHUL3B","user_id":"U74535JLB","standup":responseAnswers});
+      }
+      else {
+        console.log("Standup redo requested");
+        convo.transitionTo('askFirstQue', "Okay, we are redoing the standup.");
+      }
+  }, {}, 'lastStatement');
   }); // startConversation Ends
 }
 
@@ -294,7 +300,9 @@ slackMessages.action('standup:start', (payload, respond) => {
   {
     var updatedMessage = acknowledgeActionFromMessage(payload.original_message, 'standup:start',
                                                       'I\'m getting the standup started.');
-    question1(payload);
+    var responses = question1(payload);
+    console.log("----Responses-----------");
+    console.log(responses);
   }
    else if (optionName=="Snooze")
   {
