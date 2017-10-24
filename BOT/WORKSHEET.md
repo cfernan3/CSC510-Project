@@ -28,7 +28,7 @@
 |---|----------------------------------------------|---------------------------------------------------|--|-----------------|----------|----------|
 | 1 | Standup config                               | Configure a new standup                               |#6| Sharmin, Ronald | 21st Oct | 21st Oct |
 |   |                                              | Edit standup config                                   |  | Sharmin, Ronald | 22nd Oct | 22nd Oct |
-| 2 | Standup session                              | Trigger the standup at configured time                |  | Calvin, Nirav   |          |          |
+| 2 | Standup session                              | Trigger the standup at configured time                |  | Calvin, Nirav   | 21st Oct | 21st Oct |
 | 3 | Mocking                                      | Create mock standup config for conducting standup     |  | Sharmin, Ronald | 21st Oct | 21st Oct |
 |   |                                              | Create mock standup data for reporting module         |  | Calvin, Nirav   |          |          |
 | 4 | Reporting                                    | Compile standup report and post to configured channel |  |  Bharat         |          |          |
@@ -38,7 +38,7 @@
 
 |   | Deliverable      | Tasks | Issues | Team Members | Estimated Date | Actual Date |
 |---|----------------------------------------------|---------------------------------------------------|--|-----------------|----------|----------|
-| 1 | Standup session                              | Trigger the standup post snooze                   |  | Calvin, Nirav   |          |          |
+| 1 | Standup session                              | Trigger the standup post snooze                   |  | Calvin, Nirav   |  23rd Oct | 21st Oct |
 |   | Standup session                              |Conduct standup using mock config                  |  | Calvin, Nirav   |          |          |
 | 2 | Selenium testing Use Case 1: New standup     | test new standup creation                         |  | Sharmin, Ronald | 23 Oct   | 23 Oct   |
 | 3 | Selenium testing Use Case 2: Standup session | (Contd.) test ongoing standup session             |  | Calvin, Nirav   | 25 Oct   |          |
