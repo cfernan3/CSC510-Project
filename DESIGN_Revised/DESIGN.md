@@ -65,12 +65,12 @@ The participant-list can be a combination of the following:
 	4. all users from the slack group: all
 If the user has not supplied the partcipant-list, Whatbot will prompt for it.
 
-Cancel the standup for today: cancel standup
+Cancel/Ignore the standup for today.
 (for deleting the standup, delete the bot)	 
 
-Show when the standup is scheduled for: show schedule
+Show when the standup is scheduled.
 
-Replace all standup questions with a new set of questions: modify | update | change | replace questions questions	
+Replace all standup questions with a new set of questions.	
 ```
 
 ### **Use Cases**
@@ -95,7 +95,7 @@ Alternative flows:
 	2. The use case continues.  
 
 5A. The user does not accept the default standup questions.  
-	1. User supplies his custome standup questions.  
+	1. User supplies his custom standup questions.  
 	2. Use case returns to step 6.  
 	
 6A. The user selects a different report delivery method.
