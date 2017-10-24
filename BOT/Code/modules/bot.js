@@ -69,6 +69,29 @@ const bot = {
                 console.log('Message sent: ', res);
             }
         });
+    },
+    //Function to send report to the channel
+    sendReport(channel_json) {
+        // Send message using Slack Web Client
+        var token = process.env.SLACK_API_TOKEN || ''
+        var web = new WebClient(token);
+        var channel_id = channel_json["channel_id"];
+        var user_id = channel_json["user_id"];
+        var report_json = channel_json["standup"];
+        console.log(report_json);
+        console.log(channel_id);
+        var report = `${user_id} has submitted his report. The reponses are as follows-\n\n`;
+        for(var que in report_json){
+            report += `Q: ${que}\n`;
+            report += `A: ${report_json[que]}\n\n`;
+        }
+        this.web.chat.postMessage(channel_id, report, function (err, res) {
+            if (err) {
+                console.log('Error:', err);
+            } else {
+                console.log('Message sent: ', res);
+            }
+        });
     }
 }
 module.exports = bot;
