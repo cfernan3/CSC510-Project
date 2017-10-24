@@ -51,14 +51,22 @@ rule.dayOfWeek = [0,1,2,3,4,5,6];
 rule.hour = 04;
 rule.minute = 27;
 
+//Loading config for mock
+var mock_config = require('./mock_config2.json');
+rule.hour = mock_config["startTimeHours"];
+rule.minute = mock_config['startTimeMins'];
+var participants = mock_config["participants"];
+var reportChannel = mock_config["reportChannel"];
+var questions = mock_config["questions"];
+
+
+for (var i=0;i< participants.length;i++){
+    bot.sendMessage(participants[i]["direct_message_id"],bot.introduceToUser(participants[i]["user_id"]));
+}
+
+
+
 var j = schedule.scheduleJob(rule, function(){
-
-
-
-//console.log('running a task every minute');
-  //condoel.log("Test");
-  //bot.sendMessage("D7JBPKD8B","Calvin is awesome");
-  //bot.sendMessage("D7JBPKD8B","Calvin is awesome");
   bot.sendMessage("D7LJ7H9U4",bot.introduceToUser("U7LJ7GXBN"))
   bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
 });
@@ -103,26 +111,25 @@ function findSelectedOption(originalMessage, actionCallbackId, selectedValue) {
 
 function question1(message){
 
- var payload = { type: 'direct_message',
-  channel: 'D7MSLM35H',
-  user: 'U74535JLB',
-  text: 'hello',
-  ts: '1508794897.000490',
-  source_team: 'T6XGVUQB1',
-  team: 'T6XGVUQB1',
-  raw_message:
-   { type: 'message',
+  if(message=={}){
+    message = { type: 'direct_message',
      channel: 'D7MSLM35H',
      user: 'U74535JLB',
      text: 'hello',
      ts: '1508794897.000490',
      source_team: 'T6XGVUQB1',
-     team: 'T6XGVUQB1' },
-  _pipeline: { stage: 'receive' }};
-  if(message=={}){
-    message = payload;
+     team: 'T6XGVUQB1',
+     raw_message:
+      { type: 'message',
+        channel: 'D7MSLM35H',
+        user: 'U74535JLB',
+        text: 'hello',
+        ts: '1508794897.000490',
+        source_team: 'T6XGVUQB1',
+        team: 'T6XGVUQB1' },
+     _pipeline: { stage: 'receive' }};;
 }
-var standupQuestions = ["What is your name?","Where do you live?","What do you do for living?"];
+var standupQuestions = questions;
 var responseAnswers = {};
   bkit.startPrivateConversation(payload, function(err, convo) {
 
@@ -159,98 +166,9 @@ var responseAnswers = {};
     }, {}, 'askSecondQue');
 
 
-
-
-    convo.addQuestion(standupQuestions[1], function (response, convo) {
-      console.log('Third question answered =', response.text);
-
-      var answer = response.text;
-      if (answer != null) {
-        responseAnswers[standupQuestions[1]] = answer;
-        console.log(`${standupQuestions[1]}:${answer}`);
-        convo.gotoThread('askThirdQue');
-      }
-      else {
-        console.log("Question not entered correctly");
-        convo.transitionTo('askThirdQue', "I'm sorry. I didn't understand you. Please give a proper answer.");
-      }
-    }, {}, 'askThirdQue');
-
-
-  convo.beforeThread('lastStatement', function(convo) {
-      console.log('Standup complete');
-    });
-
-    convo.addMessage('Awesome! Your Standup is complete!', 'lastStatement');
-
-  }); // startConversation Ends
-}
-
-
-
-// Action handling
-
-slackMessages.action('standup:start', (payload, respond) => {
-  // Create an updated message that acknowledges the user's action (even if the result of that
-  // action is not yet complete).
-  var optionName = payload.actions[0].name;
-  //console.log(optionName);
-  console.log(payload);
-  const channel = payload.channel.id;
-  //console.log(payload.channel);
-
-  if (optionName=="Start")
-  {
-    var updatedMessage = acknowledgeActionFromMessage(payload.original_message, 'standup:start',
-                                                      'I\'m getting the standup started.');
-    question1(payload);
-  }
-   else if (optionName=="Snooze")
-  {
-      var updatedMessage = acknowledgeActionFromMessage(payload.original_message, 'standup:start',
-                                                      'I will remind you in 15 minutes');
-  delay(6000)         //While deploying change t0 900000
-  .then(() => {
-      //console.log("Test")
-      bot.sendMessage(channel,bot.introduceToUser(payload.user[0].id))
-  });
-  }
-   else
-  {
-      var updatedMessage = acknowledgeActionFromMessage(payload.original_message, 'standup:start',
-                                                      'See you tomorrow');
-  }
-  console.log("\n Updated Message \n")
-  console.log(updatedMessage);
-  return updatedMessage;
-});
-
-// Create the server to listen for events
-const port = normalizePort(process.env.PORT || '3000');
-const app = express();
-app.use(bodyParser.json());
-app.use('/slack/events', slackEvents.expressMiddleware());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use('/slack/actions', slackMessages.expressMiddleware());
-// Start the server
-http.createServer(app).listen(port, () => {
-  console.log(`server listening on port ${port}`);
-});
-
-bot.sendReport({"channel_id":"C7HTHUL3B","user_id":"C7HTHUL3B","standup":{"Who came first?":"Nobody! Both were sleeping."}});
-var controller = Botkit.slackbot({
-  debug: true,
-});
-var bkit = controller.spawn({
-  token: process.env.SLACK_API_TOKEN,
-}).startRTM();
-      }
-    }, {}, 'askSecondQue');
-
-
     convo.addMessage({text:standupQuestions[2], action:'askThirdQue'}, 'default');
 
-    convo.addQuestion(standupQuestions[1], function (response, convo) {
+    convo.addQuestion(standupQuestions[2], function (response, convo) {
       console.log('Third question answered =', response.text);
 
       var answer = response.text;
@@ -300,9 +218,7 @@ slackMessages.action('standup:start', (payload, respond) => {
   {
     var updatedMessage = acknowledgeActionFromMessage(payload.original_message, 'standup:start',
                                                       'I\'m getting the standup started.');
-    var responses = question1(payload);
-    console.log("----Responses-----------");
-    console.log(responses);
+    question1(payload);
   }
    else if (optionName=="Snooze")
   {
