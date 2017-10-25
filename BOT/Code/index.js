@@ -45,12 +45,20 @@ var bkit = controller.spawn({
 //var j = schedule.scheduleJob('* * * * *', function()  {
 var rule = new schedule.RecurrenceRule();                      //Reference:https://www.npmjs.com/package/node-schedule
 //rule.dayOfWeek = [0, new schedule.Range(1, 4)];
-rule.dayOfWeek = [0,1,2,3,4,5,6];            
-rule.hour = 02;
-rule.minute = 24;
- 
+rule.dayOfWeek = [0,1,2,3,4,5,6];
+rule.hour = 22;
+rule.minute = 37;
+
+controller.hears('hello', 'direct_message', function(bot, message) {
+    bot.reply(message, 'Hello human.');
+    console.log(message);
+    question1(message);
+});
+
+//bot.sendMessage("D7MDMK081",bot.introduceToUser("U7LJ7GXBN")) //Selenium Test
+//bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
 var j = schedule.scheduleJob(rule, function(){
-  
+
 
 
 //console.log('running a task every minute');
@@ -60,9 +68,10 @@ var j = schedule.scheduleJob(rule, function(){
   bot.sendMessage("D7LJ7H9U4",bot.introduceToUser("U7LJ7GXBN"))
   bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
 });
-
+bot.sendMessage("D7LJ7H9U4",bot.introduceToUser("U7LJ7GXBN"))
+bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
 /*
-//------Replace by scheduling code------ 
+//------Replace by scheduling code------
 slackEvents.on('message', (event) => {
   console.log("Event Received");
   // Filter out messages from this bot itself or updates to messages
@@ -101,21 +110,35 @@ function findSelectedOption(originalMessage, actionCallbackId, selectedValue) {
 // --- Bot QnA ---
 
 function question1(payload){
-
-  var message = { 
-    text: 'C7HTHUL3B has submitted his report. His reponses are as follows-\n\nQ: Who came first?\nA: Nobody! Both were sleeping.\n\n',
-    username: payload.user[0].name,      
-    type: 'message',
-    ts: '1508651605.000038' 
+    var message = { type: 'direct_message',
+      channel: payload.channel.id,
+      user: payload.user.id,
+      text: 'Hello',
+      ts: payload.action_ts,
+      source_team: payload.team.id,
+      team: payload.team.id,
+      raw_message:
+       { type: 'message',
+         channel: payload.channel.id,
+         user: payload.user.id,
+         text: 'Hello',
+         ts: payload.original_message.action_ts,
+         source_team: payload.team.id,
+         team: payload.team.id },
+      _pipeline: { stage: 'receive' }
   }
+    //  match: [ 'Hello', index: 0, input: 'Hello' ] }
 
-  bkit.startConversation(message, function(err, convo) {
+    // if(payload=={}){
+    //   payload = message;
+    //}
+  bkit.startPrivateConversation(message, function(err, convo) {
     var standupQuestions = ["What is your name.","Where do you live?","What do you do for living?"];
     var responseAnswers = {};
-    convo.addMessage({text:standupQuestions[0], action:'askFirstQue'}, 'default');
+    convo.addMessage({text:"Here are your questions.",action:'askFirstQue'}, 'default');
     convo.addQuestion(standupQuestions[0], function (response, convo) {
       console.log('First question answered =', response.text);
- 
+
       var answer = response.text;
       if (answer != null) {
         responseAnswers[standupQuestions[0]] = answer;
@@ -126,14 +149,12 @@ function question1(payload){
         console.log("Question not entered correctly");
         convo.transitionTo('askFirstQue', "I'm sorry. I didn't understand you. Please give a proper answer.");
       }
-    }, {}, 'askSecondQue');
- 
- 
-    convo.addMessage({text:standupQuestions[1], action:'askSecondQue'}, 'default');
- 
+  }, {}, 'askFirstQue');
+
+
     convo.addQuestion(standupQuestions[1], function (response, convo) {
       console.log('Second question answered =', response.text);
- 
+
       var answer = response.text;
       if (answer != null) {
         responseAnswers[standupQuestions[1]] = answer;
@@ -145,32 +166,37 @@ function question1(payload){
         convo.transitionTo('askSecondQue', "I'm sorry. I didn't understand you. Please give a proper answer.");
       }
     }, {}, 'askSecondQue');
- 
- 
-    convo.addMessage({text:standupQuestions[2], action:'askThirdQue'}, 'default');
- 
-    convo.addQuestion(standupQuestions[1], function (response, convo) {
+
+
+    convo.addQuestion(standupQuestions[2], function (response, convo) {
       console.log('Third question answered =', response.text);
- 
+
       var answer = response.text;
       if (answer != null) {
-        responseAnswers[standupQuestions[1]] = answer;
-        console.log(`${standupQuestions[1]}:${answer}`);
-        convo.gotoThread('askThirdQue');
+        responseAnswers[standupQuestions[2]] = answer;
+        console.log(`${standupQuestions[2]}:${answer}`);
+        convo.gotoThread('lastStatement');
       }
       else {
         console.log("Question not entered correctly");
         convo.transitionTo('askThirdQue', "I'm sorry. I didn't understand you. Please give a proper answer.");
       }
     }, {}, 'askThirdQue');
- 
-  
-  convo.beforeThread('lastStatement', function(convo) {
-      console.log('Standup complete');
-    });
- 
-    convo.addMessage('Awesome! Your Standup is complete!', 'lastStatement');
- 
+
+
+    convo.addQuestion("Press 'y' to redo the standup, else press any other key to save.", function (response, convo) {
+          console.log('Last Statement =', response.text);
+
+          var answer = response.text;
+          if (answer != 'y') {
+            console.log(`Standup Complete`);
+            bot.sendReport({"channel_id":"C7HTHUL3B","user_id":"U74535JLB","standup":responseAnswers});
+          }
+          else {
+            console.log("Standup redo requested");
+            convo.transitionTo('askFirstQue', "Okay, we are redoing the standup.");
+          }
+      }, {}, 'lastStatement');
   }); // startConversation Ends
 }
 
@@ -186,7 +212,7 @@ slackMessages.action('standup:start', (payload, respond) => {
   console.log(payload);
   const channel = payload.channel.id;
   //console.log(payload.channel);
-  
+
   if (optionName=="Start")
   {
     var updatedMessage = acknowledgeActionFromMessage(payload.original_message, 'standup:start',

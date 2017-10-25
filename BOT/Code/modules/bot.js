@@ -73,7 +73,7 @@ const bot = {
     //Function to send report to the channel
     sendReport(channel_json) {
         // Send message using Slack Web Client
-        var token = process.env.SLACK_API_TOKEN || ''
+        var token = process.env.SLACK_BOT_TOKEN || ''
         var web = new WebClient(token);
         var channel_id = channel_json["channel_id"];
         var user_id = channel_json["user_id"];
@@ -95,4 +95,3 @@ const bot = {
     }
 }
 module.exports = bot;
-
