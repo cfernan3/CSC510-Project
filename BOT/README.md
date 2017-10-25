@@ -1,6 +1,6 @@
 Revised Design -> https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/DESIGN_Revised/DESIGN.md
 
-[BOT.md](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/BOT.md)
+BOT.md -> https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/BOT.md
 
 CODE -> https://github.ncsu.edu/nedsouza/CSC510-Project/tree/master/BOT/Code
 
