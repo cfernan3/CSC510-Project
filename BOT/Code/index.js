@@ -20,6 +20,11 @@ const bot = require('./modules/bot');
 //var sleep = require('sleep');
 var schedule = require('node-schedule')
 var Botkit = require('botkit')
+//---------Required for reporting----------//
+var nock = require("nock");
+var https = require("https");
+var request = require("request")
+
 // --- Slack Events ---
 const slackEvents = slackEventsAPI.createSlackEventAdapter(process.env.SLACK_VERIFICATION_TOKEN);
 /* Not needed for now
@@ -33,6 +38,7 @@ var controller = Botkit.slackbot({
 var bkit = controller.spawn({
   token: process.env.SLACK_API_TOKEN,
 }).startRTM();
+
 // Scheduling code created
 //sched.schedule(' * * * *',function(){
 //var j = schedule.scheduleJob('* * * * *', function()  {
@@ -41,14 +47,24 @@ var rule = new schedule.RecurrenceRule();                      //Reference:https
 rule.dayOfWeek = [0,1,2,3,4,5,6];
 rule.hour = 22;
 rule.minute = 37;
-controller.hears('hello', 'direct_message', function(bot, message) {
-    bot.reply(message, 'Hello human.');
-    console.log(message);
-    question1(message);
-});
+//Loading config for mock
+var mock_config = require('./mock_config2.json');
+rule.hour = mock_config["startTimeHours"];
+rule.minute = mock_config['startTimeMins'];
+var participants = mock_config["participants"];
+var reportChannel = mock_config["reportChannel"];
+var questions = mock_config["questions"];
+
+
+for (var i=0;i< participants.length;i++){
+    bot.sendMessage(participants[i]["direct_message_id"],bot.introduceToUser(participants[i]["user_id"]));
+}
+
+
 //bot.sendMessage("D7MDMK081",bot.introduceToUser("U7LJ7GXBN")) //Selenium Test
 //bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
 var j = schedule.scheduleJob(rule, function(){
+
 //console.log('running a task every minute');
   //condoel.log("Test");
   //bot.sendMessage("D7JBPKD8B","Calvin is awesome");
@@ -56,8 +72,7 @@ var j = schedule.scheduleJob(rule, function(){
   bot.sendMessage("D7LJ7H9U4",bot.introduceToUser("U7LJ7GXBN"))
   bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
 });
-bot.sendMessage("D7LJ7H9U4",bot.introduceToUser("U7LJ7GXBN"))
-bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
+
 /*
 //------Replace by scheduling code------
 slackEvents.on('message', (event) => {
@@ -69,6 +84,7 @@ slackEvents.on('message', (event) => {
   bot.handleDirectMessage(event);
 });
 */
+
 // --- Slack Interactive Messages ---
 const slackMessages =
   slackInteractiveMessages.createMessageAdapter(process.env.SLACK_VERIFICATION_TOKEN);
@@ -87,7 +103,6 @@ function findSelectedOption(originalMessage, actionCallbackId, selectedValue) {
   const attachment = findAttachment(originalMessage, actionCallbackId);
   return attachment.actions[0].options.find(o => o.value === selectedValue);
 }
-// --- Bot QnA ---
 function question1(payload){
     var message = { type: 'direct_message',
       channel: payload.channel.id,
@@ -96,6 +111,7 @@ function question1(payload){
       ts: payload.action_ts,
       source_team: payload.team.id,
       team: payload.team.id,
+      username:payload.user.name,
       raw_message:
        { type: 'message',
          channel: payload.channel.id,
@@ -111,7 +127,7 @@ function question1(payload){
     //   payload = message;
     //}
   bkit.startPrivateConversation(message, function(err, convo) {
-    var standupQuestions = ["What is your name.","Where do you live?","What do you do for living?"];
+    var standupQuestions = questions;//["What is your name.","Where do you live?","What do you do for living?"];
     var responseAnswers = {};
     convo.addMessage({text:"Here are your questions.",action:'askFirstQue'}, 'default');
     convo.addQuestion(standupQuestions[0], function (response, convo) {
@@ -127,6 +143,8 @@ function question1(payload){
         convo.transitionTo('askFirstQue', "I'm sorry. I didn't understand you. Please give a proper answer.");
       }
   }, {}, 'askFirstQue');
+
+
     convo.addQuestion(standupQuestions[1], function (response, convo) {
       console.log('Second question answered =', response.text);
       var answer = response.text;
@@ -153,12 +171,58 @@ function question1(payload){
         convo.transitionTo('askThirdQue', "I'm sorry. I didn't understand you. Please give a proper answer.");
       }
     }, {}, 'askThirdQue');
+
+
     convo.addQuestion("Press 'y' to redo the standup, else press any other key to save.", function (response, convo) {
           console.log('Last Statement =', response.text);
+
           var answer = response.text;
           if (answer != 'y') {
             console.log(`Standup Complete`);
-            bot.sendReport({"channel_id":"C7HTHUL3B","user_id":"U74535JLB","standup":responseAnswers});
+            bot.sendReport({"channel_id":reportChannel,"user_name":message.username,"standup":responseAnswers});
+            /*************REFERENCE*************************
+https://nodemailer.com/about/
+https://stackoverflow.com/questions/42414634/nodemailer-using-gmail-cannot-create-property-mailer-on-string-smtp
+http://blog.ijasoneverett.com/2013/07/emailing-in-node-js-with-nodemailer/
+
+**********************************************/
+
+var api = nock("https://sheets.googleapis.com")
+.get("/v4/spreadsheets/abcdefgh/")
+.reply(200, {
+  "user_name":message.username,
+  "standup":{responseAnswers}
+});
+
+https.get("https://sheets.googleapis.com/v4/spreadsheets/abcdefgh/", function(resp) {
+var str = "";
+resp.on("data", function(data) { str += data; });
+resp.on("end", function() {
+console.log(str);
+var string = str
+//var string = JSON.stringify(str);
+
+
+'use strict';
+const nodemailer = require('nodemailer');
+var smtpTransport = nodemailer.createTransport("smtps://whatbot.ncsu%40gmail.com:"+encodeURIComponent('12345ABCDE') + "@smtp.gmail.com:465");
+smtpTransport.sendMail({  //email options
+from: "whatbot.ncsu@gmail.com", // sender address.  Must be the same as authenticated user if using Gmail.
+to: "cfernan3@ncsu.edu , nedsouza@ncsu.edu, rjoseph4@ncsu.edu", // receiver
+subject: "Report", // subject
+text: string // body
+}, function(error, response){  //callback
+if(error){
+console.log(error);
+}else{
+console.log("Message sent: " + response.message);
+}
+
+smtpTransport.close(); // shut down the connection pool, no more messages.  Comment this line out to continue sending emails.
+});
+
+});
+});
           }
           else {
             console.log("Standup redo requested");
@@ -186,7 +250,7 @@ slackMessages.action('standup:start', (payload, respond) => {
   {
       var updatedMessage = acknowledgeActionFromMessage(payload.original_message, 'standup:start',
                                                       'I will remind you in 15 minutes');
-  delay(6000)         //While deploying change t0 900000
+  delay(10000)         //While deploying change to 900000
   .then(() => {
       //console.log("Test")
       bot.sendMessage(channel,bot.introduceToUser(payload.user[0].id))
