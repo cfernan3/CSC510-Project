@@ -213,8 +213,7 @@ http://blog.ijasoneverett.com/2013/07/emailing-in-node-js-with-nodemailer/
 
 var api = nock("https://sheets.googleapis.com")
 .get("/v4/spreadsheets/abcdefgh/")
-.reply(200, {  
-  "channel_id": "C7HTHUL3B",
+.reply(200, {
   "user_name":message.username,
   "standup":{  
      "What did you accomplish yesterday?":"I completed the DevOps Test Analysis Milestone",
