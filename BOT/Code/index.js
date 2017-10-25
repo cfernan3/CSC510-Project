@@ -232,7 +232,7 @@ slackMessages.action('standup:start', (payload, respond) => {
   {
       var updatedMessage = acknowledgeActionFromMessage(payload.original_message, 'standup:start',
                                                       'I will remind you in 15 minutes');
-  delay(6000)         //While deploying change t0 900000
+  delay(10000)         //While deploying change to 900000
   .then(() => {
       //console.log("Test")
       bot.sendMessage(channel,bot.introduceToUser(payload.user[0].id))
