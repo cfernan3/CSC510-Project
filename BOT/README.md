@@ -124,6 +124,7 @@ https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/WORKSHEET.md
 ### Screencast
 Please find the screen casts below:
 1. [Creating a new standup](UseCase1_CreateNewStandup.mp4)
+
 https://youtu.be/8J91jmzDJuE
 
 2. [Editing an existing standup](UseCase3_EditStandup.mp4)
