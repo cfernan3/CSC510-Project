@@ -2,6 +2,8 @@ Revised Design -> https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/DE
 
 BOT.md -> https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/BOT.md
 
+CODE -> https://github.ncsu.edu/nedsouza/CSC510-Project/tree/master/BOT/Code
+
 ### Use Case Refinement  
 
 #### 1) Create a new standup
