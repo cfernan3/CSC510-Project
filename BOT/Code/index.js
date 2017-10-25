@@ -23,6 +23,10 @@ const bot = require('./modules/bot');
 //var sleep = require('sleep');
 var schedule = require('node-schedule')
 var Botkit = require('botkit')
+//---------Required for reporting----------//
+var nock = require("nock");
+var https = require("https");
+var request = require("request")
 
 // --- Slack Events ---
 const slackEvents = slackEventsAPI.createSlackEventAdapter(process.env.SLACK_VERIFICATION_TOKEN);
@@ -200,6 +204,53 @@ function question1(payload){
           if (answer != 'y') {
             console.log(`Standup Complete`);
             bot.sendReport({"channel_id":reportChannel,"user_name":message.username,"standup":responseAnswers});
+            /*************REFERENCE*************************
+https://nodemailer.com/about/
+https://stackoverflow.com/questions/42414634/nodemailer-using-gmail-cannot-create-property-mailer-on-string-smtp
+http://blog.ijasoneverett.com/2013/07/emailing-in-node-js-with-nodemailer/
+
+**********************************************/
+
+var api = nock("https://sheets.googleapis.com")
+.get("/v4/spreadsheets/abcdefgh/")
+.reply(200, {  
+  "channel_id": "C7HTHUL3B",
+  "user_name":"cfernan3",
+  "standup":{  
+     "What did you accomplish yesterday?":"I completed the DevOps Test Analysis Milestone",
+     "What will you work on today?":"Will be working on DevOps Deployment Milestone",
+     "Is there anything blocking your progress?":"Not yet"
+  }
+});
+
+https.get("https://sheets.googleapis.com/v4/spreadsheets/abcdefgh/", function(resp) {
+var str = "";
+resp.on("data", function(data) { str += data; });
+resp.on("end", function() {
+console.log(str);
+var string = JSON.stringify(str);
+
+
+'use strict';
+const nodemailer = require('nodemailer');
+var smtpTransport = nodemailer.createTransport("smtps://whatbot.ncsu%40gmail.com:"+encodeURIComponent('12345ABCDE') + "@smtp.gmail.com:465");
+smtpTransport.sendMail({  //email options
+from: "whatbot.ncsu@gmail.com", // sender address.  Must be the same as authenticated user if using Gmail.
+to: "cfernan3@ncsu.edu , nedsouza@ncsu.edu, rjoseph4@ncs.edu", // receiver
+subject: "Report", // subject
+text: string // body
+}, function(error, response){  //callback
+if(error){
+console.log(error);
+}else{
+console.log("Message sent: " + response.message);
+}
+
+smtpTransport.close(); // shut down the connection pool, no more messages.  Comment this line out to continue sending emails.
+});
+
+});
+});
           }
           else {
             console.log("Standup redo requested");
