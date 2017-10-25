@@ -44,8 +44,8 @@ public class NewStandupConfigTest
 	@AfterClass
 	public static void  tearDown() throws Exception
 	{
-		driver.close();
-		driver.quit();
+		// driver.close();
+		// driver.quit();
 	}
 
 
@@ -53,9 +53,9 @@ public class NewStandupConfigTest
 	@Test
 	public void StartConfig() throws Exception
 	{
-		driver.get("https://parkwoodgang.slack.com/messages/whatrsbot/");
+		driver.get("https://parkwoodgang.slack.com/messages/whatbot/");
 		WebDriverWait wait = new WebDriverWait(driver, 70);
-		wait.until(ExpectedConditions.titleContains("whatrsbot"));
+		wait.until(ExpectedConditions.titleContains("whatbot"));
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("msg_input")));
 		
 		// Type schedule
@@ -64,9 +64,21 @@ public class NewStandupConfigTest
 		bot.sendKeys(Keys.RETURN);
 		Thread.sleep(3000);
 		
-		// Configuring start time
+		// Configuring wrong start time
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[contains(@class,'message_body') and text() = 'What time would you like to start the standup?']")));
 		WebElement startTime = driver.findElement(
+				By.xpath("//span[contains(@class,'message_body') and text() = 'What time would you like to start the standup?']"));
+		assertNotNull(startTime);
+		Thread.sleep(3000);
+		
+		bot = driver.findElement(By.xpath("//div[@id='msg_input']/div")); // ("msg_input").);
+		bot.sendKeys("Start at 25");
+		bot.sendKeys(Keys.RETURN);
+		Thread.sleep(3000);
+
+		// Configuring start time
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[contains(@class,'message_body') and text() = 'What time would you like to start the standup?']")));
+		startTime = driver.findElement(
 				By.xpath("//span[contains(@class,'message_body') and text() = 'What time would you like to start the standup?']"));
 		assertNotNull(startTime);
 		Thread.sleep(3000);
@@ -82,6 +94,7 @@ public class NewStandupConfigTest
 				By.xpath("//span[contains(@class,'message_body') and text() = 'When would you like the standup to end?']"));
 		assertNotNull(endTime);
 		Thread.sleep(3000);
+
 		
 		bot = driver.findElement(By.xpath("//div[@id='msg_input']/div")); // ("msg_input").);
 		bot.sendKeys("End at 10:30 am");

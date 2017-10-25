@@ -44,8 +44,8 @@ public class EditStandupConfigTest
 	@AfterClass
 	public static void  tearDown() throws Exception
 	{
-		// driver.close();
-		// driver.quit();
+		driver.close();
+		driver.quit();
 	}
 
 
@@ -53,9 +53,9 @@ public class EditStandupConfigTest
 	@Test
 	public void ModifyConfig() throws Exception
 	{
-		driver.get("https://parkwoodgang.slack.com/messages/whatrsbot/");
+		driver.get("https://parkwoodgang.slack.com/messages/whatbot/");
 		WebDriverWait wait = new WebDriverWait(driver, 70);
-		wait.until(ExpectedConditions.titleContains("whatrsbot"));
+		wait.until(ExpectedConditions.titleContains("whatbot"));
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("msg_input")));
 			
 		// Modify standup
@@ -164,7 +164,7 @@ public class EditStandupConfigTest
 		Thread.sleep(1000);
 		bot.sendKeys("Done.");
 		bot.sendKeys(Keys.RETURN);
-		Thread.sleep(1000);
+		Thread.sleep(3000);
 		
 		// Modify standup
 		bot = driver.findElement(By.xpath("//div[@id='msg_input']/div")); 
