@@ -49,11 +49,19 @@ rule.dayOfWeek = [0,1,2,3,4,5,6];
 rule.hour = 22;
 rule.minute = 37;
 
-controller.hears('hello', 'direct_message', function(bot, message) {
-    bot.reply(message, 'Hello human.');
-    console.log(message);
-    question1(message);
-});
+//Loading config for mock
+var mock_config = require('./mock_config2.json');
+rule.hour = mock_config["startTimeHours"];
+rule.minute = mock_config['startTimeMins'];
+var participants = mock_config["participants"];
+var reportChannel = mock_config["reportChannel"];
+var questions = mock_config["questions"];
+
+
+for (var i=0;i< participants.length;i++){
+    bot.sendMessage(participants[i]["direct_message_id"],bot.introduceToUser(participants[i]["user_id"]));
+}
+
 
 //bot.sendMessage("D7MDMK081",bot.introduceToUser("U7LJ7GXBN")) //Selenium Test
 //bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
@@ -68,8 +76,8 @@ var j = schedule.scheduleJob(rule, function(){
   bot.sendMessage("D7LJ7H9U4",bot.introduceToUser("U7LJ7GXBN"))
   bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
 });
-bot.sendMessage("D7LJ7H9U4",bot.introduceToUser("U7LJ7GXBN"))
-bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
+//bot.sendMessage("D7LJ7H9U4",bot.introduceToUser("U7LJ7GXBN"))
+//bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
 /*
 //------Replace by scheduling code------
 slackEvents.on('message', (event) => {
@@ -117,6 +125,7 @@ function question1(payload){
       ts: payload.action_ts,
       source_team: payload.team.id,
       team: payload.team.id,
+      username:payload.user.name,
       raw_message:
        { type: 'message',
          channel: payload.channel.id,
@@ -133,7 +142,7 @@ function question1(payload){
     //   payload = message;
     //}
   bkit.startPrivateConversation(message, function(err, convo) {
-    var standupQuestions = ["What is your name.","Where do you live?","What do you do for living?"];
+    var standupQuestions = questions;//["What is your name.","Where do you live?","What do you do for living?"];
     var responseAnswers = {};
     convo.addMessage({text:"Here are your questions.",action:'askFirstQue'}, 'default');
     convo.addQuestion(standupQuestions[0], function (response, convo) {
@@ -190,7 +199,7 @@ function question1(payload){
           var answer = response.text;
           if (answer != 'y') {
             console.log(`Standup Complete`);
-            bot.sendReport({"channel_id":"C7HTHUL3B","user_id":"U74535JLB","standup":responseAnswers});
+            bot.sendReport({"channel_id":reportChannel,"user_name":message.username,"standup":responseAnswers});
           }
           else {
             console.log("Standup redo requested");
