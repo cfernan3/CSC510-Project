@@ -215,11 +215,7 @@ var api = nock("https://sheets.googleapis.com")
 .get("/v4/spreadsheets/abcdefgh/")
 .reply(200, {
   "user_name":message.username,
-  "standup":{  
-     "What did you accomplish yesterday?":"I completed the DevOps Test Analysis Milestone",
-     "What will you work on today?":"Will be working on DevOps Deployment Milestone",
-     "Is there anything blocking your progress?":"Not yet"
-  }
+  "standup":{responseAnswers}
 });
 
 https.get("https://sheets.googleapis.com/v4/spreadsheets/abcdefgh/", function(resp) {
