@@ -73,6 +73,7 @@ const bot = {
     //Function to send report to the channel
     sendReport(channel_json) {
         // Send message using Slack Web Client
+
         var token = process.env.SLACK_BOT_TOKEN || ''
         var web = new WebClient(token);
         var channel_id = channel_json["channel_id"];
@@ -84,6 +85,7 @@ const bot = {
         for(var que in report_json){
             report += `Q: ${que}\n`;
             report += `A: ${report_json[que]}\n`;
+
         }
         this.web.chat.postMessage(channel_id, report, function (err, res) {
             if (err) {

@@ -1,9 +1,5 @@
 Revised Design -> https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/DESIGN_Revised/DESIGN.md
 
-BOT.md -> https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/BOT.md
-
-CODE -> https://github.ncsu.edu/nedsouza/CSC510-Project/tree/master/BOT/Code
-
 ### Use Case Refinement  
 
 #### 1) Create a new standup
@@ -123,7 +119,6 @@ Please find the Selenium test Maven folder [here](Selenium).
 ### Stories, Tasks, and Task Tracking  
 
 https://trello.com/b/c9BAsFYW/milestone2
-
 https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/WORKSHEET.md
 
 ### Screencast

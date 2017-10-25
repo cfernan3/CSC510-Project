@@ -7,16 +7,13 @@ https://docs.npmjs.com/files/package.json
 #########################################################
 */
 require('dotenv').config();
-
 const http = require('http');
 const express = require('express');
 const bodyParser = require('body-parser');
 const normalizePort = require('normalize-port');
 const delay = require('delay');
-
 const slackEventsAPI = require('@slack/events-api');
 const slackInteractiveMessages = require('@slack/interactive-messages');
-
 const cloneDeep = require('lodash.clonedeep');
 const bot = require('./modules/bot');
 //var sched = require('node-cron');
@@ -35,14 +32,12 @@ slackEvents.on('team_join', (event) => {
   bot.introduceToUser(event.user.id);
 });
 */
-
 var controller = Botkit.slackbot({
   debug: true,
 });
 var bkit = controller.spawn({
   token: process.env.SLACK_API_TOKEN,
 }).startRTM();
-
 
 // Scheduling code created
 //sched.schedule(' * * * *',function(){
@@ -52,7 +47,6 @@ var rule = new schedule.RecurrenceRule();                      //Reference:https
 rule.dayOfWeek = [0,1,2,3,4,5,6];
 rule.hour = 22;
 rule.minute = 37;
-
 //Loading config for mock
 var mock_config = require('./mock_config2.json');
 rule.hour = mock_config["startTimeHours"];
@@ -71,8 +65,6 @@ for (var i=0;i< participants.length;i++){
 //bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
 var j = schedule.scheduleJob(rule, function(){
 
-
-
 //console.log('running a task every minute');
   //condoel.log("Test");
   //bot.sendMessage("D7JBPKD8B","Calvin is awesome");
@@ -80,8 +72,7 @@ var j = schedule.scheduleJob(rule, function(){
   bot.sendMessage("D7LJ7H9U4",bot.introduceToUser("U7LJ7GXBN"))
   bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
 });
-//bot.sendMessage("D7LJ7H9U4",bot.introduceToUser("U7LJ7GXBN"))
-//bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
+
 /*
 //------Replace by scheduling code------
 slackEvents.on('message', (event) => {
@@ -94,18 +85,13 @@ slackEvents.on('message', (event) => {
 });
 */
 
-
-
 // --- Slack Interactive Messages ---
 const slackMessages =
   slackInteractiveMessages.createMessageAdapter(process.env.SLACK_VERIFICATION_TOKEN);
-
 // Helper functions
-
 function findAttachment(message, actionCallbackId) {
   return message.attachments.find(a => a.callback_id === actionCallbackId);
 }
-
 function acknowledgeActionFromMessage(originalMessage, actionCallbackId, ackText) {
   const message = cloneDeep(originalMessage);
   const attachment = findAttachment(message, actionCallbackId);
@@ -113,14 +99,10 @@ function acknowledgeActionFromMessage(originalMessage, actionCallbackId, ackText
   attachment.text = `:white_check_mark: ${ackText}`;
   return message;
 }
-
 function findSelectedOption(originalMessage, actionCallbackId, selectedValue) {
   const attachment = findAttachment(originalMessage, actionCallbackId);
   return attachment.actions[0].options.find(o => o.value === selectedValue);
 }
-
-// --- Bot QnA ---
-
 function question1(payload){
     var message = { type: 'direct_message',
       channel: payload.channel.id,
@@ -141,7 +123,6 @@ function question1(payload){
       _pipeline: { stage: 'receive' }
   }
     //  match: [ 'Hello', index: 0, input: 'Hello' ] }
-
     // if(payload=={}){
     //   payload = message;
     //}
@@ -151,7 +132,6 @@ function question1(payload){
     convo.addMessage({text:"Here are your questions.",action:'askFirstQue'}, 'default');
     convo.addQuestion(standupQuestions[0], function (response, convo) {
       console.log('First question answered =', response.text);
-
       var answer = response.text;
       if (answer != null) {
         responseAnswers[standupQuestions[0]] = answer;
@@ -167,7 +147,6 @@ function question1(payload){
 
     convo.addQuestion(standupQuestions[1], function (response, convo) {
       console.log('Second question answered =', response.text);
-
       var answer = response.text;
       if (answer != null) {
         responseAnswers[standupQuestions[1]] = answer;
@@ -179,11 +158,8 @@ function question1(payload){
         convo.transitionTo('askSecondQue', "I'm sorry. I didn't understand you. Please give a proper answer.");
       }
     }, {}, 'askSecondQue');
-
-
     convo.addQuestion(standupQuestions[2], function (response, convo) {
       console.log('Third question answered =', response.text);
-
       var answer = response.text;
       if (answer != null) {
         responseAnswers[standupQuestions[2]] = answer;
@@ -255,11 +231,7 @@ smtpTransport.close(); // shut down the connection pool, no more messages.  Comm
       }, {}, 'lastStatement');
   }); // startConversation Ends
 }
-
-
-
 // Action handling
-
 slackMessages.action('standup:start', (payload, respond) => {
   // Create an updated message that acknowledges the user's action (even if the result of that
   // action is not yet complete).
@@ -268,7 +240,6 @@ slackMessages.action('standup:start', (payload, respond) => {
   console.log(payload);
   const channel = payload.channel.id;
   //console.log(payload.channel);
-
   if (optionName=="Start")
   {
     var updatedMessage = acknowledgeActionFromMessage(payload.original_message, 'standup:start',
@@ -294,7 +265,6 @@ slackMessages.action('standup:start', (payload, respond) => {
   console.log(updatedMessage);
   return updatedMessage;
 });
-
 // Create the server to listen for events
 const port = normalizePort(process.env.PORT || '3000');
 const app = express();
