@@ -52,8 +52,6 @@ public class WebTest
 		driver.close();
 		driver.quit();
 	}
-
-/*
 	
 	@Test
 	public void StartStandup() throws Exception
@@ -184,7 +182,7 @@ public class WebTest
     	Ignore.get(0).click();
     	Thread.sleep(5000); 
 	}
-	*/	
+	
 	@Test
 	public void RedoStandup() throws Exception
 	{
