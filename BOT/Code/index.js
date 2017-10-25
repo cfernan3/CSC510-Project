@@ -213,9 +213,8 @@ http://blog.ijasoneverett.com/2013/07/emailing-in-node-js-with-nodemailer/
 
 var api = nock("https://sheets.googleapis.com")
 .get("/v4/spreadsheets/abcdefgh/")
-.reply(200, {  
-  "channel_id": "C7HTHUL3B",
-  "user_name":"cfernan3",
+.reply(200, {
+  "user_name":payload.user.name,
   "standup":{  
      "What did you accomplish yesterday?":"I completed the DevOps Test Analysis Milestone",
      "What will you work on today?":"Will be working on DevOps Deployment Milestone",
@@ -228,7 +227,7 @@ var str = "";
 resp.on("data", function(data) { str += data; });
 resp.on("end", function() {
 console.log(str);
-var string = str
+var string = "Standup report of user" +str.user_name + " \n " + str.standup
 //var string = JSON.stringify(str);
 
 
@@ -237,7 +236,7 @@ const nodemailer = require('nodemailer');
 var smtpTransport = nodemailer.createTransport("smtps://whatbot.ncsu%40gmail.com:"+encodeURIComponent('12345ABCDE') + "@smtp.gmail.com:465");
 smtpTransport.sendMail({  //email options
 from: "whatbot.ncsu@gmail.com", // sender address.  Must be the same as authenticated user if using Gmail.
-to: "cfernan3@ncsu.edu , nedsouza@ncsu.edu, rjoseph4@ncs.edu", // receiver
+to: "cfernan3@ncsu.edu , nedsouza@ncsu.edu, rjoseph4@ncsu.edu", // receiver
 subject: "Report", // subject
 text: string // body
 }, function(error, response){  //callback
