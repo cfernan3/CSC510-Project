@@ -12,4 +12,4 @@
 
 ### Design_Revised https://github.ncsu.edu/nedsouza/CSC510-Project/tree/master/DESIGN_Revised/DESIGN.md
 
-### Bot https://github.ncsu.edu/nedsouza/CSC510-Project/tree/master/BOT
+### BOT https://github.ncsu.edu/nedsouza/CSC510-Project/tree/master/BOT
