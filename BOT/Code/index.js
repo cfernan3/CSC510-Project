@@ -228,7 +228,8 @@ var str = "";
 resp.on("data", function(data) { str += data; });
 resp.on("end", function() {
 console.log(str);
-var string = JSON.stringify(str);
+var string = str
+//var string = JSON.stringify(str);
 
 
 'use strict';
