@@ -109,6 +109,11 @@ Alternative flows:
 
 ### Mocking Service Component
 * ***Mocking the bot config file used for Use Case 2:*** 
+
+Below is the mock JSON used
+*****************************************************************************************
+
+
 * **Mocking Google spreadsheet API:** 
 We are using Google REST API to store the answers we receive from the whatbot. For now we are mocking the storage of this data. When generating a report we are using mock data to simulate retrieval of answers from the Google Sheet and publish it to the Slack channel.
 
@@ -124,7 +129,7 @@ Below is the snippet of the HTTP GET request initiated by the Bot
 ![image](https://media.github.ncsu.edu/user/6391/files/8cb6e466-b9c9-11e7-9507-e39db4416428)
 **************************************************************************************
 
-The mock json used is as below
+Below is the mock JSON used
 
 >{  
             "channel_id": "C7HTHUL3B",
