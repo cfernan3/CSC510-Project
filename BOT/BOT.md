@@ -115,6 +115,10 @@ Below is the snippet of the code used
 
   ![nockslackbot](https://media.github.ncsu.edu/user/6391/files/c55ee540-b9c7-11e7-8a65-34b9faf8c6df)
 ********************************************************************************
+***We have used the nock npm module to mock the google spreadsheets api. Once the end time of the standup meeting is triggered via the scheduling funciton, the bot does an HTTP GET request to get the consolidated report from the Google spreadsheets . On successful response, the bot publishes the report on the channel/email***
+Below is the snippet of the HTTP GET reuest initiated by the Bot
+
+
 We intend to use Gmail REST API to send out an email to each member of the standup session. For now we are mocking this by returning success to the bot.
 
 ### Bot Implementation  
