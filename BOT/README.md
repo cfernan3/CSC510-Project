@@ -161,9 +161,9 @@ Bot Integration: It is integrated with Slack API to enable it to communicate suc
 ### Selenium Testing  
 Please find the Selenium test Maven folder [here](Selenium).  
 There are 3 files:   
-1. [UseCase 1](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/Selenium/src/test/java/NewStandupConfigTest.java) tests usecase 1 which initiates a new standup configuration     
+1. [UseCase 1](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/Selenium/src/test/java/selenium/tests/NewStandupConfigTest.java) tests usecase 1 which initiates a new standup configuration     
 2. [UseCase 2](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/Selenium/src/test/java/selenium/tests/WebTest.java) tests the conversation between the user and the bot and also reporting.  
-3. [UseCase 3](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/Selenium/src/test/java/EditStandupConfigTest.java) tests the edit configuration usecase.    
+3. [UseCase 3](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/Selenium/src/test/java/selenium/tests/EditStandupConfigTest.java) tests the edit configuration usecase.    
 
 
 ### Stories, Tasks, and Task Tracking  
