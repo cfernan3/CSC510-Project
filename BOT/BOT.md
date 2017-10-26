@@ -142,10 +142,19 @@ Below is the mock JSON used
             ]
          }
 
+
 ### Bot Implementation  
+BOT Platform : Our bot is a Slack Bot. It has webhooks, events and interactive messages enabled on the SLACK API page. It is hosted currently in an AWS EC2 instance. It is written in node.js.  
+
+Bot Integration: It is integrated with Slack API to enable it to communicate successfully with Slack. We used nodemailer module to integrate with Google's GMail API to effectively send email reports to the end users.  
 
 ### Selenium Testing  
-Please find the Selenium test Maven folder [here](Selenium).
+Please find the Selenium test Maven folder [here](Selenium).  
+There are 3 files:   
+1. [UseCase 1](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/Selenium/src/test/java/NewStandupConfigTest.java) tests usecase 1 which initiates a new standup configuration     
+2. [UseCase 2](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/Selenium/src/test/java/selenium/tests/WebTest.java) tests the conversation between the user and the bot and also reporting.  
+3. [UseCase 3](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/Selenium/src/test/java/EditStandupConfigTest.java) tests the edit configuration usecase.    
+
 
 ### Stories, Tasks, and Task Tracking  
 
@@ -154,6 +163,8 @@ https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/WORKSHEET.md
 
 ### Screencast
 Please find the screen casts below:
-1. [Creating a new standup](https://youtu.be/hLl3-K6LaPo)
+1. [Creating a new standup](https://youtu.be/hLl3-K6LaPo)  
 
-2. [Editing an existing standup](https://youtu.be/Px0WkkErilQ)
+2. [Standup session with a user](https://youtu.be/p7QxX7Az8ww)
+
+3. [Editing an existing standup](https://youtu.be/Px0WkkErilQ)
