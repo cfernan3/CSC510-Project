@@ -4,6 +4,7 @@ BOT.md -> https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/BOT.md
 
 CODE -> https://github.ncsu.edu/nedsouza/CSC510-Project/tree/master/BOT/Code
 
+
 ### Use Case Refinement  
 
 #### 1) Create a new standup
@@ -111,9 +112,42 @@ Alternative flows:
 [S1, S2, S3, S4, S5] If the user enters an invalid input then the Whatbot responds with an error message and terminates the subflow.
 
 
-### Mocking Service Component  
-We are using Google REST API to store the answers we receive from the whatbot. For now we are mocking the storage of this data. When generating a report we are using mock data to simulate retrieval of answers from the Google Sheet and publish it to the Slack channel.
-We intend to use Gmail REST API to send out an email to each member of the standup session. For now we are mocking this by returning success to the bot.
+### Mocking Service Component
+* ***Mocking the bot config file used for Use Case 2:*** Use Case 2 depends upon the bot configuration standup parameters like start time,end time, questions to be asked, participants to be added, mode of publishing the report(channel/email) etc.
+For the Testing of Use case 2, we have mocked the bot configurations as a JSON file and are parsing the parameters appropriately
+
+Below is the mock JSON used
+*****************************************************************************************
+![image](https://media.github.ncsu.edu/user/6391/files/b2366e74-b9cd-11e7-91a4-a7bf24d2e3a9)
+******************************************************************************************
+
+* **Mocking Google spreadsheet API:** 
+We are using Google Spreadsheets to store and consolidate the answers we receive from whatbot. For now we are mocking the storage of this data. When generating a report we are using mock data to simulate retrieval of answers from the Google Sheet and publish it to the Slack channel.
+
+	Below is the snippet of the code used
+********************************************************************************
+
+  ![nockslackbot](https://media.github.ncsu.edu/user/6391/files/c55ee540-b9c7-11e7-8a65-34b9faf8c6df)
+********************************************************************************
+***We have used the nock npm module to mock the google spreadsheets api. Once the end time of the standup meeting is triggered via the scheduling funciton, the bot does an HTTP GET request to get the consolidated report from the Google spreadsheets . On successful response, the bot publishes the report on the channel/email***
+
+Below is the snippet of the HTTP GET request initiated by the Bot
+*************************************************************************************
+![image](https://media.github.ncsu.edu/user/6391/files/8cb6e466-b9c9-11e7-9507-e39db4416428)
+**************************************************************************************
+
+Below is the mock JSON used
+
+>{  
+            "channel_id": "C7HTHUL3B",
+            "user_name":"cfernan3",
+            "standup":[
+               "What did you accomplish yesterday?","I completed the DevOps Test Analysis Milestone",
+               "What will you work on today?","Will be working on DevOps Deployment Milestone",
+               "Is there anything blocking your progress?","Not yet"
+            ]
+         }
+
 
 ### Bot Implementation  
 BOT Platform : Our bot is a Slack Bot. It has webhooks, events and interactive messages enabled on the SLACK API page. It is hosted currently in an AWS EC2 instance. It is written in node.js.  
@@ -131,7 +165,6 @@ There are 3 files:
 ### Stories, Tasks, and Task Tracking  
 
 https://trello.com/b/c9BAsFYW/milestone2
-
 https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/WORKSHEET.md
 
 ### Screencast
