@@ -121,6 +121,19 @@ Below is the snippet of the HTTP GET request initiated by the Bot
 *************************************************************************************
 ![image](https://media.github.ncsu.edu/user/6391/files/8cb6e466-b9c9-11e7-9507-e39db4416428)
 **************************************************************************************
+
+The mock json used 
+
+>{  
+            "channel_id": "C7HTHUL3B",
+            "user_name":"cfernan3",
+            "standup":[
+               "What did you accomplish yesterday?","I completed the DevOps Test Analysis Milestone",
+               "What will you work on today?","Will be working on DevOps Deployment Milestone",
+               "Is there anything blocking your progress?","Not yet"
+            ]
+         }
+
 We intend to use Gmail REST API to send out an email to each member of the standup session. For now we are mocking this by returning success to the bot.
 
 ### Bot Implementation  
