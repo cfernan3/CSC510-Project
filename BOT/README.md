@@ -128,6 +128,8 @@ https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/WORKSHEET.md
 
 ### Screencast
 Please find the screen casts below:
-1. [Creating a new standup](https://youtu.be/hLl3-K6LaPo)
+1. [Creating a new standup](https://youtu.be/hLl3-K6LaPo)  
+
+2. [Standup session with a user](https://youtu.be/p7QxX7Az8ww)
 
 2. [Editing an existing standup](https://youtu.be/Px0WkkErilQ)
