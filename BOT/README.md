@@ -140,4 +140,4 @@ Please find the screen casts below:
 
 2. [Standup session with a user](https://youtu.be/p7QxX7Az8ww)
 
-2. [Editing an existing standup](https://youtu.be/Px0WkkErilQ)
+3. [Editing an existing standup](https://youtu.be/Px0WkkErilQ)
