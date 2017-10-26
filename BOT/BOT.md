@@ -108,11 +108,12 @@ Alternative flows:
 
 
 ### Mocking Service Component
-* ***Mocking the bot config file used for Use Case 2:*** 
+* ***Mocking the bot config file used for Use Case 2:*** Use Case 2 depends upon the bot configuration standup parameters like start time,end time, questions to be asked, participants to be added, mode of publishing the report(channel/email) etc.
+For the Testing of Use case 2, we have mocked the bot configurations as a JSON file and are parsing the parameters appropriately
 
 Below is the mock JSON used
 *****************************************************************************************
-![image](https://media.github.ncsu.edu/user/6391/files/d6748778-b9cb-11e7-8101-c50eed26b29b)
+![image](https://media.github.ncsu.edu/user/6391/files/b2366e74-b9cd-11e7-91a4-a7bf24d2e3a9)
 ******************************************************************************************
 
 * **Mocking Google spreadsheet API:** 
