@@ -31,7 +31,7 @@
 | 2 | Standup session                              | Trigger the standup at configured time                |  | Calvin, Nirav   | 21st Oct | 21st Oct |
 | 3 | Mocking                                      | Create mock standup config for conducting standup     |  | Sharmin, Ronald | 21st Oct | 21st Oct |
 |   |                                              | Create mock standup data for reporting module         |  | Calvin, Nirav   |          |          |
-| 4 | Reporting                                    | Compile standup report and post to configured channel |  |  Bharat         |          |          |
+| 4 | Reporting                                    | Compile standup report and post to configured channel |  |  Bharat         |  24th Oct        |     24th Oct      |
 | 5 | Selenium testing Use Case 2: Standup session | test ongoing standup session                          |  | Calvin, Nirav   | 22 Oct   |    -     |
 
 ### Week 4 : 23rd Oct to 25th Oct
