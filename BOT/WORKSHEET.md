@@ -1,4 +1,6 @@
 #### All our tasks are being tracked through the Trello platform. [Here](https://trello.com/b/c9BAsFYW/milestone2) is the link to the Trello Cards.
+![image](https://media.github.ncsu.edu/user/6391/files/3867849c-b9d3-11e7-8d6e-74951ea8a79a)
+
 
 # Worksheet
 
