@@ -117,7 +117,7 @@ Below is the mock JSON used
 ******************************************************************************************
 
 * **Mocking Google spreadsheet API:** 
-We are using Google REST API to store the answers we receive from the whatbot. For now we are mocking the storage of this data. When generating a report we are using mock data to simulate retrieval of answers from the Google Sheet and publish it to the Slack channel.
+We are using Google Spreadsheets to store and consolidate the answers we receive from whatbot. For now we are mocking the storage of this data. When generating a report we are using mock data to simulate retrieval of answers from the Google Sheet and publish it to the Slack channel.
 
 	Below is the snippet of the code used
 ********************************************************************************
