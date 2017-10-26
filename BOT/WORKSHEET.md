@@ -1,4 +1,4 @@
-#### All our tasks are being tracked through the Trello platform. [Here](https://trello.com/b/c9BAsFYW/milestone2) is the link to the story board.
+#### All our tasks are being tracked through the Trello platform. [Here](https://trello.com/b/c9BAsFYW/milestone2) is the link to the Trello Cards.
 
 # Worksheet
 
