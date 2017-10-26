@@ -51,7 +51,7 @@ Normal flow:
 
 Alternative flows:  
 3A. User clicks on 'SNOOZE' button.  
-	1. Whatbot sends a reminder message to the user in 10 minutes. 
+	1. Whatbot sends a reminder message to the user in 10 minutes. For Selenium testing, the time s configured as 10sec
 	2. The use case returns to step 2.
 	
 3B. User clicks on 'IGNORE' button.  
