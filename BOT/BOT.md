@@ -107,8 +107,10 @@ Alternative flows:
 [S1, S2, S3, S4, S5] If the user enters an invalid input then the Whatbot responds with an error message and terminates the subflow.
 
 
-### Mocking Service Component  
+### Mocking Service Component
 We are using Google REST API to store the answers we receive from the whatbot. For now we are mocking the storage of this data. When generating a report we are using mock data to simulate retrieval of answers from the Google Sheet and publish it to the Slack channel.
+Below is the snippet of the code used
+
 We intend to use Gmail REST API to send out an email to each member of the standup session. For now we are mocking this by returning success to the bot.
 
 ### Bot Implementation  
