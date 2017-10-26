@@ -112,7 +112,8 @@ Alternative flows:
 
 Below is the mock JSON used
 *****************************************************************************************
-
+![image](https://media.github.ncsu.edu/user/6391/files/d6748778-b9cb-11e7-8101-c50eed26b29b)
+******************************************************************************************
 
 * **Mocking Google spreadsheet API:** 
 We are using Google REST API to store the answers we receive from the whatbot. For now we are mocking the storage of this data. When generating a report we are using mock data to simulate retrieval of answers from the Google Sheet and publish it to the Slack channel.
