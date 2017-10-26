@@ -116,9 +116,17 @@ We are using Google REST API to store the answers we receive from the whatbot. F
 We intend to use Gmail REST API to send out an email to each member of the standup session. For now we are mocking this by returning success to the bot.
 
 ### Bot Implementation  
+BOT Platform : Our bot is a Slack Bot. It has webhooks, events and interactive messages enabled on the SLACK API page. It is hosted currently in an AWS EC2 instance. It is written in node.js.  
+
+Bot Integration: It is integrated with Slack API to enable it to communicate successfully with Slack. We used nodemailer module to integrate with Google's GMail API to effectively send email reports to the end users.  
 
 ### Selenium Testing  
-Please find the Selenium test Maven folder [here](Selenium).
+Please find the Selenium test Maven folder [here](Selenium).  
+There are 3 files.  
+[UseCase 1](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/Selenium/src/test/java/NewStandupConfigTest.java) tests usecase 1 which initiates a new standup configuration     
+[UseCase 2](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/Selenium/src/test/java/selenium/tests/WebTest.java) tests the conversation between the user and the bot and also reporting.  
+[UseCase 3](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/Selenium/src/test/java/EditStandupConfigTest.java) tests the edit configuration usecase.    
+
 
 ### Stories, Tasks, and Task Tracking  
 
