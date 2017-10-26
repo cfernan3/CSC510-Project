@@ -117,7 +117,7 @@ Below is the snippet of the code used
 ********************************************************************************
 ***We have used the nock npm module to mock the google spreadsheets api. Once the end time of the standup meeting is triggered via the scheduling funciton, the bot does an HTTP GET request to get the consolidated report from the Google spreadsheets . On successful response, the bot publishes the report on the channel/email***
 
-Below is the snippet of the HTTP GET reuest initiated by the Bot
+Below is the snippet of the HTTP GET request initiated by the Bot
 *************************************************************************************
 ![image](https://media.github.ncsu.edu/user/6391/files/8cb6e466-b9c9-11e7-9507-e39db4416428)
 **************************************************************************************
