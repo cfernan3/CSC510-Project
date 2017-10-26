@@ -45,4 +45,5 @@
 |   |                                              | test report sharing on channel                    |  | Bharat          | 24 Oct         |  24 Oct        |
 | 4 | Selenium testing Use Case 3: Edit standup    | test editing standup config                       |  | Sharmin, Ronald | 23 Oct   | 23 Oct   |
 | 5 | Screen cast                                  | Use case 1                                        |  | Sharmin         | 25 Oct   | 25 Oct   |
-|   |                                              | Use case 2                                        |  | Ronald          | 25 Oct   | 25 Oct   |
+|   |                                              | Use case 2                                        |  | Calvin, Nirav, Bharat   | 25 Oct   | 25 Oct   |
+|   |                                              | Use case 3                                        |  | Ronald          | 25 Oct   | 25 Oct   |
