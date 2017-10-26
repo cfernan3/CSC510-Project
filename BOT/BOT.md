@@ -148,10 +148,10 @@ Below is the mock JSON used
 BOT Platform : Our bot is a Slack Bot. It has webhooks, events and interactive messages enabled on the SLACK API page. It is hosted currently in an AWS EC2 instance. It is written in node.js.  
 
 Bot Integration: It is integrated with Slack API to enable it to communicate successfully with Slack. We used nodemailer module to integrate with Google's GMail API to effectively send email reports to the end users.  
-[main.js](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/Code/main.js) is the file that handles the standu configuration and editing those configurations  
-[config.js](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/Code/modules/config.js) contains functions called by main.js  
-[index.js](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/Code/index.js) is the file that handles all the API calls with slack, GMail and mocking.  
-[bot.js](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/Code/modules/bot.js) handles Slack web API calls   
+* [main.js](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/Code/main.js) is the file that handles the standup configuration and editing those configurations  
+* [config.js](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/Code/modules/config.js) contains functions called by main.js  
+* [index.js](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/Code/index.js) is the file that handles all the API calls with slack, GMail and mocking.  
+* [bot.js](https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/BOT/Code/modules/bot.js) handles Slack web API calls     
 
 ### Selenium Testing  
 Please find the Selenium test Maven folder [here](Selenium).  
