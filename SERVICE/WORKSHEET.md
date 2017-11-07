@@ -1,51 +1,31 @@
-#### All our tasks are being tracked through the Trello platform. [Here](https://trello.com/b/c9BAsFYW/milestone2) is the link to the Trello Cards.
-![image](https://media.github.ncsu.edu/user/6391/files/3867849c-b9d3-11e7-8d6e-74951ea8a79a)
+#### All our tasks are being tracked through the Trello platform. [Here](https://trello.com/b/xPCqntUz/milestone3) is the link to the Trello Cards.
 
 
 # Worksheet
 
-## Milestone 2 : BOT DESIGN
+## Milestone 3 : SERVICE
 
-### Week 1 : 3rd Oct to 8th Oct  
+### Week 1 : 30th Oct to 5th Nov  
   
-|   | Deliverable       | Tasks                       | Issues | Team Members          | Estimated Date | Actual Date |
-|---|-------------------|-----------------------------|--------|-----------------------|----------------|-------------|
-| 1 | Design Refinement | Refining use case           |        | Sharmin, Ronald       | 4th Oct        | 6th Oct     |
-|   |                   | Refining constraints        |        | Sharmin, Ronald       | 4th Oct        | 6th Oct     |
-|   |                   | Edit storyboard & wireframe | #4, #5 | Calvin, Nirav, Bharat | 4th Oct        | 6th Oct     |
-| 2 | Planning          | Discuss task breakup        |        | All                   | 4th Oct        | 6th Oct     |
-  
-### Week 2 : 9th Oct to 15th Oct   
+|   | Deliverable    | Tasks | Issues | Team Members  | Estimated Date | Actual Date |
+|---|----------------|-------|--------|---------------|----------------|-------------|
+| 1 | Standup config | Add help feature, so the user understands how to interact with the bot |  | Sharmin, Ronald | 5th Nov | 5th Nov |
+|   |                | Add show feature, so the user can see the configured standup parameters | | Sharmin, Ronald | 5th Nov | 5th Nov |
+| 2 | Standup session| Redo standup                |  | Calvin, Nirav  | 5th Nov | 5th Nov |
+| 3 | Reporting      | Email standup report        |  | Calvin, Nirav  | 5th Nov | 4th Nov |
 
-|   | Deliverable      | Tasks | Issues | Team Members | Estimated Date | Actual Date |
-|---|------------------|-----------------------------------------------------------|--|-----------------|----------|----------|
-| 1 | Standup config   | Brainstorm how to store the config                        |  | Sharmin, Ronald | 12th Oct | 12th Oct |
-| 2 | Standup session  | Create and integrate a Slack app                          |  | Calvin, Nirav   | 12th Oct | 14th Oct |
-|   |                  | Add start, ignore, snooze options                         |  | Calvin, Nirav, Bharat   | 12th Oct | 15th Oct |
-| 3 | Mocking          | Create mock user+channel data for configuring the standup |  | Sharmin, Ronald | 12th Oct | 14th Oct |
+### Week 2 : 6th Nov to 9th Nov   
 
-### Week 3 : 16th Oct to 22nd Oct    
-
-|   | Deliverable      | Tasks | Issues | Team Members | Estimated Date | Actual Date |
-|---|----------------------------------------------|---------------------------------------------------|--|-----------------|----------|----------|
-| 1 | Standup config                               | Configure a new standup                               |#6| Sharmin, Ronald | 21st Oct | 21st Oct |
-|   |                                              | Edit standup config                                   |  | Sharmin, Ronald | 22nd Oct | 22nd Oct |
-| 2 | Standup session                              | Trigger the standup at configured time                |  | Calvin, Nirav, Bharat   | 21st Oct | 21st Oct |
-| 3 | Mocking                                      | Create mock standup config for conducting standup     |  | Sharmin, Ronald | 21st Oct | 21st Oct |
-|   |                                              | Create mock standup data for reporting module         |  | Calvin, Nirav, Bharat   |  22nd Oct    |  22nd Oct    |
-| 4 | Reporting                                    | Compile standup report and post to configured channel |  |  Bharat         |  22nd Oct        |     24th Oct      |
-| 5 | Selenium testing Use Case 2: Standup session | test ongoing standup session                          |  | Calvin, Nirav, Bharat   | 22nd Oct   |    22nd Oct     |
-
-### Week 4 : 23rd Oct to 25th Oct
-
-|   | Deliverable      | Tasks | Issues | Team Members | Estimated Date | Actual Date |
-|---|----------------------------------------------|---------------------------------------------------|--|-----------------|----------|----------|
-| 1 | Standup session                              | Trigger the standup post snooze                   |  | Calvin, Nirav, Bharat   |  23rd Oct | 23rd Oct |
-|   | Standup session                              |Conduct standup using mock config                  |  | Calvin, Nirav   | 23rd Oct  |    23rd Oct      |
-| 2 | Selenium testing Use Case 1: New standup     | test new standup creation                         |  | Sharmin, Ronald | 23rd Oct   | 23rd Oct   |
-| 3 | Selenium testing Use Case 2: Standup session | (Contd.) test ongoing standup session             |  | Calvin, Nirav, Bharat   | 25th Oct   | 25th Oct    |
-|   |                                              | test report sharing on channel                    |  | Bharat          | 24th Oct         |  24th Oct        |
-| 4 | Selenium testing Use Case 3: Edit standup    | test editing standup config                       |  | Sharmin, Ronald | 23rd Oct   | 23rd Oct   |
-| 5 | Screen cast                                  | Use case 1                                        |  | Sharmin         | 25th Oct   | 25th Oct   |
-|   |                                              | Use case 2                                        |  | Calvin, Nirav, Bharat   | 25th Oct   | 25th Oct   |
-|   |                                              | Use case 3                                        |  | Ronald          | 25th Oct   | 25th Oct   |
+|   | Deliverable    | Tasks | Issues | Team Members  | Estimated Date | Actual Date |
+|---|----------------|-------|--------|---------------|----------------|-------------|
+| 1 | Standup config | Fetch config from the config file when the bot is restarted |  | Sharmin, Ronald | 8th Nov | |
+|   |                | Create Google Sheet for the bot and save the access info in the config | | Sharmin, Ronald | 8th Nov |  |
+|   |                | Verify that the standup participants / reporting channel configured are valid. (Replace mocking with slack API calls) |  | Sharmin, Ronald | 8th Nov | |
+| 2 | Standup session| Store the standup answers on google sheets |  | Calvin, Nirav  | | |
+| 3 | Reporting      | Trigger report generation at standup end time |  |  Bharat     | | |
+|   |                | Retrieve standup answers from google sheets and compile standup report |  | | | |
+| 4 | Code Integration | Integrate index.js and main.js and divide code modules into different files |  | | | |
+| 5 | Selenium testing | Add show and help commands to use case 1 |  |Sharmin, Ronald | 9th Nov | |
+| 6 | Screen cast      | Use case 1                                  |  |          | 9th Nov   |   |
+|   |                  | Use case 2                                  |  |          | 9th Nov   |   |
+|   |                  | Use case 3                                  |  |          | 9th Nov   |   |
