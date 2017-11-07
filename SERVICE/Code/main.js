@@ -202,6 +202,31 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
   }); // startConversation Ends
 }); // hears 'schedule' ends
 
+/*
+************************ Show an existing standup configuration***********************
+*/
+controller.hears(['show', 'display'],['direct_mention', 'direct_message'], function(bot,message) {
+  bot.startConversation(message, function(err, convo) {
+    convo.say('Let me show you the current configuration...');
+    // Start time
+    convo.say("Start time: " + standupConfig.startTimeHours + ":" + standupConfig.startTimeMins);
+    // End time
+    convo.say("End time: " + standupConfig.endTimeHours + ":" + standupConfig.endTimeMins);
+    // participants
+    convo.say("participants: " + standupConfig.participants.toString());
+    // Question set
+    convo.say("Question Set: ");
+    standupConfig.questions.forEach(function(val) {
+      convo.say(val);
+    });
+    // Reporting medium
+    convo.say("Reporting Medium: " + standupConfig.reportMedium);
+    if (standupConfig.reportMedium == "channel") {
+      convo.say("Channel: " + standupConfig.reportChannel);
+    }
+
+  });
+});
 
 /*
 ************************ Editing an existing standup**********************************
