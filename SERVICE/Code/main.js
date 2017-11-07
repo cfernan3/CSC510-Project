@@ -217,12 +217,13 @@ controller.hears(['show', 'display'],['direct_mention', 'direct_message'], funct
     // Question set
     convo.say("Question Set: ");
     standupConfig.questions.forEach(function(val) {
-      convo.say(val);
+      convo.say("\t" + val);
     });
     // Reporting medium
-    convo.say("Reporting Medium: " + standupConfig.reportMedium);
     if (standupConfig.reportMedium == "channel") {
-      convo.say("Channel: " + standupConfig.reportChannel);
+      convo.say("Reporting Medium: " + standupConfig.reportMedium + "("+ standupConfig.reportChannel + ")");
+    } else {
+      convo.say("Reporting Medium: " + standupConfig.reportMedium);
     }
 
   });
