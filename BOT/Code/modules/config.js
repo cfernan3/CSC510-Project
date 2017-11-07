@@ -158,5 +158,11 @@ attachments:[
             }
         ]
     }
-]}
+]},
+
+
+helpMsg: helpMsg = "Heya! I'm here to organize your standup.\n\
+You can tell me to configure a new standup, and I'll guide you through the setup.\n\
+All I need is the standup window, participant list, question set, and reporting medium (Slack channel / Email).\n\
+Don't worry if you make a mistake. You can always modify the parameters later. :)"
 } // module.exports ends
