@@ -43,7 +43,8 @@
     "https": "^1.0.0",
     "nock": "^0.34.1",
     "nodemailer": "^4.3.1",
-    "request": "^2.83.0"
-
+    "request": "^2.83.0",
+    "googleapis":"*",
+    "google-auth-library":"*"
   }
 }
