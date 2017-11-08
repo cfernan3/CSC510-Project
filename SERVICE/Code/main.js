@@ -426,6 +426,13 @@ var writeToConfigFile = function() {
    });
 }
 
+/*
+************************ Help on how to configure a standup**********************************
+*/
+
+controller.hears(['help'],['direct_mention', 'direct_message'], function(bot,message) {
+  bot.reply(message, config.helpMsg);
+}); // hears 'help' ends
 
 /*
 ************************ standup session **********************************

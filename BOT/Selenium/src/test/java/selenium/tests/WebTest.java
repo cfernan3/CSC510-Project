@@ -41,7 +41,7 @@ public class WebTest
     	WebElement email = driver.findElement(By.xpath("//*[@id='email']"));
     	email.sendKeys("whatbot.ncsu@gmail.com");
     	WebElement password = driver.findElement(By.xpath("//*[@id='password']"));
-    	password.sendKeys("12345ABCDE");
+    	password.sendKeys("*******");
     	WebElement signin = driver.findElement(By.xpath("//*[@id='signin_btn']/span[1]"));
     	signin.click();
 	}
