@@ -22,6 +22,20 @@ var defaultQuestions = "\t" + standupConfig.questions[0];
 for(var i = 1; i < standupConfig.questions.length; i++)
   defaultQuestions += "\n\t" + standupConfig.questions[i];
 
+// TODO: Invoke when stand up is configured.
+  var rule = new schedule.RecurrenceRule();                      //Reference:https://www.npmjs.com/package/node-schedule
+  //rule.dayOfWeek = [0, new schedule.Range(1, 4)];
+  rule.dayOfWeek = [0,1,2,3,4,5,6];
+  rule.hour = 22;
+  rule.minute = 37;
+  //Loading config for mock
+  var mock_config = require('./mock_config2.json');
+  rule.hour = mock_config["startTimeHours"];
+  rule.minute = mock_config['startTimeMins'];
+  var participants = mock_config["participants"];
+  var reportChannel = mock_config["reportChannel"];
+  var questions = mock_config["questions"];
+
 var controller = Botkit.slackbot({
   debug: false,
   interactive_replies: true, // tells botkit to send button clicks into conversations
@@ -217,11 +231,11 @@ controller.hears(['show', 'display'],['direct_mention', 'direct_message'], funct
     // Question set
     convo.say("Question Set: ");
     standupConfig.questions.forEach(function(val) {
-      convo.say("\t" + val);
+      convo.say("    " + val);
     });
     // Reporting medium
     if (standupConfig.reportMedium == "channel") {
-      convo.say("Reporting Medium: " + standupConfig.reportMedium + "("+ standupConfig.reportChannel + ")");
+      convo.say("Reporting Medium: " + standupConfig.reportMedium + " ("+ standupConfig.reportChannel + ") ");
     } else {
       convo.say("Reporting Medium: " + standupConfig.reportMedium);
     }
@@ -385,7 +399,22 @@ controller.hears(['modify', 'change', 'update', 'reschedule'],['direct_mention',
 
           convo.next();
         }
-    }, {}, 'editReportMedium');
+    }, {}, 'editReportMedium');for (var i=0;i< participants.length;i++){
+        bot.sendMessage(participants[i]["direct_message_id"],bot.introduceToUser(participants[i]["user_id"]));
+    }
+
+
+    //bot.sendMessage("D7MDMK081",bot.introduceToUser("U7LJ7GXBN")) //Selenium Test
+    //bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
+    var j = schedule.scheduleJob(rule, function(){
+
+    //console.log('running a task every minute');
+      //condoel.log("Test");
+      //bot.sendMessage("D7JBPKD8B","Calvin is awesome");
+      //bot.sendMessage("D7JBPKD8B","Calvin is awesome");
+      bot.sendMessage("D7LJ7H9U4",bot.introduceToUser("U7LJ7GXBN"))
+      bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
+    });
 
   }); // startConversation Ends
 }); // hears 'schedule' ends
@@ -396,3 +425,17 @@ var writeToConfigFile = function() {
      if (err) throw err;
    });
 }
+
+
+/*
+************************ standup session **********************************
+*/
+
+for (var i=0;i< participants.length;i++){
+    bot.sendMessage(participants[i]["direct_message_id"],bot.introduceToUser(participants[i]["user_id"]));
+}
+
+var j = schedule.scheduleJob(rule, function(){
+  bot.sendMessage("D7LJ7H9U4",bot.introduceToUser("U7LJ7GXBN"))
+  bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
+});

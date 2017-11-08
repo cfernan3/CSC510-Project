@@ -36,7 +36,7 @@ var controller = Botkit.slackbot({
   debug: true,
 });
 var bkit = controller.spawn({
-  token: process.env.SLACK_API_TOKEN,
+  token: process.env.SLACK_TOKEN,
 }).startRTM();
 
 // Scheduling code created
@@ -271,7 +271,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use('/slack/events', slackEvents.expressMiddleware());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use('/slack/actions', slackMessages.expressMiddleware());
+app.use('/slack/receive', slackMessages.expressMiddleware());
 // Start the server
 http.createServer(app).listen(port, () => {
   console.log(`server listening on port ${port}`);

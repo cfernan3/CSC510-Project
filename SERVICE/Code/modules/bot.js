@@ -12,7 +12,7 @@ if (process.env.SLACK_ENV) {
 }
 //Bot module
 const bot = {
-    web: new WebClient(process.env.SLACK_BOT_TOKEN, slackClientOptions),
+    web: new WebClient(process.env.SLACK_TOKEN, slackClientOptions),
     orders: {},
 
     //Initial question with options
@@ -58,7 +58,7 @@ const bot = {
     //Function to send any message to the user
     sendMessage(channel, text) {
         // Send message using Slack Web Client
-        var token = process.env.SLACK_API_TOKEN || ''
+        var token = process.env.SLACK_TOKEN || ''
         var web = new WebClient(token);
         console.log(text);
         console.log(channel);
@@ -74,7 +74,7 @@ const bot = {
     sendReport(channel_json) {
         // Send message using Slack Web Client
 
-        var token = process.env.SLACK_BOT_TOKEN || ''
+        var token = process.env.SLACK_TOKEN || ''
         var web = new WebClient(token);
         var channel_id = channel_json["channel_id"];
         var user_name = channel_json["user_name"];
