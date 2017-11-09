@@ -6,18 +6,18 @@ var standup = require('./modules/standup');
 var schedule = require('node-schedule')
 var util = require('util')
 var report = require('./modules/report.js')
-const delay = require('delay');
+var delay = require('delay');
 
 function StandupConfig(){
   this.startTimeHours = 0;
   this.startTimeMins = 0;
   this.endTimeHours = 0;
   this.endTimeMins = 0;
-  this.questions = ["What did you accomplish yesterday?", "What will you work on today",
+  this.questions = ["What did you accomplish yesterday?", "What will you work on today?",
                     "Is there anything blocking your progress?"];  // should have aleast 1 question
-  this.participants = [];  // TODO: makse sure there are no duplicates
+  this.participants = ["U6WJV396H", "U7LJ7GXBN"];  // TODO: makse sure there are no duplicates
   this.reportMedium = "channel";  // default medium is channel
-  this.reportChannel = "";
+  this.reportChannel = "C7M70JML4";
   this.creator = "";
 }
 
@@ -29,17 +29,13 @@ for(var i = 1; i < standupConfig.questions.length; i++)
 
 // TODO: Invoke when stand up is configured.
   var rule = new schedule.RecurrenceRule();                      //Reference:https://www.npmjs.com/package/node-schedule
+
   //rule.dayOfWeek = [0, new schedule.Range(1, 4)];
+  // TODO: set the start and end times for schedule each time they are updated
   rule.dayOfWeek = [0,1,2,3,4,5,6];
-  rule.hour = 22;
-  rule.minute = 37;
-  //Loading config for mock
-  var mock_config = require('./mock_config2.json');
-  rule.hour = mock_config["startTimeHours"];
-  rule.minute = mock_config['startTimeMins'];
-  var participants = mock_config["participants"];
-  var reportChannel = mock_config["reportChannel"];
-  var questions = mock_config["questions"];
+  rule.hour = standupConfig.startTimeHours;
+  rule.minute = standupConfig.startTimeMins;
+
 
 var controller = Botkit.slackbot({
   debug: false,
@@ -66,7 +62,6 @@ controller.setupWebserver(process.env.port,function(err,webserver) {
   });
 });
 
-// to make sure we don't connect to the RTM twice for the same team
 function makebot() {
   this.startPrivateConversation = function (user,cb) {
 
@@ -74,6 +69,7 @@ function makebot() {
 }
 
 var _bot = new makebot();
+
 function trackBot(bot) {
   _bot = bot;
   console.log("bot:" + bot);
@@ -100,8 +96,8 @@ controller.on('create_bot',function(bot,config) {
         }
       });
 
-for (var i=0;i< participants.length;i++){
-      _bot.startPrivateConversation({user: participants[i]['user_id']},function(err,convo) {
+for (var i=0; i < standupConfig.participants.length; i++){
+      _bot.startPrivateConversation({user: standupConfig.participants[i]},function(err,convo) {
         if (err) {
           console.log(err);
         } else {
@@ -112,11 +108,10 @@ for (var i=0;i< participants.length;i++){
                   _bot.replyInteractive(response, {text: "We are starting with the standup.", attachments: [attachment]});
                   var answers = [];
 
-                  for(var i = 0; i < questions.length; i++) {
-                    convo.addQuestion(questions[i], function (response, convo) {
+                  for(var i = 0; i < standupConfig.questions.length; i++) {
+                    convo.addQuestion(standupConfig.questions[i], function (response, convo) {
                       console.log('Question answered =', response.text);
                       answers.push(response.text);
-                      console.log(answers);
                       convo.next();
                     }, {}, 'askQuestion');
                   }
@@ -136,11 +131,11 @@ for (var i=0;i< participants.length;i++){
                               callback: function(response, convo) {
                                 convo.addMessage(" Thanks for your responses! We are done with today's standup.", 'askQuestion');
                                 convo.next();
+
                                 // TODO: Remove Reporting from here and trigger it at standup close time.
-                                console.log(require('util').inspect(response, { depth: null }));
-                                report.postReportToChannel(_bot, {"channel_id":reportChannel,
+                                report.postReportToChannel(_bot, {"channel_id":StandupConfig.reportChannel,
                                   "user_name":"<@"+response.user+">",
-                                  "questions":questions,
+                                  "questions":standupConfig.questions,
                                   "answers":answers});
                               }
                           }
@@ -152,10 +147,9 @@ for (var i=0;i< participants.length;i++){
               case "snooze":
                 var attachment = {text: `:white_check_mark: I will remind you in 15 minutes`, title: "Select one option."};
                 _bot.replyInteractive(response, {text: "We are starting with the standup.", attachments: [attachment]});
-                console.log("Before delay");
+
                 delay(5000)
                 .then(() => {
-                  console.log("After Delay");
                   convo.gotoThread('default');
                 });
                 break;
@@ -501,21 +495,22 @@ controller.hears(['modify', 'change', 'update', 'reschedule'],['direct_mention',
 
           convo.next();
         }
-    }, {}, 'editReportMedium');for (var i=0;i< participants.length;i++){
-        bot.sendMessage(participants[i]["direct_message_id"],bot.introduceToUser(participants[i]["user_id"]));
-    }
+    }, {}, 'editReportMedium');
 
-
-    //bot.sendMessage("D7MDMK081",bot.introduceToUser("U7LJ7GXBN")) //Selenium Test
-    //bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
     var j = schedule.scheduleJob(rule, function(){
 
-    //console.log('running a task every minute');
-      //condoel.log("Test");
-      //bot.sendMessage("D7JBPKD8B","Calvin is awesome");
-      //bot.sendMessage("D7JBPKD8B","Calvin is awesome");
-      //bot.sendMessage("D7LJ7H9U4",bot.introduceToUser("U7LJ7GXBN"))
-      //bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
+
+
+
+
+
+
+
+
+
+
+
+
     });
 
   }); // startConversation Ends
