@@ -6,18 +6,18 @@ var standup = require('./modules/standup');
 var schedule = require('node-schedule')
 var util = require('util')
 var report = require('./modules/report.js')
-const delay = require('delay');
+var delay = require('delay');
 
 function StandupConfig(){
   this.startTimeHours = 0;
   this.startTimeMins = 0;
   this.endTimeHours = 0;
   this.endTimeMins = 0;
-  this.questions = ["What did you accomplish yesterday?", "What will you work on today",
+  this.questions = ["What did you accomplish yesterday?", "What will you work on today?",
                     "Is there anything blocking your progress?"];  // should have aleast 1 question
-  this.participants = [];  // TODO: makse sure there are no duplicates
+  this.participants = ["U6WJV396H", "U7LJ7GXBN"];  // TODO: makse sure there are no duplicates
   this.reportMedium = "channel";  // default medium is channel
-  this.reportChannel = "";
+  this.reportChannel = "C7M70JML4";
   this.creator = "";
 }
 
@@ -27,19 +27,19 @@ var defaultQuestions = "\t" + standupConfig.questions[0];
 for(var i = 1; i < standupConfig.questions.length; i++)
   defaultQuestions += "\n\t" + standupConfig.questions[i];
 
-// TODO: Invoke when stand up is configured.
-  var rule = new schedule.RecurrenceRule();                      //Reference:https://www.npmjs.com/package/node-schedule
-  //rule.dayOfWeek = [0, new schedule.Range(1, 4)];
-  rule.dayOfWeek = [0,1,2,3,4,5,6];
-  rule.hour = 22;
-  rule.minute = 37;
-  //Loading config for mock
-  var mock_config = require('./mock_config2.json');
-  rule.hour = mock_config["startTimeHours"];
-  rule.minute = mock_config['startTimeMins'];
-  var participants = mock_config["participants"];
-  var reportChannel = mock_config["reportChannel"];
-  var questions = mock_config["questions"];
+var snoozeDelayMins = 0.5; // Snooze delay in minutes
+
+var startRule = new schedule.RecurrenceRule();
+
+// TODO: set the start and end times for schedule each time they are updated
+startRule.dayOfWeek = [0,1,2,3,4,5,6];
+//startRule.hour = standupConfig.startTimeHours;
+startRule.hour = 0;
+//startRule.minute = standupConfig.startTimeMins;
+startRule.minute = 8;
+
+var sessionJob;  // Schedule this job using startRule to conduct the daily standup session
+var reportJob;   // Schedule this job using endRule to trigger reporting
 
 var controller = Botkit.slackbot({
   debug: false,
@@ -66,7 +66,6 @@ controller.setupWebserver(process.env.port,function(err,webserver) {
   });
 });
 
-// to make sure we don't connect to the RTM twice for the same team
 function makebot() {
   this.startPrivateConversation = function (user,cb) {
 
@@ -74,122 +73,29 @@ function makebot() {
 }
 
 var _bot = new makebot();
+
 function trackBot(bot) {
   _bot = bot;
   console.log("bot:" + bot);
 }
 
 controller.on('create_bot',function(bot,config) {
+  bot.startRTM(function(err) {
 
-  if (false) {
-    // already online! do nothing.
-  } else {
-    bot.startRTM(function(err) {
+    if (!err) {
+      trackBot(bot);
+      console.log("bot:" + bot);
+    }
 
-      if (!err) {
-        trackBot(bot);
-        console.log("bot:" + bot);
+    standupConfig.creator = config.createdBy;
+    bot.startPrivateConversation({user: config.createdBy},function(err,convo) {
+      if (err) {
+        console.log(err);
+      } else {
+        convo.say("Hello! I'm here to organise your standup. Let me know when you want to schedule one.");
       }
-
-      standupConfig.creator = config.createdBy;
-      bot.startPrivateConversation({user: config.createdBy},function(err,convo) {
-        if (err) {
-          console.log(err);
-        } else {
-          convo.say("Hello! I'm here to organise your standup. Let me know when you want to schedule one.");
-        }
-      });
-
-for (var i=0;i< participants.length;i++){
-      _bot.startPrivateConversation({user: participants[i]['user_id']},function(err,convo) {
-        if (err) {
-          console.log(err);
-        } else {
-          convo.ask( startStandupButtons, function (response, convo) {
-            switch (response.text) {
-              case "start":
-                  var attachment = {text: `:white_check_mark: Awesome! Let's start the standup.`, title: "Select one option."};
-                  _bot.replyInteractive(response, {text: "We are starting with the standup.", attachments: [attachment]});
-                  var answers = [];
-
-                  for(var i = 0; i < questions.length; i++) {
-                    convo.addQuestion(questions[i], function (response, convo) {
-                      console.log('Question answered =', response.text);
-                      answers.push(response.text);
-                      console.log(answers);
-                      convo.next();
-                    }, {}, 'askQuestion');
-                  }
-
-                  convo.addQuestion("We are done with the standup. Do you want to redo?", [
-                          {
-                              pattern: _bot.utterances.yes,
-                              callback: function(response, convo) {
-                                standupConfig.questions = [];
-                                console.log('Redoing');
-                                convo.gotoThread('askQuestion');
-                              }
-                          },
-                          {
-                              pattern: _bot.utterances.no,
-                              default: true,
-                              callback: function(response, convo) {
-                                convo.addMessage(" Thanks for your responses! We are done with today's standup.", 'askQuestion');
-                                convo.next();
-                                // TODO: Remove Reporting from here and trigger it at standup close time.
-                                console.log(require('util').inspect(response, { depth: null }));
-                                report.postReportToChannel(_bot, {"channel_id":reportChannel,
-                                  "user_name":"<@"+response.user+">",
-                                  "questions":questions,
-                                  "answers":answers});
-                              }
-                          }
-                        ], {}, 'askQuestion');
-
-                  convo.addMessage({text:"Here are your questions.", action:'askQuestion'}, 'default');
-                  convo.next();
-                break;
-              case "snooze":
-                var attachment = {text: `:white_check_mark: I will remind you in 15 minutes`, title: "Select one option."};
-                _bot.replyInteractive(response, {text: "We are starting with the standup.", attachments: [attachment]});
-                console.log("Before delay");
-                delay(5000)
-                .then(() => {
-                  console.log("After Delay");
-                  convo.gotoThread('default');
-                });
-                break;
-              case "ignore":
-                var attachment = {text: `:white_check_mark: See you tomorrow`, title: "Select one option."};
-                _bot.replyInteractive(response, {text: "We are starting with the standup.", attachments: [attachment]});
-                convo.next();
-                break;
-            }
-          });
-        }
-      });
-}
-
-
-/*      //var j = schedule.scheduleJob(rule, function(){
-//        for (var i=0;i< participants.length;i++){
-          console.log("user: " + participants[0]['user_id']);
-            // bot.sendMessage(participants[i]["direct_message_id"],bot.introduceToUser(participants[i]["user_id"]));
-            bot.startPrivateConversation({user: config.createdBy},function(err,convo) {
-              if (err) {
-                console.log(err);
-              } else {
-                convo.ask(bot.startStandupButtons,
-                  function (response, convo) {
-                    console.log(response.text);
-                  });
-              }
-            });
-        //}
-      //});
-*/
     });
-  }
+  });
 });
 
 /*
@@ -222,7 +128,8 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
     convo.addQuestion('When would you like the standup to end?', function (response, convo) {
       console.log('End time entered =', response.text);
 
-      var endTime = chrono.parseDate(response.text)  // TODO: check that end time > start time
+      // TODO: check that end time - start time > 15 mins
+      var endTime = chrono.parseDate(response.text)
       if (endTime != null) {
         standupConfig.endTimeHours = endTime.getHours();
         standupConfig.endTimeMins = endTime.getMinutes();
@@ -243,6 +150,7 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
           3. specific channel: #<channel-name>', function (response, convo) {
 
       console.log('participants=', response.text);
+      standupConfig.participants = [];
       config.addParticipants(response.text, standupConfig);
       convo.gotoThread('askQuestionSet');
     }, {}, 'askParticipants');
@@ -309,6 +217,9 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
     convo.beforeThread('lastStatement', function(convo, next) {
       console.log('New standup config complete');
       writeToConfigFile();
+
+      // start the standup scheduling job after the standup parameters are configured
+      sessionJob = schedule.scheduleJob(startRule, startStandupWithParticipants);
       next();
     });
 
@@ -349,7 +260,7 @@ controller.hears(['show', 'display'],['direct_mention', 'direct_message'], funct
 ************************ Editing an existing standup**********************************
 */
 
-controller.hears(['modify', 'change', 'update', 'reschedule'],['direct_mention', 'direct_message'], function(bot,message) {
+controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_mention', 'direct_message'], function(bot,message) {
   // TODO: check that standup exists
 
   bot.startConversation(message, function(err, convo) {
@@ -383,13 +294,20 @@ controller.hears(['modify', 'change', 'update', 'reschedule'],['direct_mention',
     convo.addQuestion('What time would you like to start the standup?', function (response, convo) {
       console.log('Start time entered =', response.text);
 
+      //TODO: check that end time - new start time > 15 mins
       var startTime = chrono.parseDate(response.text)
       if (startTime != null) {
         standupConfig.startTimeHours = startTime.getHours();
         standupConfig.startTimeMins = startTime.getMinutes();
         console.log("Start time = " + standupConfig.startTimeHours + ":" + standupConfig.startTimeMins);
+        //TODO: display time in 12 hr format
         convo.addMessage("All set! I have updated the start time to " + standupConfig.startTimeHours +
                           ":" + standupConfig.startTimeMins + ".", 'editStartTime');
+
+        // reschedule the standup session job after the start time is modified
+        startRule.hour = standupConfig.startTimeHours;
+        startRule.minute = standupConfig.startTimeMins;
+        sessionJob.reschedule(startRule);
 
         writeToConfigFile();
         convo.next();
@@ -405,7 +323,7 @@ controller.hears(['modify', 'change', 'update', 'reschedule'],['direct_mention',
     convo.addQuestion('When would you like the standup to end?', function (response, convo) {
       console.log('End time entered =', response.text);
 
-      var endTime = chrono.parseDate(response.text)  // TODO: check that end time > start time
+      var endTime = chrono.parseDate(response.text)  // TODO: check that new end time - start time > 15 mins
       if (endTime != null) {
         standupConfig.endTimeHours = endTime.getHours();
         standupConfig.endTimeMins = endTime.getMinutes();
@@ -501,29 +419,88 @@ controller.hears(['modify', 'change', 'update', 'reschedule'],['direct_mention',
 
           convo.next();
         }
-    }, {}, 'editReportMedium');for (var i=0;i< participants.length;i++){
-        bot.sendMessage(participants[i]["direct_message_id"],bot.introduceToUser(participants[i]["user_id"]));
-    }
-
-
-    //bot.sendMessage("D7MDMK081",bot.introduceToUser("U7LJ7GXBN")) //Selenium Test
-    //bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
-    var j = schedule.scheduleJob(rule, function(){
-
-    //console.log('running a task every minute');
-      //condoel.log("Test");
-      //bot.sendMessage("D7JBPKD8B","Calvin is awesome");
-      //bot.sendMessage("D7JBPKD8B","Calvin is awesome");
-      //bot.sendMessage("D7LJ7H9U4",bot.introduceToUser("U7LJ7GXBN"))
-      //bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
-    });
+    }, {}, 'editReportMedium');
 
   }); // startConversation Ends
 }); // hears 'schedule' ends
 
 
+/*
+************************ standup session **********************************
+*/
+function startStandupWithParticipants(){
+  for (var i=0; i < standupConfig.participants.length; i++){
+    _bot.startPrivateConversation({user: standupConfig.participants[i]},function(err,convo) {
+      if (err) {
+        console.log(err);
+      } else {
+        convo.ask( startStandupButtons, function (response, convo) {
+          switch (response.text) {
+            case "start":
+                var attachment = {text: `:white_check_mark: Awesome! Let's start the standup.`, title: "Select one option."};
+                _bot.replyInteractive(response, {text: "We are starting with the standup.", attachments: [attachment]});
+                var answers = [];
+
+                for(var i = 0; i < standupConfig.questions.length; i++) {
+                  convo.addQuestion(standupConfig.questions[i], function (response, convo) {
+                    console.log('Question answered =', response.text);
+                    answers.push(response.text);
+                    convo.next();
+                  }, {}, 'askQuestion');
+                }
+
+                convo.addQuestion("We are done with the standup. Do you want to redo?", [
+                        {
+                            pattern: _bot.utterances.yes,
+                            callback: function(response, convo) {
+                              standupConfig.questions = [];
+                              console.log('Redoing');
+                              convo.gotoThread('askQuestion');
+                            }
+                        },
+                        {
+                            pattern: _bot.utterances.no,
+                            default: true,
+                            callback: function(response, convo) {
+                              convo.addMessage(" Thanks for your responses! We are done with today's standup.", 'askQuestion');
+                              convo.next();
+
+                              // TODO: Remove Reporting from here and trigger it at standup close time.
+                              report.postReportToChannel(_bot, {"channel_id":StandupConfig.reportChannel,
+                                "user_name":"<@"+response.user+">",
+                                "questions":standupConfig.questions,
+                                "answers":answers});
+                            }
+                        }
+                      ], {}, 'askQuestion');
+
+                convo.addMessage({text:"Here are your questions.", action:'askQuestion'}, 'default');
+                convo.next();
+              break;
+            case "snooze":
+              var attachment = {text: `:white_check_mark: I will remind you in ${snoozeDelayMins} minutes`, title: "Select one option."};
+              _bot.replyInteractive(response, {text: "We are starting with the standup.", attachments: [attachment]});
+
+              delay(snoozeDelayMins * 60000)
+              .then(() => {
+                convo.gotoThread('default');
+              });
+              break;
+            case "ignore":
+              var attachment = {text: `:white_check_mark: See you tomorrow`, title: "Select one option."};
+              _bot.replyInteractive(response, {text: "We are starting with the standup.", attachments: [attachment]});
+              convo.next();
+              break;
+          }
+        });
+      }
+    });
+  }
+}
+
+
 var writeToConfigFile = function() {
-  fs.writeFile('./mock_config.json', JSON.stringify(standupConfig), (err) => {
+  fs.writeFile('./config.json', JSON.stringify(standupConfig), (err) => {
      if (err) throw err;
    });
 }
@@ -535,7 +512,3 @@ var writeToConfigFile = function() {
 controller.hears(['help'],['direct_mention', 'direct_message'], function(bot,message) {
   bot.reply(message, config.helpMsg);
 }); // hears 'help' ends
-
-/*
-************************ standup session **********************************
-*/

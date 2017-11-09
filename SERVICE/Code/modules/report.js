@@ -1,7 +1,6 @@
 
 module.exports = {
   postReportToChannel: function(bot, channel_json) {
-
     var answers = channel_json["answers"];
     var questions = channel_json["questions"];
 
@@ -16,30 +15,7 @@ module.exports = {
       text: report,
       channel: channel_json["channel_id"]
     }
-  );
-
-/*
-      var token = process.env.SLACK_TOKEN || ''
-      var web = new WebClient(token);
-      var channel_id = channel_json["channel_id"];
-      var user_name = channel_json["user_name"];
-      var report_json = channel_json["standup"];
-      console.log(report_json);
-      console.log(channel_id);
-      var report = `${user_name} has completed the standup. The reponses are as follows-\n\n`;
-      for(var que in report_json){
-          report += `Q: ${que}\n`;
-          report += `A: ${report_json[que]}\n`;
-
-      }
-      this.web.chat.postMessage(channel_id, report, function (err, res) {
-          if (err) {
-              console.log('Error:', err);
-          } else {
-              console.log('Message sent: ', res);
-          }
-      });
-      */
+    );
   },
 
   emailReport: function() {
