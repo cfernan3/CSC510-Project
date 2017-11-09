@@ -14,36 +14,23 @@
   "url": "https://github.ncsu.edu/nedsouza/CSC510-Project/",
   "private": true,
   "description": "Slack Agile Bot",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node main.js"
   },
-  "author": "Nirav Dsouza <nedsouza@ncsu.edu>",
-  "license": "BSD-3-Clause",
   "devDependencies": {
     "eslint": "^3.19.0",
     "eslint-config-airbnb-base": "^11.1.3",
     "eslint-plugin-import": "^2.2.0"
   },
   "dependencies": {
-    "@slack/client": "^3.14.1",
-    "@slack/events-api": "^1.0.1",
-    "@slack/interactive-messages": "^0.2.0",
-    "axios": "^0.16.2",
-    "body-parser": "^1.18.2",
+    "dotenv": "^4.0.0",
     "botkit": "^0.6.4",
     "delay": "^2.0.0",
-    "dotenv": "^4.0.0",
-    "express": "^4.16.2",
-    "lodash.clonedeep": "^4.5.0",
-    "lodash.map": "^4.6.0",
     "node-cron": "^1.2.1",
     "node-schedule": "^1.2.5",
-    "normalize-port": "^1.0.0",
-    "https": "^1.0.0",
     "nock": "^0.34.1",
     "nodemailer": "^4.3.1",
-    "request": "^2.83.0"
-
+    "chrono-node": "^5.4.2"
   }
 }
