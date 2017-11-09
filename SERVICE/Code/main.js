@@ -2,6 +2,11 @@ var Botkit = require('botkit');
 var chrono = require('chrono-node');
 var fs = require('fs');
 var config = require('./modules/config.js')
+var standup = require('./modules/standup');
+var schedule = require('node-schedule')
+var util = require('util')
+var report = require('./modules/report.js')
+const delay = require('delay');
 
 function StandupConfig(){
   this.startTimeHours = 0;
@@ -62,20 +67,28 @@ controller.setupWebserver(process.env.port,function(err,webserver) {
 });
 
 // to make sure we don't connect to the RTM twice for the same team
-var _bots = {};
+function makebot() {
+  this.startPrivateConversation = function (user,cb) {
+
+  }
+}
+
+var _bot = new makebot();
 function trackBot(bot) {
-  _bots[bot.config.token] = bot;
+  _bot = bot;
+  console.log("bot:" + bot);
 }
 
 controller.on('create_bot',function(bot,config) {
 
-  if (_bots[bot.config.token]) {
+  if (false) {
     // already online! do nothing.
   } else {
     bot.startRTM(function(err) {
 
       if (!err) {
         trackBot(bot);
+        console.log("bot:" + bot);
       }
 
       standupConfig.creator = config.createdBy;
@@ -86,6 +99,95 @@ controller.on('create_bot',function(bot,config) {
           convo.say("Hello! I'm here to organise your standup. Let me know when you want to schedule one.");
         }
       });
+
+for (var i=0;i< participants.length;i++){
+      _bot.startPrivateConversation({user: participants[i]['user_id']},function(err,convo) {
+        if (err) {
+          console.log(err);
+        } else {
+          convo.ask( startStandupButtons, function (response, convo) {
+            switch (response.text) {
+              case "start":
+                  var attachment = {text: `:white_check_mark: Awesome! Let's start the standup.`, title: "Select one option."};
+                  _bot.replyInteractive(response, {text: "We are starting with the standup.", attachments: [attachment]});
+                  var answers = [];
+
+                  for(var i = 0; i < questions.length; i++) {
+                    convo.addQuestion(questions[i], function (response, convo) {
+                      console.log('Question answered =', response.text);
+                      answers.push(response.text);
+                      console.log(answers);
+                      convo.next();
+                    }, {}, 'askQuestion');
+                  }
+
+                  convo.addQuestion("We are done with the standup. Do you want to redo?", [
+                          {
+                              pattern: _bot.utterances.yes,
+                              callback: function(response, convo) {
+                                standupConfig.questions = [];
+                                console.log('Redoing');
+                                convo.gotoThread('askQuestion');
+                              }
+                          },
+                          {
+                              pattern: _bot.utterances.no,
+                              default: true,
+                              callback: function(response, convo) {
+                                convo.addMessage(" Thanks for your responses! We are done with today's standup.", 'askQuestion');
+                                convo.next();
+                                // TODO: Remove Reporting from here and trigger it at standup close time.
+                                console.log(require('util').inspect(response, { depth: null }));
+                                report.postReportToChannel(_bot, {"channel_id":reportChannel,
+                                  "user_name":"<@"+response.user+">",
+                                  "questions":questions,
+                                  "answers":answers});
+                              }
+                          }
+                        ], {}, 'askQuestion');
+
+                  convo.addMessage({text:"Here are your questions.", action:'askQuestion'}, 'default');
+                  convo.next();
+                break;
+              case "snooze":
+                var attachment = {text: `:white_check_mark: I will remind you in 15 minutes`, title: "Select one option."};
+                _bot.replyInteractive(response, {text: "We are starting with the standup.", attachments: [attachment]});
+                console.log("Before delay");
+                delay(5000)
+                .then(() => {
+                  console.log("After Delay");
+                  convo.gotoThread('default');
+                });
+                break;
+              case "ignore":
+                var attachment = {text: `:white_check_mark: See you tomorrow`, title: "Select one option."};
+                _bot.replyInteractive(response, {text: "We are starting with the standup.", attachments: [attachment]});
+                convo.next();
+                break;
+            }
+          });
+        }
+      });
+}
+
+
+/*      //var j = schedule.scheduleJob(rule, function(){
+//        for (var i=0;i< participants.length;i++){
+          console.log("user: " + participants[0]['user_id']);
+            // bot.sendMessage(participants[i]["direct_message_id"],bot.introduceToUser(participants[i]["user_id"]));
+            bot.startPrivateConversation({user: config.createdBy},function(err,convo) {
+              if (err) {
+                console.log(err);
+              } else {
+                convo.ask(bot.startStandupButtons,
+                  function (response, convo) {
+                    console.log(response.text);
+                  });
+              }
+            });
+        //}
+      //});
+*/
     });
   }
 });
@@ -412,8 +514,8 @@ controller.hears(['modify', 'change', 'update', 'reschedule'],['direct_mention',
       //condoel.log("Test");
       //bot.sendMessage("D7JBPKD8B","Calvin is awesome");
       //bot.sendMessage("D7JBPKD8B","Calvin is awesome");
-      bot.sendMessage("D7LJ7H9U4",bot.introduceToUser("U7LJ7GXBN"))
-      bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
+      //bot.sendMessage("D7LJ7H9U4",bot.introduceToUser("U7LJ7GXBN"))
+      //bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
     });
 
   }); // startConversation Ends
@@ -437,12 +539,3 @@ controller.hears(['help'],['direct_mention', 'direct_message'], function(bot,mes
 /*
 ************************ standup session **********************************
 */
-
-for (var i=0;i< participants.length;i++){
-    bot.sendMessage(participants[i]["direct_message_id"],bot.introduceToUser(participants[i]["user_id"]));
-}
-
-var j = schedule.scheduleJob(rule, function(){
-  bot.sendMessage("D7LJ7H9U4",bot.introduceToUser("U7LJ7GXBN"))
-  bot.sendMessage("D7JBPKD8B",bot.introduceToUser("U6WEA6ULA"))
-});

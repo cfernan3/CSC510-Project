@@ -126,7 +126,7 @@ function question1(payload){
     // if(payload=={}){
     //   payload = message;
     //}
-  bkit.startPrivateConversation(message, function(err, convo) {
+  bkit.startPrivateConversation({user: payload.user.id}, function(err, convo) {
     var standupQuestions = questions;//["What is your name.","Where do you live?","What do you do for living?"];
     var responseAnswers = {};
     convo.addMessage({text:"Here are your questions.",action:'askFirstQue'}, 'default');
@@ -231,48 +231,3 @@ smtpTransport.close(); // shut down the connection pool, no more messages.  Comm
       }, {}, 'lastStatement');
   }); // startConversation Ends
 }
-// Action handling
-slackMessages.action('standup:start', (payload, respond) => {
-  // Create an updated message that acknowledges the user's action (even if the result of that
-  // action is not yet complete).
-  var optionName = payload.actions[0].name;
-  //console.log(optionName);
-  console.log(payload);
-  const channel = payload.channel.id;
-  //console.log(payload.channel);
-  if (optionName=="Start")
-  {
-    var updatedMessage = acknowledgeActionFromMessage(payload.original_message, 'standup:start',
-                                                      'I\'m getting the standup started.');
-    question1(payload);
-  }
-   else if (optionName=="Snooze")
-  {
-      var updatedMessage = acknowledgeActionFromMessage(payload.original_message, 'standup:start',
-                                                      'I will remind you in 15 minutes');
-  delay(10000)         //While deploying change to 900000
-  .then(() => {
-      //console.log("Test")
-      bot.sendMessage(channel,bot.introduceToUser(payload.user[0].id))
-  });
-  }
-   else
-  {
-      var updatedMessage = acknowledgeActionFromMessage(payload.original_message, 'standup:start',
-                                                      'See you tomorrow');
-  }
-  console.log("\n Updated Message \n")
-  console.log(updatedMessage);
-  return updatedMessage;
-});
-// Create the server to listen for events
-const port = normalizePort(process.env.PORT || '3000');
-const app = express();
-app.use(bodyParser.json());
-app.use('/slack/events', slackEvents.expressMiddleware());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use('/slack/receive', slackMessages.expressMiddleware());
-// Start the server
-http.createServer(app).listen(port, () => {
-  console.log(`server listening on port ${port}`);
-});
