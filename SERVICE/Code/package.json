@@ -32,5 +32,8 @@
     "nock": "^0.34.1",
     "nodemailer": "^4.3.1",
     "chrono-node": "^5.4.2"
+    "request": "^2.83.0",
+    "googleapis":"*",
+    "google-auth-library":"*"
   }
 }
