@@ -27,18 +27,19 @@ var defaultQuestions = "\t" + standupConfig.questions[0];
 for(var i = 1; i < standupConfig.questions.length; i++)
   defaultQuestions += "\n\t" + standupConfig.questions[i];
 
-// TODO: Invoke when stand up is configured.
-var rule = new schedule.RecurrenceRule();                      //Reference:https://www.npmjs.com/package/node-schedule
+var snoozeDelayMins = 0.5; // Snooze delay in minutes
 
-//rule.dayOfWeek = [0, new schedule.Range(1, 4)];
+var startRule = new schedule.RecurrenceRule();
+
 // TODO: set the start and end times for schedule each time they are updated
-rule.dayOfWeek = [0,1,2,3,4,5,6];
-//rule.hour = standupConfig.startTimeHours;
-rule.hour = 0;
-//rule.minute = standupConfig.startTimeMins;
-rule.minute = 8;
+startRule.dayOfWeek = [0,1,2,3,4,5,6];
+//startRule.hour = standupConfig.startTimeHours;
+startRule.hour = 0;
+//startRule.minute = standupConfig.startTimeMins;
+startRule.minute = 8;
 
-var standupJob;
+var sessionJob;  // Schedule this job using startRule to conduct the daily standup session
+var reportJob;   // Schedule this job using endRule to trigger reporting
 
 var controller = Botkit.slackbot({
   debug: false,
@@ -79,28 +80,22 @@ function trackBot(bot) {
 }
 
 controller.on('create_bot',function(bot,config) {
+  bot.startRTM(function(err) {
 
-  if (false) {
-    // already online! do nothing.
-  } else {
-    bot.startRTM(function(err) {
+    if (!err) {
+      trackBot(bot);
+      console.log("bot:" + bot);
+    }
 
-      if (!err) {
-        trackBot(bot);
-        console.log("bot:" + bot);
+    standupConfig.creator = config.createdBy;
+    bot.startPrivateConversation({user: config.createdBy},function(err,convo) {
+      if (err) {
+        console.log(err);
+      } else {
+        convo.say("Hello! I'm here to organise your standup. Let me know when you want to schedule one.");
       }
-
-      standupConfig.creator = config.createdBy;
-      bot.startPrivateConversation({user: config.createdBy},function(err,convo) {
-        if (err) {
-          console.log(err);
-        } else {
-          convo.say("Hello! I'm here to organise your standup. Let me know when you want to schedule one.");
-        }
-      });
-
     });
-  }
+  });
 });
 
 /*
@@ -133,7 +128,8 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
     convo.addQuestion('When would you like the standup to end?', function (response, convo) {
       console.log('End time entered =', response.text);
 
-      var endTime = chrono.parseDate(response.text)  // TODO: check that end time > start time
+      // TODO: check that end time - start time > 15 mins
+      var endTime = chrono.parseDate(response.text)
       if (endTime != null) {
         standupConfig.endTimeHours = endTime.getHours();
         standupConfig.endTimeMins = endTime.getMinutes();
@@ -154,6 +150,7 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
           3. specific channel: #<channel-name>', function (response, convo) {
 
       console.log('participants=', response.text);
+      standupConfig.participants = [];
       config.addParticipants(response.text, standupConfig);
       convo.gotoThread('askQuestionSet');
     }, {}, 'askParticipants');
@@ -222,7 +219,7 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
       writeToConfigFile();
 
       // start the standup scheduling job after the standup parameters are configured
-      standupJob = schedule.scheduleJob(rule, startStandupWithParticipants);
+      sessionJob = schedule.scheduleJob(startRule, startStandupWithParticipants);
       next();
     });
 
@@ -263,7 +260,7 @@ controller.hears(['show', 'display'],['direct_mention', 'direct_message'], funct
 ************************ Editing an existing standup**********************************
 */
 
-controller.hears(['modify', 'change', 'update', 'reschedule'],['direct_mention', 'direct_message'], function(bot,message) {
+controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_mention', 'direct_message'], function(bot,message) {
   // TODO: check that standup exists
 
   bot.startConversation(message, function(err, convo) {
@@ -297,13 +294,20 @@ controller.hears(['modify', 'change', 'update', 'reschedule'],['direct_mention',
     convo.addQuestion('What time would you like to start the standup?', function (response, convo) {
       console.log('Start time entered =', response.text);
 
+      //TODO: check that end time - new start time > 15 mins
       var startTime = chrono.parseDate(response.text)
       if (startTime != null) {
         standupConfig.startTimeHours = startTime.getHours();
         standupConfig.startTimeMins = startTime.getMinutes();
         console.log("Start time = " + standupConfig.startTimeHours + ":" + standupConfig.startTimeMins);
+        //TODO: display time in 12 hr format
         convo.addMessage("All set! I have updated the start time to " + standupConfig.startTimeHours +
                           ":" + standupConfig.startTimeMins + ".", 'editStartTime');
+
+        // reschedule the standup session job after the start time is modified
+        startRule.hour = standupConfig.startTimeHours;
+        startRule.minute = standupConfig.startTimeMins;
+        sessionJob.reschedule(startRule);
 
         writeToConfigFile();
         convo.next();
@@ -319,7 +323,7 @@ controller.hears(['modify', 'change', 'update', 'reschedule'],['direct_mention',
     convo.addQuestion('When would you like the standup to end?', function (response, convo) {
       console.log('End time entered =', response.text);
 
-      var endTime = chrono.parseDate(response.text)  // TODO: check that end time > start time
+      var endTime = chrono.parseDate(response.text)  // TODO: check that new end time - start time > 15 mins
       if (endTime != null) {
         standupConfig.endTimeHours = endTime.getHours();
         standupConfig.endTimeMins = endTime.getMinutes();
@@ -474,10 +478,10 @@ function startStandupWithParticipants(){
                 convo.next();
               break;
             case "snooze":
-              var attachment = {text: `:white_check_mark: I will remind you in 15 minutes`, title: "Select one option."};
+              var attachment = {text: `:white_check_mark: I will remind you in ${snoozeDelayMins} minutes`, title: "Select one option."};
               _bot.replyInteractive(response, {text: "We are starting with the standup.", attachments: [attachment]});
 
-              delay(5000)
+              delay(snoozeDelayMins * 60000)
               .then(() => {
                 convo.gotoThread('default');
               });
@@ -496,7 +500,7 @@ function startStandupWithParticipants(){
 
 
 var writeToConfigFile = function() {
-  fs.writeFile('./mock_config.json', JSON.stringify(standupConfig), (err) => {
+  fs.writeFile('./config.json', JSON.stringify(standupConfig), (err) => {
      if (err) throw err;
    });
 }
