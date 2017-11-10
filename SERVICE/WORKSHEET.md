@@ -23,8 +23,7 @@
 |   |                | Verify that the standup participants / reporting channel configured are valid. (Replace mocking with slack API calls) |  | Sharmin, Ronald | 8th Nov | |
 | 2 | Standup session| Store the standup answers on google sheets |  | Calvin, Nirav  | | |
 |   |                | Modify conversation to loop over all configured questions |  | Sharmin, Ronald | | |
-|   |                | Trigger the standup scheduling function after the standup is configured or after loading config from config file.
-Reschedule it whenever the standup start time is modified. |  | Sharmin, Ronald | | |
+|   |                | Trigger the standup scheduling function after the standup is configured or after loading config from config file. Reschedule it whenever the standup start time is modified. |  | Sharmin, Ronald | | |
 | 3 | Reporting      | Trigger report generation at standup end time. Reschedule it whenever the standup end time is modified. |  |  Bharat     | | |
 |   |                | Retrieve standup answers from google sheets and compile standup report |  | | | |
 | 4 | Code Integration | Integrate index.js and main.js and divide code modules into different files |  | Sharmin, Ronald, Nirav | | |
@@ -38,4 +37,4 @@ Reschedule it whenever the standup start time is modified. |  | Sharmin, Ronald 
 |   |                  | Modify use case 2 to show google sheets integration |  | | | |
 | 2 | Screen cast      | Use case 1                                  |  |   |  |   |
 |   |                  | Use case 2                                  |  |   |  |   |
-|   |                  | Use case 3                                  |  |          | 9th Nov   |   |
+|   |                  | Use case 3                                  |  |   |  |   |
