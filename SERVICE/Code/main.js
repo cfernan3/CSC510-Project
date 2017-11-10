@@ -350,7 +350,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
                 2. specific user group: @<user-group-name> \n \
                 3. specific channel: #<channel-name>', function (response, convo) {
             console.log('participants to add =', response.text);
-            config.addParticipants(response.text, standupConfig);
+            config.addParticipants(bot, response.text, standupConfig);
             //console.log(standupConfig.participants);
             convo.addMessage("All set! I have updated the participants", 'editParticipants');
             writeToConfigFile();

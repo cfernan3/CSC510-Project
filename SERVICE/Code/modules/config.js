@@ -1,37 +1,52 @@
 var fs = require('fs');
 var reg = /<(.*?)>/g;
 var result;
-var objUsers = JSON.parse(fs.readFileSync('mock_users.json', 'utf8'));
+// var objUsers = JSON.parse(fs.readFileSync('mock_users.json', 'utf8'));
 
 module.exports = {
 
-addParticipants: function(participants, standupConfig) {
+addParticipants: function(bot, participants, standupConfig) {
+
+  // Iterate through the valid participants list.
   while((result = reg.exec(participants)) !== null) {
-      if (result[1].charAt(0) == '@') { // This is a user
-        for (key in objUsers.users) {
-          if (objUsers.users[key] == result[1].substr(1)) {
-            console.log("Found user ", result[1]);
-            // Add this user to the json file.
-            standupConfig.participants.push(result[1].substr(1));
-            console.log("Adding ", (result[1].substr(1)));
-            break;
-          }
-        }
-      } else if (result[1].charAt(0) == '#') { // This is a channel
-        for (key in objUsers.channels) {
-          var channel_key = Object.keys(objUsers.channels[key])[0];
-          var channel_id = result[1].substr(1,9);
-          if (channel_key == channel_id) {
-            // Add all users to the json file.
-            console.log("Found channel ", channel_id);
-            for (i in (objUsers.channels[key])[channel_id]) {
-              standupConfig.participants.push((objUsers.channels[key])[channel_id][i]);
-              console.log("Adding ", ((objUsers.channels[key])[channel_id][i]));
-            }
-            break;
-          }
-        }
+
+    if (result[1].charAt(0) == '@') { // This is a user
+
+      // Add this user to the json file.
+      if (standupConfig.participants.indexOf(result[1].substr(1)) < 0) {
+        console.log("Adding ", result[1].substr(1));
+        standupConfig.participants.push(result[1].substr(1));
       }
+      console.log("Participants " + standupConfig.participants);
+
+    } else if (result[1].charAt(0) == '#') { // This is a channel
+
+      // Get the users of the channel.
+      var channel_id = result[1].substr(1).split('|')[0];
+      console.log("channel_id = ", channel_id);
+
+      bot.api.channels.info({"channel": channel_id},function(err,response) {
+
+        // Check if the user is a bot, then don't add him.
+        var members = response["channel"]["members"];
+        for (var p_i in members) {
+
+          console.log("Member id = " + members[p_i]);
+          bot.api.users.info({"user": members[p_i]},function(err,response) {
+
+            if (response["user"]["is_bot"] == false) { // This is a user
+              
+              // Add this participant
+              if (standupConfig.participants.indexOf(response["user"]["id"]) < 0) {
+                console.log("Adding ", response["user"]["id"]);
+                standupConfig.participants.push(response["user"]["id"]);
+              }
+            }
+            console.log("Participants " + standupConfig.participants);
+          });
+        }
+      });
+    }
   }
 },
 
@@ -40,7 +55,6 @@ removeParticipants: function(participants, standupConfig) {
       if (result[1].charAt(0) == '@') { // This is a user
         for (i in standupConfig.participants) {
           if (standupConfig.participants[i] == result[1].substr(1)) {
-            console.log("Found user ", result[1]);
             // Remove this user from the json file.
             standupConfig.participants.splice(i,1);
             console.log("Removing ", (result[1].substr(1)));
@@ -141,7 +155,7 @@ modifyUserButtons: modifyUserButtons = {
 attachments:[
     {
         title: "Select one option.",
-        callback_id: '123',
+        callback_id: '456',
         attachment_type: 'default',
         actions: [
             {
