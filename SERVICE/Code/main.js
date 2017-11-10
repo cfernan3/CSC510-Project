@@ -15,9 +15,9 @@ function StandupConfig(){
   this.endTimeMins = 0;
   this.questions = ["What did you accomplish yesterday?", "What will you work on today?",
                     "Is there anything blocking your progress?"];  // should have aleast 1 question
-  this.participants = ["U6WJV396H", "U7LJ7GXBN"];  // TODO: makse sure there are no duplicates
-  this.reportMedium = "channel";  // default medium is channel
-  this.reportChannel = "C7M70JML4";
+  this.participants = [];  // TODO: makse sure there are no duplicates
+  this.reportMedium = "email";  // default medium is email
+  this.reportChannel = "";
   this.creator = "";
 }
 
@@ -30,13 +30,12 @@ for(var i = 1; i < standupConfig.questions.length; i++)
 var snoozeDelayMins = 0.5; // Snooze delay in minutes
 
 var startRule = new schedule.RecurrenceRule();
-
-// TODO: set the start and end times for schedule each time they are updated
 startRule.dayOfWeek = [0,1,2,3,4,5,6];
-//startRule.hour = standupConfig.startTimeHours;
-startRule.hour = 0;
-//startRule.minute = standupConfig.startTimeMins;
-startRule.minute = 8;
+
+// TODO: start the reporting job after standup is configured
+// TODO: modify the endRule and reschedule the reporting job whenever end time is modified
+var endRule = new schedule.RecurrenceRule();
+endRule.dayOfWeek = [0,1,2,3,4,5,6];
 
 var sessionJob;  // Schedule this job using startRule to conduct the daily standup session
 var reportJob;   // Schedule this job using endRule to trigger reporting
@@ -67,34 +66,54 @@ controller.setupWebserver(process.env.port,function(err,webserver) {
 });
 
 function makebot() {
-  this.startPrivateConversation = function (user,cb) {
-
-  }
+  this.startPrivateConversation = function (user, callback) {}
 }
 
 var _bot = new makebot();
 
 function trackBot(bot) {
   _bot = bot;
-  console.log("bot:" + bot);
 }
 
-controller.on('create_bot',function(bot,config) {
+
+/*
+************************ Launching the slack app**********************************
+*/
+
+controller.on('create_bot',function(bot, bot_config) {
   bot.startRTM(function(err) {
 
     if (!err) {
       trackBot(bot);
-      console.log("bot:" + bot);
     }
 
-    standupConfig.creator = config.createdBy;
-    bot.startPrivateConversation({user: config.createdBy},function(err,convo) {
-      if (err) {
-        console.log(err);
-      } else {
-        convo.say("Hello! I'm here to organise your standup. Let me know when you want to schedule one.");
-      }
-    });
+    // Read the config from the config file if present
+    var configObj = config.validateConfigFile();
+
+    // If the config file is present and the format is valid, use the config.
+    // Useful for restarting the main process.
+    if(configObj != null) {
+      standupConfig = configObj;
+      console.log(standupConfig);
+
+      // schedule the standup job at the configured start time
+      startRule.hour = standupConfig.startTimeHours;
+      startRule.minute = standupConfig.startTimeMins;
+      sessionJob = schedule.scheduleJob(startRule, startStandupWithParticipants);
+
+      //TODO: // schedule the report job at the configured end time
+
+    } else {
+      // tell the user to configure a standup
+      standupConfig.creator = bot_config.createdBy;
+      bot.startPrivateConversation({user: bot_config.createdBy},function(err,convo) {
+        if (err) {
+          console.log(err);
+        } else {
+          convo.say("Hello! I'm here to organise your standup. Let me know when you want to schedule one.");
+        }
+      });
+    }
   });
 });
 
@@ -102,7 +121,7 @@ controller.on('create_bot',function(bot,config) {
 ************************ Configuring a new standup**********************************
 */
 
-controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], function(bot,message) {
+controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_message'], function(bot,message) {
   bot.startConversation(message, function(err, convo) {
 
     convo.addMessage({text:"Let's begin configuring a new standup.", action:'askStartTime'}, 'default');
@@ -205,6 +224,7 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
         } else {
           standupConfig.reportMedium = "channel";
           convo.addQuestion('Which slack channel do you want to use? E.g. #general', function (response, convo) {
+            standupConfig.reportMedium = "channel";  //TODO: set meidum as channel only if given channel is valid
             config.parseReportChannel(response.text, standupConfig);
             convo.gotoThread('lastStatement');
           }, {}, 'askReportMedium');
@@ -218,8 +238,16 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
       console.log('New standup config complete');
       writeToConfigFile();
 
-      // start the standup scheduling job after the standup parameters are configured
-      sessionJob = schedule.scheduleJob(startRule, startStandupWithParticipants);
+      startRule.hour = standupConfig.startTimeHours;
+      startRule.minute = standupConfig.startTimeMins;
+
+      // schedule the standup job, if not already scheduled
+      if(typeof sessionJob == 'undefined')
+        sessionJob = schedule.scheduleJob(startRule, startStandupWithParticipants);
+      else
+        sessionJob.reschedule(startRule);
+
+      //TODO: schedule the report job
       next();
     });
 
@@ -234,21 +262,31 @@ controller.hears(['schedule', 'setup'],['direct_mention', 'direct_message'], fun
 */
 controller.hears(['show', 'display'],['direct_mention', 'direct_message'], function(bot,message) {
   bot.startConversation(message, function(err, convo) {
+
     convo.say('Let me show you the current configuration...');
     // Start time
-    convo.say("Start time: " + standupConfig.startTimeHours + ":" + standupConfig.startTimeMins);
+    convo.say("Start time: " + config.getHourIn12HourFormat(standupConfig.startTimeHours, standupConfig.startTimeMins));
+
     // End time
-    convo.say("End time: " + standupConfig.endTimeHours + ":" + standupConfig.endTimeMins);
+    convo.say("End time: " + config.getHourIn12HourFormat(standupConfig.endTimeHours, standupConfig.endTimeMins));
+
     // participants
-    convo.say("participants: " + standupConfig.participants.toString());
+    var participantsStr = "";
+    standupConfig.participants.forEach(function(val) {
+     participantsStr += " <@" + val + ">";
+    });
+    convo.say(`Participants:${participantsStr}`);
+
     // Question set
     convo.say("Question Set: ");
+    var i = 1;
     standupConfig.questions.forEach(function(val) {
-      convo.say("    " + val);
+      convo.say(i++ + ".  " + val);
     });
+
     // Reporting medium
     if (standupConfig.reportMedium == "channel") {
-      convo.say("Reporting Medium: " + standupConfig.reportMedium + " ("+ standupConfig.reportChannel + ") ");
+      convo.say("Reporting Medium: " + standupConfig.reportMedium + " (<#" + standupConfig.reportChannel + ">)");
     } else {
       convo.say("Reporting Medium: " + standupConfig.reportMedium);
     }
@@ -300,9 +338,9 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
         standupConfig.startTimeHours = startTime.getHours();
         standupConfig.startTimeMins = startTime.getMinutes();
         console.log("Start time = " + standupConfig.startTimeHours + ":" + standupConfig.startTimeMins);
-        //TODO: display time in 12 hr format
-        convo.addMessage("All set! I have updated the start time to " + standupConfig.startTimeHours +
-                          ":" + standupConfig.startTimeMins + ".", 'editStartTime');
+
+        convo.addMessage("All set! I have updated the start time to " +
+                        config.getHourIn12HourFormat(standupConfig.startTimeHours, standupConfig.startTimeMins) + ".", 'editStartTime');
 
         // reschedule the standup session job after the start time is modified
         startRule.hour = standupConfig.startTimeHours;
@@ -328,8 +366,13 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
         standupConfig.endTimeHours = endTime.getHours();
         standupConfig.endTimeMins = endTime.getMinutes();
         console.log("End time = " + standupConfig.endTimeHours + ":" + standupConfig.endTimeMins);
-        convo.addMessage("All set! I have updated the end time to " + standupConfig.endTimeHours +
-                          ":" + standupConfig.endTimeMins + ".", 'editEndTime');
+        convo.addMessage("All set! I have updated the end time to " +
+                        config.getHourIn12HourFormat(standupConfig.endTimeHours, standupConfig.endTimeMins) + ".", 'editEndTime');
+
+        // reschedule the standup session job after the start time is modified
+        endRule.hour = standupConfig.endTimeHours;
+        endRule.minute = standupConfig.endTimeMins;
+        //reportJob.reschedule(endRule);
 
         writeToConfigFile();
         convo.next();
@@ -351,7 +394,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
                 3. specific channel: #<channel-name>', function (response, convo) {
             console.log('participants to add =', response.text);
             config.addParticipants(bot, response.text, standupConfig);
-            //console.log(standupConfig.participants);
+
             convo.addMessage("All set! I have updated the participants", 'editParticipants');
             writeToConfigFile();
             convo.next();
@@ -363,8 +406,8 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
           function (response, convo) {
             console.log('participants to remove =', response.text);
             config.removeParticipants(response.text, standupConfig);
-            //console.log(standupConfig.participants);
-            convo.addMessage("All set! I have updated the participants", 'editParticipants');
+
+            convo.addMessage("All set! I have updated the participants.", 'editParticipants');
             writeToConfigFile();
             convo.next();
           }, {}, 'editParticipants');
@@ -408,10 +451,10 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
           writeToConfigFile();
           convo.next();
         } else {
-          standupConfig.reportMedium = "channel";
           convo.addQuestion('Which slack channel do you want to use? E.g. #general', function (response, convo) {
+            standupConfig.reportMedium = "channel";  // TODO: set medium as channel only if given channel is valid
             config.parseReportChannel(response.text, standupConfig);
-            convo.addMessage("All set! Standup reports will now be posted to your channel.", 'editReportMedium');
+            convo.addMessage("All set! Standup reports will now be posted to your channel.", 'editReportMedium');  //TODO: print channel name
 
             writeToConfigFile();
             convo.next();
@@ -434,6 +477,9 @@ function startStandupWithParticipants(){
       if (err) {
         console.log(err);
       } else {
+        //TODO: standup session should not be continued if the the window closes in between.
+        // If a user clicks snooze multiple times, session should terminate once standup end time is reached.
+
         convo.ask( startStandupButtons, function (response, convo) {
           switch (response.text) {
             case "start":
@@ -466,6 +512,7 @@ function startStandupWithParticipants(){
                               convo.next();
 
                               // TODO: Remove Reporting from here and trigger it at standup close time.
+                              // Change the function arguments - send the compiled report instead of a single user's answers
                               report.postReportToChannel(_bot, {"channel_id":StandupConfig.reportChannel,
                                 "user_name":"<@"+response.user+">",
                                 "questions":standupConfig.questions,
