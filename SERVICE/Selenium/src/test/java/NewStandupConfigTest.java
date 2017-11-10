@@ -1,9 +1,5 @@
-//Ref:http://toolsqa.com/selenium-webdriver/browser-commands/
-
 import static org.junit.Assert.*;
-
 import java.util.List;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -20,16 +16,16 @@ import io.github.bonigarcia.wdm.ChromeDriverManager;
 public class NewStandupConfigTest
 {
 	private static WebDriver driver;
-	
+
 	public static String URL = "https://parkwoodgang.slack.com";
-	
+
 	@BeforeClass
-	public static void setUp() throws Exception 
+	public static void setUp() throws Exception
 	{
 		ChromeDriverManager.getInstance().setup();
 		driver = new ChromeDriver();
 		driver.get(URL);
-        assertEquals("Slack", driver.getTitle());		
+        assertEquals("Slack", driver.getTitle());
 
     	WebDriverWait wait = new WebDriverWait(driver, 30);
     	wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id='signin_form']/p[1]/strong[1]")));
@@ -40,7 +36,7 @@ public class NewStandupConfigTest
     	WebElement signin = driver.findElement(By.xpath("//*[@id='signin_btn']/span[1]"));
     	signin.click();
 	}
-	
+
 	@AfterClass
 	public static void  tearDown() throws Exception
 	{
@@ -49,28 +45,41 @@ public class NewStandupConfigTest
 	}
 
 
-	
+
 	@Test
 	public void StartConfig() throws Exception
 	{
+		WebElement bot;
 		driver.get("https://parkwoodgang.slack.com/messages/whatbot/");
 		WebDriverWait wait = new WebDriverWait(driver, 70);
 		wait.until(ExpectedConditions.titleContains("whatbot"));
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("msg_input")));
-		
-		// Type schedule
-		WebElement bot = driver.findElement(By.xpath("//div[@id='msg_input']/div")); 
-		bot.sendKeys("Let's setup a standup meeting.");
+
+		// Type help
+		bot = driver.findElement(By.xpath("//div[@id='msg_input']/div"));
+		bot.sendKeys("Help");
 		bot.sendKeys(Keys.RETURN);
 		Thread.sleep(3000);
-		
+
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[contains(@class,'message_body') and text() = 'What time would you like to start the standup?']")));
+		WebElement help = driver.findElement(
+				By.xpath("//span[contains(@class,'message_body') and text() = 'All I need is the standup window, participant list, question set, and reporting medium (Slack channel / Email).']"));
+		assertNotNull(help);
+		Thread.sleep(3000);
+
+		// Type schedule
+		bot = driver.findElement(By.xpath("//div[@id='msg_input']/div"));
+		bot.sendKeys("I want to setup a standup meeting.");
+		bot.sendKeys(Keys.RETURN);
+		Thread.sleep(3000);
+
 		// Configuring wrong start time
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[contains(@class,'message_body') and text() = 'What time would you like to start the standup?']")));
 		WebElement startTime = driver.findElement(
 				By.xpath("//span[contains(@class,'message_body') and text() = 'What time would you like to start the standup?']"));
 		assertNotNull(startTime);
 		Thread.sleep(3000);
-		
+
 		bot = driver.findElement(By.xpath("//div[@id='msg_input']/div")); // ("msg_input").);
 		bot.sendKeys("Start at 25");
 		bot.sendKeys(Keys.RETURN);
@@ -82,12 +91,12 @@ public class NewStandupConfigTest
 				By.xpath("//span[contains(@class,'message_body') and text() = 'What time would you like to start the standup?']"));
 		assertNotNull(startTime);
 		Thread.sleep(3000);
-		
+
 		bot = driver.findElement(By.xpath("//div[@id='msg_input']/div")); // ("msg_input").);
 		bot.sendKeys("Start the meeting at 9:30 am");
 		bot.sendKeys(Keys.RETURN);
 		Thread.sleep(3000);
-		
+
 		// Configuring end time
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[contains(@class,'message_body') and text() = 'When would you like the standup to end?']")));
 		WebElement endTime = driver.findElement(
@@ -95,12 +104,11 @@ public class NewStandupConfigTest
 		assertNotNull(endTime);
 		Thread.sleep(3000);
 
-		
 		bot = driver.findElement(By.xpath("//div[@id='msg_input']/div")); // ("msg_input").);
 		bot.sendKeys("End at 10:30 am");
 		bot.sendKeys(Keys.RETURN);
 		Thread.sleep(3000);
-		
+
 		// Configuring participants
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[contains(@class,'message_body') and text() = 'Who would you like to invite for the standup session?']")));
 		WebElement users = driver.findElement(
@@ -112,7 +120,7 @@ public class NewStandupConfigTest
 		bot.sendKeys("#general");
 		bot.sendKeys(Keys.RETURN);
 		Thread.sleep(3000);
-		
+
 		// Configuring questions
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[contains(@class,'message_body') and text() = 'Would you like to give your own question set?']")));
 		WebElement questions = driver.findElement(
@@ -145,14 +153,14 @@ public class NewStandupConfigTest
 		bot.sendKeys("I'm done giving the questions.");
 		bot.sendKeys(Keys.RETURN);
 		Thread.sleep(3000);
-		
+
 		// Look for the buttons
-    	wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@class='btn btn_attachment'and contains(., 'channel')]")));
-    	List<WebElement> reportButton = driver.findElements(By.xpath("//button[@class='btn btn_attachment'and contains(., 'channel')]"));
-    	reportButton.get(reportButton.size()-1).click();
+  	wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@class='btn btn_attachment'and contains(., 'channel')]")));
+  	List<WebElement> reportButton = driver.findElements(By.xpath("//button[@class='btn btn_attachment'and contains(., 'channel')]"));
+  	reportButton.get(reportButton.size()-1).click();
 
     	// Configure channel name
-    	wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[contains(@class,'message_body') and text() = 'Which slack channel do you want to use? E.g. #general']")));
+    wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[contains(@class,'message_body') and text() = 'Which slack channel do you want to use? E.g. #general']")));
 		WebElement channelName = driver.findElement(
 				By.xpath("//span[contains(@class,'message_body') and text() = 'Which slack channel do you want to use? E.g. #general']"));
 		assertNotNull(channelName);
@@ -161,7 +169,7 @@ public class NewStandupConfigTest
 		bot = driver.findElement(By.xpath("//div[@id='msg_input']/div")); // ("msg_input").);
 		bot.sendKeys("#general");
 		bot.sendKeys(Keys.RETURN);
- 	
-    	Thread.sleep(3000); 
+
+    Thread.sleep(3000);
 	}
 }

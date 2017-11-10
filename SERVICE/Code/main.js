@@ -395,7 +395,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
             console.log('participants to add =', response.text);
             config.addParticipants(response.text, standupConfig);
 
-            convo.addMessage("All set! I have updated the participants", 'editParticipants');
+            convo.addMessage("All set! I have updated the participants.", 'editParticipants');
             writeToConfigFile();
             convo.next();
           }, {}, 'editParticipants');
@@ -406,8 +406,8 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
           function (response, convo) {
             console.log('participants to remove =', response.text);
             config.removeParticipants(response.text, standupConfig);
-            //console.log(standupConfig.participants);
-            convo.addMessage("All set! I have updated the participants", 'editParticipants');
+
+            convo.addMessage("All set! I have updated the participants.", 'editParticipants');
             writeToConfigFile();
             convo.next();
           }, {}, 'editParticipants');
