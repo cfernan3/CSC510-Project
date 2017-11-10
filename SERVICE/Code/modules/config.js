@@ -1,7 +1,5 @@
-var fs = require('fs');
 var reg = /<(.*?)>/g;
 var result;
-// var objUsers = JSON.parse(fs.readFileSync('mock_users.json', 'utf8'));
 
 module.exports = {
 
@@ -35,7 +33,7 @@ addParticipants: function(bot, participants, standupConfig) {
           bot.api.users.info({"user": members[p_i]},function(err,response) {
 
             if (response["user"]["is_bot"] == false) { // This is a user
-              
+
               // Add this participant
               if (standupConfig.participants.indexOf(response["user"]["id"]) < 0) {
                 console.log("Adding ", response["user"]["id"]);
