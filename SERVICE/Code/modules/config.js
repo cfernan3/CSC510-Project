@@ -1,7 +1,26 @@
 var fs = require('fs');
+var Validator = require('jsonschema').Validator;
+var v = new Validator();
 var reg = /<(.*?)>/g;
 var result;
 var objUsers = JSON.parse(fs.readFileSync('mock_users.json', 'utf8'));
+
+var configSchema = {
+  type: 'object',
+  properties: {
+    startTimeHours: { type: 'number', minimum: 0, maximum: 23 },
+    startTimeMins: { type: 'number', minimum: 0, maximum: 59 },
+    endTimeHours: { type: 'number', minimum: 0, maximum: 23 },
+    endTimeMins: { type: 'number', minimum: 0, maximum: 59 },
+    questions: { type: 'array', items: { type: 'string' }, minItems: 1 },
+    participants: { type: 'array', items: { type: 'string', minLength: 9, maxLength: 9 }, minItems: 1 },
+    reportMedium: { type: 'string', enum: ['email', 'channel'] },
+    reportChannel: { type: 'string', maxLength: 9 },
+    creator: { type: 'string' }
+  },
+  required: ['startTimeHours', 'startTimeMins', 'endTimeHours', 'endTimeMins',
+              'questions', 'participants', 'reportMedium', 'reportChannel', 'creator']
+}
 
 module.exports = {
 
@@ -66,6 +85,25 @@ parseReportChannel: function(chan, standupConfig) {
     standupConfig.reportChannel = chan.substr(i).split('|')[0];
     console.log('channel = ', standupConfig.reportChannel);
   }
+},
+
+
+validateConfigFile: function() {
+  try {
+      var config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+      var results = v.validate(config, configSchema);
+      //console.log(results["errors"];
+
+      if(Object.keys(results["errors"]).length === 0) {
+        //console.log("no errors");
+        return config;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
 },
 
 
