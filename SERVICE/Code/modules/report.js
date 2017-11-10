@@ -10,6 +10,8 @@ module.exports = {
         report += `A: ${answers[i]}\n`;
     }
 
+    console.log(report);
+    console.log("Channel_id " + channel_json["channel_id"]);
     bot.say(
     {
       text: report,

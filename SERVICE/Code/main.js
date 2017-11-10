@@ -14,13 +14,14 @@ function StandupConfig(){
   this.endTimeHours = 0;
   this.endTimeMins = 0;
   this.questions = ["What did you accomplish yesterday?", "What will you work on today?",
-                    "Is there anything blocking your progress?"];  // should have aleast 1 question
-  this.participants = [];  // TODO: makse sure there are no duplicates
+                    "Is there anything blocking your progress?"];  // TODO: should have aleast 1 question
+  this.participants = [];  // TODO: makse sure atleast one participant
   this.reportMedium = "email";  // default medium is email
   this.reportChannel = "";
   this.creator = "";
 }
 
+var botId; // Contains the bot's user id.
 var standupConfig = new StandupConfig();
 
 var defaultQuestions = "\t" + standupConfig.questions[0];
@@ -83,6 +84,8 @@ function trackBot(bot) {
 controller.on('create_bot',function(bot, bot_config) {
   bot.startRTM(function(err) {
 
+    botId = bot_config.user_id;
+
     if (!err) {
       trackBot(bot);
     }
@@ -105,6 +108,7 @@ controller.on('create_bot',function(bot, bot_config) {
 
     } else {
       // tell the user to configure a standup
+      // TODO: send some greeting msg to the user
       standupConfig.creator = bot_config.createdBy;
       bot.startPrivateConversation({user: bot_config.createdBy},function(err,convo) {
         if (err) {
@@ -170,7 +174,7 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
 
       console.log('participants=', response.text);
       standupConfig.participants = [];
-      config.addParticipants(response.text, standupConfig);
+      config.addParticipants(bot, response.text, standupConfig);
       convo.gotoThread('askQuestionSet');
     }, {}, 'askParticipants');
 
@@ -224,9 +228,21 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
         } else {
           standupConfig.reportMedium = "channel";
           convo.addQuestion('Which slack channel do you want to use? E.g. #general', function (response, convo) {
-            standupConfig.reportMedium = "channel";  //TODO: set meidum as channel only if given channel is valid
-            config.parseReportChannel(response.text, standupConfig);
-            convo.gotoThread('lastStatement');
+
+            config.parseReportChannel(bot, botId, response.text, standupConfig, function(rsp) {
+              switch (rsp) {
+                case 0: // Success
+                  standupConfig.reportMedium = "channel";
+                  convo.gotoThread('lastStatement');
+                  break;
+                case 1: // Channel id is invalid
+                  convo.transitionTo('askReportMedium', 'This channel does not exist.');
+                  break;
+                case 2: // Bot is NOT a member of valid channel
+                convo.transitionTo('askReportMedium', 'I am not a member of this channel.');
+                  break;
+              }
+            });
           }, {}, 'askReportMedium');
 
           convo.next();
@@ -260,7 +276,7 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
 /*
 ************************ Show an existing standup configuration***********************
 */
-controller.hears(['show', 'display'],['direct_mention', 'direct_message'], function(bot,message) {
+controller.hears(['show', 'display', 'view', 'see', 'check'],['direct_mention', 'direct_message'], function(bot,message) {
   bot.startConversation(message, function(err, convo) {
 
     convo.say('Let me show you the current configuration...');
@@ -369,7 +385,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
         convo.addMessage("All set! I have updated the end time to " +
                         config.getHourIn12HourFormat(standupConfig.endTimeHours, standupConfig.endTimeMins) + ".", 'editEndTime');
 
-        // reschedule the standup session job after the start time is modified
+        // TODO: reschedule the report job after the end time is modified
         endRule.hour = standupConfig.endTimeHours;
         endRule.minute = standupConfig.endTimeMins;
         //reportJob.reschedule(endRule);
@@ -452,12 +468,23 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
           convo.next();
         } else {
           convo.addQuestion('Which slack channel do you want to use? E.g. #general', function (response, convo) {
-            standupConfig.reportMedium = "channel";  // TODO: set medium as channel only if given channel is valid
-            config.parseReportChannel(response.text, standupConfig);
-            convo.addMessage("All set! Standup reports will now be posted to your channel.", 'editReportMedium');  //TODO: print channel name
 
-            writeToConfigFile();
-            convo.next();
+            config.parseReportChannel(bot, botId, response.text, standupConfig, function(rsp) {
+              switch (rsp) {
+                case 0: // Success
+                  standupConfig.reportMedium = "channel";
+                  writeToConfigFile();
+                  convo.addMessage("All set! Standup reports will now be posted to your channel.", 'editReportMedium');  //TODO: print channel name
+                  convo.next();
+                  break;
+                case 1: // Channel id is invalid
+                  convo.transitionTo('editReportMedium', 'This channel does not exist.');
+                  break;
+                case 2: // Bot is NOT a member of valid channel
+                convo.transitionTo('editReportMedium', 'I am not a member of this channel.');
+                  break;
+              }
+            });
           }, {}, 'editReportMedium');
 
           convo.next();
@@ -513,7 +540,7 @@ function startStandupWithParticipants(){
 
                               // TODO: Remove Reporting from here and trigger it at standup close time.
                               // Change the function arguments - send the compiled report instead of a single user's answers
-                              report.postReportToChannel(_bot, {"channel_id":StandupConfig.reportChannel,
+                              report.postReportToChannel(_bot, {"channel_id":standupConfig.reportChannel,
                                 "user_name":"<@"+response.user+">",
                                 "questions":standupConfig.questions,
                                 "answers":answers});

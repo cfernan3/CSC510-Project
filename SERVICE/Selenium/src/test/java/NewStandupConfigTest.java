@@ -40,8 +40,8 @@ public class NewStandupConfigTest
 	@AfterClass
 	public static void  tearDown() throws Exception
 	{
-		// driver.close();
-		// driver.quit();
+		driver.close();
+		driver.quit();
 	}
 
 
@@ -61,7 +61,7 @@ public class NewStandupConfigTest
 		bot.sendKeys(Keys.RETURN);
 		Thread.sleep(3000);
 
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[contains(@class,'message_body') and text() = 'What time would you like to start the standup?']")));
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[contains(@class,'message_body') and text() = 'All I need is the standup window, participant list, question set, and reporting medium (Slack channel / Email).']")));
 		WebElement help = driver.findElement(
 				By.xpath("//span[contains(@class,'message_body') and text() = 'All I need is the standup window, participant list, question set, and reporting medium (Slack channel / Email).']"));
 		assertNotNull(help);
@@ -169,7 +169,18 @@ public class NewStandupConfigTest
 		bot = driver.findElement(By.xpath("//div[@id='msg_input']/div")); // ("msg_input").);
 		bot.sendKeys("#general");
 		bot.sendKeys(Keys.RETURN);
-
     Thread.sleep(3000);
+
+		// Type show
+		bot = driver.findElement(By.xpath("//div[@id='msg_input']/div"));
+		bot.sendKeys("Show config");
+		bot.sendKeys(Keys.RETURN);
+		Thread.sleep(3000);
+
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[contains(@class,'message_body') and text() = 'Let me show you the current configuration...']")));
+		WebElement showConfig = driver.findElement(
+				By.xpath("//span[contains(@class,'message_body') and text() = 'Let me show you the current configuration...']"));
+		assertNotNull(showConfig);
+		Thread.sleep(10000);
 	}
 }

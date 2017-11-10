@@ -1,7 +1,6 @@
 var fs = require('fs');
 var Validator = require('jsonschema').Validator;
 var v = new Validator();
-var reg = /<(.*?)>/g;
 var result;
 
 var configSchema = {
@@ -24,7 +23,7 @@ var configSchema = {
 module.exports = {
 
 addParticipants: function(bot, participants, standupConfig) {
-
+  var reg = /<(.*?)>/g;
   // Iterate through the valid participants list.
   while((result = reg.exec(participants)) !== null) {
 
@@ -90,13 +89,38 @@ parseQuestions: function(quest, standupConfig) {
 },
 
 
-parseReportChannel: function(chan, standupConfig) {
-  // TODO: check if the given channel is a valid channel
-  // TODO: check if the bot is a member of the given channel
-  var i = chan.indexOf('#');
-  if(i != -1) {  // TODO: handle else
-    standupConfig.reportChannel = chan.substr(i).split('|')[0];
-    console.log('channel = ', standupConfig.reportChannel);
+parseReportChannel: function(bot, botId, chan, standupConfig, callback) {
+  console.log("Channel = " + chan);
+  var regChan = /<(.*?)>/g;
+  var result = regChan.exec(chan);
+  console.log("Result = " + result);
+  if (result && result[1].charAt(0) == '#') { // This is a channel
+
+    // check if the given channel is a valid channel
+    var channel_id = result[1].substr(1).split('|')[0];
+    console.log("channel_id = ", channel_id);
+
+    // check if the bot is a member of the given channel
+    bot.api.channels.info({"channel": channel_id},function(err,response) {
+
+      // Check if the user is a bot, then don't add him.
+      var members = response["channel"]["members"];
+      if(members.indexOf(botId) < 0) {
+        // Bot is NOT present in the channel.
+        console.log("Callback 2");
+        callback(2);
+        return;
+      } else {
+        // Bot is present in valid channel
+        standupConfig.reportChannel = channel_id;
+        console.log("Callback 0");
+        callback(0);
+        return;
+      }
+    });
+  } else { // Channel is invalid
+    console.log("Callback 1");
+    callback(1);
   }
 },
 
@@ -129,7 +153,7 @@ getHourIn12HourFormat: function(hour, min) {
     else
       timeStr += ":" + min;
 
-    if(hour/12 == 0)
+    if(hour/12 < 1)
       timeStr += " AM";
     else
       timeStr += " PM";
@@ -233,5 +257,5 @@ attachments:[
 helpMsg: helpMsg = "Heya! I'm here to organize your standup.\n\
 You can tell me to configure a new standup, and I'll guide you through the setup.\n\
 All I need is the standup window, participant list, question set, and reporting medium (Slack channel / Email).\n\
-Don't worry if you make a mistake. You can always modify the parameters later. :)"
+Don't worry if you make a mistake. You can always view and modify the config later. :)"
 } // module.exports ends
