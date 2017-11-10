@@ -20,7 +20,8 @@
 |---|----------------|-------|--------|---------------|----------------|-------------|
 | 1 | Standup config | Fetch config from the config file when the bot is restarted |  | Sharmin, Ronald | 8th Nov | |
 |   |                | Create Google Sheet for the bot and save the access info in the config | | Bharat, Calvin | 8th Nov |  |
-|   |                | Verify that the standup participants / reporting channel configured are valid. (Replace mocking with slack API calls) |  | Sharmin, Ronald | 8th Nov | |
+|   |                | Verify that the standup participants configured are valid users, and fetch all users if a channel name is given (Replace mocking with slack API calls) |  | Sharmin, Ronald | | |
+|   |                | Verify that the reporting channel is valid, and that the bot is a member of the channel |  | Sharmin, Ronald | | |
 | 2 | Standup session| Store the standup answers on google sheets |  | Calvin, Nirav  | | |
 |   |                | Modify conversation to loop over all configured questions |  | Sharmin, Ronald | | |
 |   |                | Trigger the standup scheduling function after the standup is configured or after loading config from config file. Reschedule it whenever the standup start time is modified. |  | Sharmin, Ronald | | |
@@ -33,7 +34,7 @@
 
 |   | Deliverable    | Tasks | Issues | Team Members  | Estimated Date | Actual Date |
 |---|----------------|-------|--------|---------------|----------------|-------------|
-| 1 | Selenium testing | Add show and help commands to use case 1 |  |Sharmin, Ronald | | |
+| 1 | Selenium testing | Add show and help commands to use case 1. Add cases for invalid channel and participants. |  |Sharmin, Ronald | | |
 |   |                  | Modify use case 2 to show google sheets integration |  | | | |
 | 2 | Screen cast      | Use case 1                                  |  |   |  |   |
 |   |                  | Use case 2                                  |  |   |  |   |
