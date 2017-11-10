@@ -106,6 +106,24 @@ validateConfigFile: function() {
     }
 },
 
+getHourIn12HourFormat: function(hour, min) {
+    var timeStr = hour % 12;
+    if(timeStr == 0)
+      timeStr = 12;
+
+    if(min/10 < 1)
+      timeStr += ":0" + min;
+    else
+      timeStr += ":" + min;
+
+    if(hour/12 == 0)
+      timeStr += " AM";
+    else
+      timeStr += " PM";
+
+    return timeStr;
+},
+
 
 reportMediumButtons: reportMediumButtons = {
 attachments:[
