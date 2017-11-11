@@ -14,11 +14,12 @@ var configSchema = {
     participants: { type: 'array', items: { type: 'string', minLength: 9, maxLength: 9 }, minItems: 1 },
     reportMedium: { type: 'string', enum: ['email', 'channel'] },
     reportChannel: { type: 'string', maxLength: 9 },
-    creator: { type: 'string' }
+    creator: { type: 'string', minLength: 9, maxLength: 9 }
   },
   required: ['startTimeHours', 'startTimeMins', 'endTimeHours', 'endTimeMins',
               'questions', 'participants', 'reportMedium', 'reportChannel', 'creator']
 }
+
 
 module.exports = {
 
@@ -43,7 +44,6 @@ addParticipants: function(bot, participants, standupConfig) {
       console.log("channel_id = ", channel_id);
 
       bot.api.channels.info({"channel": channel_id},function(err,response) {
-
         // Check if the user is a bot, then don't add him.
         var members = response["channel"]["members"];
         for (var p_i in members) {
@@ -67,6 +67,7 @@ addParticipants: function(bot, participants, standupConfig) {
   }
 },
 
+
 removeParticipants: function(participants, standupConfig) {
   while((result = reg.exec(participants)) !== null) {
       if (result[1].charAt(0) == '@') { // This is a user
@@ -81,6 +82,7 @@ removeParticipants: function(participants, standupConfig) {
       }
   }
 },
+
 
 parseQuestions: function(quest, standupConfig) {
   var questions = quest.split('\n');
@@ -102,6 +104,8 @@ parseReportChannel: function(bot, botId, chan, standupConfig, callback) {
 
     // check if the bot is a member of the given channel
     bot.api.channels.info({"channel": channel_id},function(err,response) {
+    // This API call is asynchronous.
+    // Thus we need callbacks to continue the conversation with the user
 
       // Check if the user is a bot, then don't add him.
       var members = response["channel"]["members"];
@@ -133,6 +137,11 @@ validateConfigFile: function() {
 
       if(Object.keys(results["errors"]).length === 0) {
         //console.log("no errors");
+
+        //TODO: add other checks for time
+        if(config.reportMedium == "channel" && config.reportChannel == "")
+          return null;
+
         return config;
       } else {
         return null;
@@ -142,6 +151,7 @@ validateConfigFile: function() {
       return null;
     }
 },
+
 
 getHourIn12HourFormat: function(hour, min) {
     var timeStr = hour % 12;
