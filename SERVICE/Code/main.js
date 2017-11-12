@@ -40,7 +40,7 @@ endRule.dayOfWeek = [0,1,2,3,4,5,6];
 
 var sessionJob;  // Schedule this job using startRule to conduct the daily standup session
 var reportJob;   // Schedule this job using endRule to trigger reporting
-
+var answers = [];
 var controller = Botkit.slackbot({
   debug: false,
   interactive_replies: true, // tells botkit to send button clicks into conversations
@@ -105,6 +105,10 @@ controller.on('create_bot',function(bot, bot_config) {
       sessionJob = schedule.scheduleJob(startRule, startStandupWithParticipants);
 
       //TODO: // schedule the report job at the configured end time
+      endRule.hour = standupConfig.endTimeHours;
+      endRule.minute = standupConfig.endTimeMins+1;
+      console.log("#####################################NIRAV: Configured the Report for time = "+standupConfig.endTimeHours+":"+standupConfig.endTimeMins ) 
+      reportJob = schedule.scheduleJob(endRule, shareReportWithParticipants);
 
       bot.startPrivateConversation({user: standupConfig.creator},function(err,convo) {
         if (err) {
@@ -265,11 +269,21 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
       startRule.minute = standupConfig.startTimeMins;
 
       // schedule the standup job, if not already scheduled
-      if(typeof sessionJob == 'undefined')
-        sessionJob = schedule.scheduleJob(startRule, startStandupWithParticipants);
-      else
-        sessionJob.reschedule(startRule);
 
+      endRule.hour = standupConfig.endTimeHours;
+      endRule.minute = standupConfig.endTimeMins;
+
+      if(typeof sessionJob == 'undefined'){
+        console.log("NIRAV: Pre ShareReport")
+        sessionJob = schedule.scheduleJob(startRule, startStandupWithParticipants);
+        reportJob = schedule.scheduleJob(endRule, shareReportWithParticipants);
+      }
+      else
+        {
+        console.log("NIRAV: Modifying ShareReport")
+        sessionJob.reschedule(startRule);
+        reportJob.reschedule(endRule);
+      }
       //TODO: schedule the report job
       next();
     });
@@ -388,6 +402,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
       if (endTime != null) {
         standupConfig.endTimeHours = endTime.getHours();
         standupConfig.endTimeMins = endTime.getMinutes();
+
         console.log("End time = " + standupConfig.endTimeHours + ":" + standupConfig.endTimeMins);
         convo.addMessage("All set! I have updated the end time to " +
                         config.getHourIn12HourFormat(standupConfig.endTimeHours, standupConfig.endTimeMins) + ".", 'editEndTime');
@@ -395,7 +410,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
         // TODO: reschedule the report job after the end time is modified
         endRule.hour = standupConfig.endTimeHours;
         endRule.minute = standupConfig.endTimeMins;
-        //reportJob.reschedule(endRule);
+        reportJob.reschedule(endRule);
 
         writeToConfigFile();
         convo.next();
@@ -519,7 +534,7 @@ function startStandupWithParticipants(){
             case "start":
                 var attachment = {text: `:white_check_mark: Awesome! Let's start the standup.`, title: "Select one option."};
                 _bot.replyInteractive(response, {text: "We are starting with the standup.", attachments: [attachment]});
-                var answers = [];
+                
 
                 for(var i = 0; i < standupConfig.questions.length; i++) {
                   convo.addQuestion(standupConfig.questions[i], function (response, convo) {
@@ -577,6 +592,14 @@ function startStandupWithParticipants(){
       }
     });
   }
+}
+
+function shareReportWithParticipants(){
+  console.log("NIRAV: In ShareReport")
+  report.postReportToChannel(_bot, {"channel_id":standupConfig.reportChannel,
+  "user_name":"<@"+"U6WEA6ULA"+">",
+  "questions":standupConfig.questions,
+  "answers":answers});
 }
 
 

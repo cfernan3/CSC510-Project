@@ -3,14 +3,17 @@ module.exports = {
   postReportToChannel: function(bot, channel_json) {
     var answers = channel_json["answers"];
     var questions = channel_json["questions"];
-
+    console.log("###########################");
+    console.log(answers);
+    console.log(questions);
+    
     var report = channel_json["user_name"] + ` has completed the standup. The reponses are as follows-\n\n`;
-    for(var i = 0; i < questions.length; i++){
-        report += `Q: ${questions[i]}\n`;
-        report += `A: ${answers[i]}\n`;
+    for(var i = 0; i < answers.length; i++){
+        report += `Q: ${questions[i%questions.length]}\n`;
+        report += `A: ${answers[i]}\n`;    
     }
 
-    console.log(report);
+    console.log('REPORT:/n',report);
     console.log("Channel_id " + channel_json["channel_id"]);
     bot.say(
     {
@@ -59,7 +62,7 @@ module.exports = {
     });
 
     });
-    });
+    }) ; 
 */
   }
 }
