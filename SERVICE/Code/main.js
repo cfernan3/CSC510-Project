@@ -8,6 +8,7 @@ var util = require('util')
 var report = require('./modules/report.js')
 var delay = require('delay');
 
+
 function StandupConfig(){
   this.startTimeHours = 0;
   this.startTimeMins = 0;
@@ -41,6 +42,7 @@ endRule.dayOfWeek = [0,1,2,3,4,5,6];
 var sessionJob;  // Schedule this job using startRule to conduct the daily standup session
 var reportJob;   // Schedule this job using endRule to trigger reporting
 var answers = [];
+var standupuser = [];
 var controller = Botkit.slackbot({
   debug: false,
   interactive_replies: true, // tells botkit to send button clicks into conversations
@@ -109,7 +111,7 @@ controller.on('create_bot',function(bot, bot_config) {
       endRule.minute = standupConfig.endTimeMins+1;
       console.log("#####################################NIRAV: Configured the Report for time = "+standupConfig.endTimeHours+":"+standupConfig.endTimeMins ) 
       reportJob = schedule.scheduleJob(endRule, shareReportWithParticipants);
-
+     
       bot.startPrivateConversation({user: standupConfig.creator},function(err,convo) {
         if (err) {
           console.log(err);
@@ -402,7 +404,6 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
       if (endTime != null) {
         standupConfig.endTimeHours = endTime.getHours();
         standupConfig.endTimeMins = endTime.getMinutes();
-
         console.log("End time = " + standupConfig.endTimeHours + ":" + standupConfig.endTimeMins);
         convo.addMessage("All set! I have updated the end time to " +
                         config.getHourIn12HourFormat(standupConfig.endTimeHours, standupConfig.endTimeMins) + ".", 'editEndTime');
@@ -559,13 +560,10 @@ function startStandupWithParticipants(){
                             callback: function(response, convo) {
                               convo.addMessage(" Thanks for your responses! We are done with today's standup.", 'askQuestion');
                               convo.next();
-
+                              standupuser.push("<@"+response.user+">")
+                              console.log(response);
                               // TODO: Remove Reporting from here and trigger it at standup close time.
                               // Change the function arguments - send the compiled report instead of a single user's answers
-                              report.postReportToChannel(_bot, {"channel_id":standupConfig.reportChannel,
-                                "user_name":"<@"+response.user+">",
-                                "questions":standupConfig.questions,
-                                "answers":answers});
                             }
                         }
                       ], {}, 'askQuestion');
@@ -595,13 +593,18 @@ function startStandupWithParticipants(){
 }
 
 function shareReportWithParticipants(){
-  console.log("NIRAV: In ShareReport")
+  console.log("In ShareReport")
+  console.log("###############################")
+  console.log(standupuser)
+  console.log("###############################")
+  console.log(standupConfig.questions)
+  console.log("###############################")
+  console.log(answers)
   report.postReportToChannel(_bot, {"channel_id":standupConfig.reportChannel,
-  "user_name":"<@"+"U6WEA6ULA"+">",
+  "user_name":standupuser,
   "questions":standupConfig.questions,
   "answers":answers});
 }
-
 
 //TODO: move this to config.js
 var writeToConfigFile = function() {
