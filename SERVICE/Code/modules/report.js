@@ -8,7 +8,7 @@ module.exports = {
     var report = "The Consolidated Report is as follows\n\n";
     for(var i = 0; i < answers.length; i++){
       if (i%questions.length==0){
-        report += ` ${users[j]} + has completed the standup. The reponses are as follows-\n\n`
+        report += ` ${users[j]} has completed the standup. The reponses are as follows-\n\n`
         j+=1;
       }
         report += `Q: ${questions[i%questions.length]}\n`;
