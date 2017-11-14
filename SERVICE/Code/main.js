@@ -7,6 +7,7 @@ var schedule = require('node-schedule')
 var util = require('util')
 var report = require('./modules/report.js')
 var delay = require('delay');
+var db = require('./modules/sheets.js'); 
 
 function StandupConfig(){
   this.startTimeHours = 0;
@@ -261,6 +262,18 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
       console.log('New standup config complete');
       writeToConfigFile();
 
+      // Create a google sheet for storing standup questions and answers
+      // Create a new google sheet first
+      db.createSheet(function(response){standupConfig.gSheetId = response;});
+      console.log("New Google Sheet has been created and set as the default storage for the standup answers. The gsheet Id is=")
+      console.log(standupConfig.gSheetId);
+
+      // Store the standup questions in the sheet's first(header) row
+      db.storeQuestions(standupConfig.gSheetId,'Whatbot',standupConfig.questions,function(response){
+        console.log('The standup Questions have been updated in the google sheet');
+      });
+
+
       startRule.hour = standupConfig.startTimeHours;
       startRule.minute = standupConfig.startTimeMins;
 
@@ -457,7 +470,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
         default: true,
         callback: function(response, convo) {
           console.log('questions entered =', response.text);
-          config.parseQuestions(response.text, standupConfig);
+          config.parseQuestions(response.text, standupConfig); // TODO: report the existing stored answers and call storequestions method in sheets.js again
           convo.silentRepeat();
         }
       }
