@@ -10,23 +10,10 @@ var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH || 
     process.env.USERPROFILE) + '/.credentials/'; 
 var TOKEN_PATH = TOKEN_DIR + 'sheets.googleapis.com-nodejs-quickstart.json'; 
- 
-// Load client secrets from a local file. 
-/*fs.readFileSync('./modules/client_secret.json', function processClientSecrets(err, content) { 
-  if (err) { 
-    console.log('Error loading client secret file: ' + err); 
-    return; 
-  } 
-  // Authorize a client with the loaded credentials, then call the 
-  // Google Sheets API. 
-   sheet.auth = authorize(JSON.parse(content)); 
-   console.log("Inside the function"); 
-   console.log(sheet); 
-}); 
-*/ 
+
  
 //------Synchronous version of readFile----// 
-var content = fs.readFileSync('./modules/client_secret.json'); 
+var content = process.env.client_secret;
 // Authorize a client with the loaded credentials, then call the 
 // Google Sheets API. 
 sheet.auth = authorize(JSON.parse(content)); 
@@ -167,11 +154,33 @@ sheet.storeAnswers = function(spreadsheet_id,user_id,answers_list,callback) {
       console.error('Store Answers: The API returned an error: ' + err); 
       return; 
     } 
-    callback(); 
+    var updates = response.updates;
+    callback(updates); 
  
   }); 
 } 
+
+sheet.storeQuestions = function(spreadsheet_id,first_cell,question_list,callback) { 
+  var sheets = google.sheets('v4'); 
+  var value = [first_cell,...question_list]; 
+  sheets.spreadsheets.values.update({ 
+    auth: sheet.auth, 
+    spreadsheetId: spreadsheet_id, 
+    range: 'Sheet1!A1:Z', 
+    valueInputOption:"USER_ENTERED", 
+    resource: { 
+    values: [value]}, 
+  }, function(err, response) { 
+    if (err) { 
+      console.error('Store Answers: The API returned an error: ' + err); 
+      return; 
+    } 
+    var updates = response;
+    callback(updates); 
  
+  }); 
+} 
+
 sheet.createSheet = function(callback) { 
   var sheets = google.sheets('v4'); 
   sheets.spreadsheets.create({ 
