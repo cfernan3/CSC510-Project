@@ -269,16 +269,7 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
       writeToConfigFile();
 
       // Create a google sheet for storing standup questions and answers
-      // Create a new google sheet first
-      db.createSheet(function(response){standupConfig.gSheetId = response;});
-      console.log("New Google Sheet has been created and set as the default storage for the standup answers. The gsheet Id is=")
-      console.log(standupConfig.gSheetId);
-
-      // Store the standup questions in the sheet's first(header) row
-      db.storeQuestions(standupConfig.gSheetId,'Whatbot',standupConfig.questions,function(response){
-        console.log('The standup Questions have been updated in the google sheet');
-      });
-
+      db.createSheet(addNewSheetToConfigfile);
 
       startRule.hour = standupConfig.startTimeHours;
       startRule.minute = standupConfig.startTimeMins;
@@ -309,6 +300,18 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
   }); // startConversation Ends
 }); // hears 'schedule' ends
 
+
+function addNewSheetToConfigfile(sheet_id){
+  // Create a new google sheet first
+  console.log("New Google Sheet has been created and set as the default storage for the standup answers. The gsheet Id is=");
+  standupConfig.gSheetId = sheet_id;
+  console.log(standupConfig.gSheetId);
+  // Store the standup questions in the sheet's first(header) row
+  db.storeQuestions(standupConfig.gSheetId,'Whatbot',standupConfig.questions,function(response){
+    //console.log('The standup Questions have been updated in the google sheet');
+  });
+  writeToConfigFile();
+}
 /*
 ************************ Show an existing standup configuration***********************
 */
