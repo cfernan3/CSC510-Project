@@ -3,14 +3,19 @@ module.exports = {
   postReportToChannel: function(bot, channel_json) {
     var answers = channel_json["answers"];
     var questions = channel_json["questions"];
-
-    var report = channel_json["user_name"] + ` has completed the standup. The reponses are as follows-\n\n`;
-    for(var i = 0; i < questions.length; i++){
-        report += `Q: ${questions[i]}\n`;
+    var users = channel_json["user_name"];
+    var j = 0;
+    var report = "The Consolidated Report is as follows\n\n";
+    for(var i = 0; i < answers.length; i++){
+      if (i%questions.length==0){
+        report += ` ${users[j]} has completed the standup. The reponses are as follows-\n\n`
+        j+=1;
+      }
+        report += `Q: ${questions[i%questions.length]}\n`;
         report += `A: ${answers[i]}\n`;
     }
 
-    console.log(report);
+    console.log('REPORT:/n',report);
     console.log("Channel_id " + channel_json["channel_id"]);
     bot.say(
     {
@@ -23,7 +28,7 @@ module.exports = {
   emailReport: function() {
     // TODO: This needs to be fixed and remove nock and remove hardcoded username and password.
     // Trigger thiss function at standup end time
-/*
+
     var api = nock("https://sheets.googleapis.com")
     .get("/v4/spreadsheets/abcdefgh/")
     .reply(200, {
@@ -60,6 +65,6 @@ module.exports = {
 
     });
     });
-*/
+
   }
 }
