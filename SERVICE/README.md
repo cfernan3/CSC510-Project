@@ -2,14 +2,12 @@ CODE -> https://github.ncsu.edu/nedsouza/CSC510-Project/tree/master/SERVICE/Code
 
 ### Services  
 
-Emailing reports: We used nodemailer module to integrate with Google's GMail API to effectively send email reports to the end users. 
-Storing standing responses: 
-
-Modules:
-main.js
-config.js
-standup.js
-report.js
+Modules:  
+main.js - handles the conversation between the bot and the user for all 3 use cases  
+config.js - has helper functions and data for storing and modifying the standup config  
+standup.js - has helper functions and data for conducting a standup session with each participant  
+report.js - has helper functions for report compilation and sharing (uses nodemailer module to integrate with Google's GMail API to send email reports)  
+sheets.js - storing/retreiving standup responses to/from google sheets  
 
 ### Selenium Testing  
 Please find the Selenium test Maven folder [here](Selenium).  
@@ -21,7 +19,7 @@ There are 3 files:
 
 ### Stories, Tasks, and Task Tracking  
 
-https://trello.com/b/xPCqntUz/milestone3
+https://trello.com/b/xPCqntUz/milestone3  
 https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/SERVICE/WORKSHEET.md
 
 ### Screencast

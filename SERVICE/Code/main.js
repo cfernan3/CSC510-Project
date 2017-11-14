@@ -106,11 +106,18 @@ controller.on('create_bot',function(bot, bot_config) {
 
       //TODO: // schedule the report job at the configured end time
 
+      bot.startPrivateConversation({user: standupConfig.creator},function(err,convo) {
+        if (err) {
+          console.log(err);
+        } else {
+          convo.say("Hello! I found a config file and have configured the standup parameters using it.\nYou can modify individual parameters or do a fresh setup if you want.");
+        }
+      });
+
     } else {
       // tell the user to configure a standup
-      // TODO: send some greeting msg to the user
       standupConfig.creator = bot_config.createdBy;
-      bot.startPrivateConversation({user: bot_config.createdBy},function(err,convo) {
+      bot.startPrivateConversation({user: standupConfig.creator},function(err,convo) {
         if (err) {
           console.log(err);
         } else {
@@ -573,6 +580,7 @@ function startStandupWithParticipants(){
 }
 
 
+//TODO: move this to config.js
 var writeToConfigFile = function() {
   fs.writeFile('./config.json', JSON.stringify(standupConfig), (err) => {
      if (err) throw err;
