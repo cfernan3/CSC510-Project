@@ -42,8 +42,8 @@ endRule.dayOfWeek = [0,1,2,3,4,5,6];
 
 var sessionJob;  // Schedule this job using startRule to conduct the daily standup session
 var reportJob;   // Schedule this job using endRule to trigger reporting
-var answers = [];
-var standupuser = [];
+//var answers = [];
+//var standupuser = [];
 var controller = Botkit.slackbot({
   debug: false,
   interactive_replies: true, // tells botkit to send button clicks into conversations
@@ -549,6 +549,7 @@ function startStandupWithParticipants(){
         convo.ask( startStandupButtons, function (response, convo) {
           switch (response.text) {
             case "start":
+            var answers = [];
                 var attachment = {text: `:white_check_mark: Awesome! Let's start the standup.`, title: "Select one option."};
                 _bot.replyInteractive(response, {text: "We are starting with the standup.", attachments: [attachment]});
                 
@@ -576,7 +577,8 @@ function startStandupWithParticipants(){
                             callback: function(response, convo) {
                               convo.addMessage(" Thanks for your responses! We are done with today's standup.", 'askQuestion');
                               convo.next();
-                              standupuser.push("<@"+response.user+">")
+                              //standupuser.push("<@"+response.user+">")
+                              db.storeAnswers(standupConfig.gSheetId,response.user,answers,function(res){console.log("Stored standup answers for user"+response.user);}); 
                               console.log(response);
                               // TODO: Remove Reporting from here and trigger it at standup close time.
                               // Change the function arguments - send the compiled report instead of a single user's answers
