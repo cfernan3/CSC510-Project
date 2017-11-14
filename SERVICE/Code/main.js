@@ -42,8 +42,8 @@ endRule.dayOfWeek = [0,1,2,3,4,5,6];
 
 var sessionJob;  // Schedule this job using startRule to conduct the daily standup session
 var reportJob;   // Schedule this job using endRule to trigger reporting
-//var answers = [];
-//var standupuser = [];
+var answers = [];
+var standupuser = [];
 var controller = Botkit.slackbot({
   debug: false,
   interactive_replies: true, // tells botkit to send button clicks into conversations
@@ -111,7 +111,7 @@ controller.on('create_bot',function(bot, bot_config) {
       endRule.hour = standupConfig.endTimeHours;
       endRule.minute = standupConfig.endTimeMins+1;
       console.log("#####################################NIRAV: Configured the Report for time = "+standupConfig.endTimeHours+":"+standupConfig.endTimeMins ) 
-      reportJob = schedule.scheduleJob(endRule, shareReportWithParticipants);
+      reportJob = schedule.scheduleJob(endRule, db.retrieveAllAnswersList(standupConfig.gSheetId,false,processReportToSend));
      
       bot.startPrivateConversation({user: standupConfig.creator},function(err,convo) {
         if (err) {
@@ -282,7 +282,7 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
       if(typeof sessionJob == 'undefined'){
         console.log("NIRAV: Pre ShareReport")
         sessionJob = schedule.scheduleJob(startRule, startStandupWithParticipants);
-        reportJob = schedule.scheduleJob(endRule, shareReportWithParticipants);
+        reportJob = schedule.scheduleJob(endRule, db.retrieveAllAnswersList(standupConfig.gSheetId,false,processReportToSend));
       }
       else
         {
@@ -577,8 +577,8 @@ function startStandupWithParticipants(){
                             callback: function(response, convo) {
                               convo.addMessage(" Thanks for your responses! We are done with today's standup.", 'askQuestion');
                               convo.next();
-                              //standupuser.push("<@"+response.user+">")
-                              db.storeAnswers(standupConfig.gSheetId,response.user,answers,function(res){console.log("Stored standup answers for user"+response.user);}); 
+                              standupuser[response.user_id] = response.user;
+                              db.storeAnswers(standupConfig.gSheetId,response.user_name,answers,function(res){console.log("Stored standup answers for user "+response.user);}); 
                               console.log(response);
                               // TODO: Remove Reporting from here and trigger it at standup close time.
                               // Change the function arguments - send the compiled report instead of a single user's answers
@@ -610,6 +610,14 @@ function startStandupWithParticipants(){
   }
 }
 
+function processReportToSend(stored_answers){
+  console.log(JSON.stringify(stored_answers));
+  for (var i = 0;i<standupuser.length;i++){
+    answers.push(stored_answers[standupuser[i]]);
+  }
+  shareReportWithParticipants();
+}
+
 function shareReportWithParticipants(){
   console.log("In ShareReport")
   console.log("###############################")
@@ -617,7 +625,7 @@ function shareReportWithParticipants(){
   console.log("###############################")
   console.log(standupConfig.questions)
   console.log("###############################")
-  console.log(answers)
+  console.log(answers);
   report.postReportToChannel(_bot, {"channel_id":standupConfig.reportChannel,
   "user_name":standupuser,
   "questions":standupConfig.questions,
