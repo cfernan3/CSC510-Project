@@ -174,10 +174,10 @@ sheet.storeQuestions = function(spreadsheet_id,first_cell,question_list,callback
     if (err) { 
       console.error('Store Answers: The API returned an error: ' + err); 
       return; 
-    } 
-    var updates = response;
+    } else {
+      var updates = response;
     callback(updates); 
- 
+    }
   }); 
 } 
 
@@ -188,7 +188,7 @@ sheet.createSheet = function(callback) {
     resource: {}, 
   }, function(err, response) { 
     if (err) { 
-      console.error('Store Answers: The API returned an error: ' + err); 
+      console.error('Create New Sheet: The API returned an error: ' + err); 
       return; 
     } 
     var spreadsheetId = response.spreadsheetId; 
