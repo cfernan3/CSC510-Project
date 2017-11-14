@@ -93,10 +93,6 @@ function storeAuthCreds(authToken) {
   console.log('authToken stored to authCreds.json'); 
 } 
  
-/** 
- * Print the names and majors of students in a sample spreadsheet: 
- * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit 
- */ 
 sheet.retrieveAllAnswers = function(spreadsheet_id,flush,questions_list,callback) { 
   var sheets = google.sheets('v4'); 
   var output = {}; 
@@ -109,7 +105,9 @@ sheet.retrieveAllAnswers = function(spreadsheet_id,flush,questions_list,callback
       console.error('Retrieve Answers: The API returned an error: ' + err); 
       return; 
     } 
+    //console.log(response.values);
     var rows = response.values; 
+    if (rows){
       for (var i = 0; i < rows.length; i++) { 
         var row = rows[i]; 
         // Take each row. Parse first column as answerer name. Parse rest columns as answers based on the questions in questions_list. 
@@ -121,6 +119,7 @@ sheet.retrieveAllAnswers = function(spreadsheet_id,flush,questions_list,callback
           } 
         } 
     }; 
+    if (flush){
     //Flush the spreadsheet since the answers have been retrieved 
     sheets.spreadsheets.values.clear({ 
       spreadsheetId: spreadsheet_id, 
@@ -134,7 +133,49 @@ sheet.retrieveAllAnswers = function(spreadsheet_id,flush,questions_list,callback
       //Print the response after clearing the sheet 
       console.log(JSON.stringify(response, null, 2)); 
     }); 
- 
+  }
+}
+    callback(output); 
+  }); 
+} 
+
+sheet.retrieveAllAnswersList = function(spreadsheet_id,flush,callback) { 
+  var sheets = google.sheets('v4'); 
+  var output = {}; 
+  sheets.spreadsheets.values.get({ 
+    auth: sheet.auth, 
+    spreadsheetId: spreadsheet_id, 
+    range: 'Sheet1!A2:Z', 
+  }, function(err, response) { 
+    if (err) { 
+      console.error('Retrieve Answers: The API returned an error: ' + err); 
+      return; 
+    } 
+    var rows = response.values;
+    if (rows){
+    console.log(response); 
+      for (var i = 0; i < rows.length; i++) { 
+        var row = rows[i]; 
+        // Take each row. Parse first column as answerer name. Parse rest columns as answers based on the questions in questions_list. 
+        var user = row[0]; 
+        output[user] = row.slice(1); 
+    }; 
+    if (flush){
+    //Flush the spreadsheet since the answers have been retrieved 
+    sheets.spreadsheets.values.clear({ 
+      spreadsheetId: spreadsheet_id, 
+      range: 'Sheet1!A2:Z',   
+      auth: sheet.auth, 
+    }, function(err, response) { 
+      if (err) { 
+        console.error('Flushing Answers: The API returned an error: ' + err); 
+        return; 
+      } 
+    }); 
+    }
+  }
+    //Print the response after clearing the sheet 
+    console.log(JSON.stringify(output, null, 2));
     callback(output); 
   }); 
 } 
