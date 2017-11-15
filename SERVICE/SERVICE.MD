@@ -58,6 +58,5 @@ Please find the screen casts below:
 2. a. [Start Standup session with a user](https://youtu.be/3HFTdG7vf5k)  
    b. [Snooze Standup session with a user](https://youtu.be/JSIq8RkqGSU)  
    c. [Ignore Standup session with a user](https://youtu.be/m4XMA-Sq9R8)  
-   d. [Redo Standup sesssion with a user](https://youtu.be/3HFTdG7vf5k)
 
 3. [Editing an existing standup](https://youtu.be/8IjT-hRskKg)  
