@@ -10,23 +10,10 @@ var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH || 
     process.env.USERPROFILE) + '/.credentials/'; 
 var TOKEN_PATH = TOKEN_DIR + 'sheets.googleapis.com-nodejs-quickstart.json'; 
- 
-// Load client secrets from a local file. 
-/*fs.readFileSync('./modules/client_secret.json', function processClientSecrets(err, content) { 
-  if (err) { 
-    console.log('Error loading client secret file: ' + err); 
-    return; 
-  } 
-  // Authorize a client with the loaded credentials, then call the 
-  // Google Sheets API. 
-   sheet.auth = authorize(JSON.parse(content)); 
-   console.log("Inside the function"); 
-   console.log(sheet); 
-}); 
-*/ 
+
  
 //------Synchronous version of readFile----// 
-var content = fs.readFileSync('./modules/client_secret.json'); 
+var content = process.env.client_secret;
 // Authorize a client with the loaded credentials, then call the 
 // Google Sheets API. 
 sheet.auth = authorize(JSON.parse(content)); 
@@ -106,10 +93,6 @@ function storeAuthCreds(authToken) {
   console.log('authToken stored to authCreds.json'); 
 } 
  
-/** 
- * Print the names and majors of students in a sample spreadsheet: 
- * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit 
- */ 
 sheet.retrieveAllAnswers = function(spreadsheet_id,flush,questions_list,callback) { 
   var sheets = google.sheets('v4'); 
   var output = {}; 
@@ -122,7 +105,9 @@ sheet.retrieveAllAnswers = function(spreadsheet_id,flush,questions_list,callback
       console.error('Retrieve Answers: The API returned an error: ' + err); 
       return; 
     } 
+    //console.log(response.values);
     var rows = response.values; 
+    if (rows){
       for (var i = 0; i < rows.length; i++) { 
         var row = rows[i]; 
         // Take each row. Parse first column as answerer name. Parse rest columns as answers based on the questions in questions_list. 
@@ -134,6 +119,7 @@ sheet.retrieveAllAnswers = function(spreadsheet_id,flush,questions_list,callback
           } 
         } 
     }; 
+    if (flush){
     //Flush the spreadsheet since the answers have been retrieved 
     sheets.spreadsheets.values.clear({ 
       spreadsheetId: spreadsheet_id, 
@@ -147,7 +133,49 @@ sheet.retrieveAllAnswers = function(spreadsheet_id,flush,questions_list,callback
       //Print the response after clearing the sheet 
       console.log(JSON.stringify(response, null, 2)); 
     }); 
- 
+  }
+}
+    callback(output); 
+  }); 
+} 
+
+sheet.retrieveAllAnswersList = function(spreadsheet_id,flush,callback) { 
+  var sheets = google.sheets('v4'); 
+  var output = {}; 
+  sheets.spreadsheets.values.get({ 
+    auth: sheet.auth, 
+    spreadsheetId: spreadsheet_id, 
+    range: 'Sheet1!A2:Z', 
+  }, function(err, response) { 
+    if (err) { 
+      console.error('Retrieve Answers: The API returned an error: ' + err); 
+      return; 
+    } 
+    var rows = response.values;
+    if (rows){
+    console.log(response); 
+      for (var i = 0; i < rows.length; i++) { 
+        var row = rows[i]; 
+        // Take each row. Parse first column as answerer name. Parse rest columns as answers based on the questions in questions_list. 
+        var user = row[0]; 
+        output[user] = row.slice(1); 
+    }; 
+    if (flush){
+    //Flush the spreadsheet since the answers have been retrieved 
+    sheets.spreadsheets.values.clear({ 
+      spreadsheetId: spreadsheet_id, 
+      range: 'Sheet1!A2:Z',   
+      auth: sheet.auth, 
+    }, function(err, response) { 
+      if (err) { 
+        console.error('Flushing Answers: The API returned an error: ' + err); 
+        return; 
+      } 
+    }); 
+    }
+  }
+    //Print the response after clearing the sheet 
+    //console.log(JSON.stringify(output, null, 2));
     callback(output); 
   }); 
 } 
@@ -167,11 +195,33 @@ sheet.storeAnswers = function(spreadsheet_id,user_id,answers_list,callback) {
       console.error('Store Answers: The API returned an error: ' + err); 
       return; 
     } 
-    callback(); 
+    var updates = response.updates;
+    callback(updates); 
  
   }); 
 } 
- 
+
+sheet.storeQuestions = function(spreadsheet_id,first_cell,question_list,callback) { 
+  var sheets = google.sheets('v4'); 
+  var value = [first_cell,...question_list]; 
+  sheets.spreadsheets.values.update({ 
+    auth: sheet.auth, 
+    spreadsheetId: spreadsheet_id, 
+    range: 'Sheet1!A1:Z', 
+    valueInputOption:"USER_ENTERED", 
+    resource: { 
+    values: [value]}, 
+  }, function(err, response) { 
+    if (err) { 
+      console.error('Store Answers: The API returned an error: ' + err); 
+      return; 
+    } else {
+      var updates = response;
+    callback(updates); 
+    }
+  }); 
+} 
+
 sheet.createSheet = function(callback) { 
   var sheets = google.sheets('v4'); 
   sheets.spreadsheets.create({ 
@@ -179,7 +229,7 @@ sheet.createSheet = function(callback) {
     resource: {}, 
   }, function(err, response) { 
     if (err) { 
-      console.error('Store Answers: The API returned an error: ' + err); 
+      console.error('Create New Sheet: The API returned an error: ' + err); 
       return; 
     } 
     var spreadsheetId = response.spreadsheetId; 

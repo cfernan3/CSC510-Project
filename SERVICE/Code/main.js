@@ -7,6 +7,8 @@ var schedule = require('node-schedule')
 var util = require('util')
 var report = require('./modules/report.js')
 var delay = require('delay');
+var db = require('./modules/sheets.js'); 
+
 
 function StandupConfig(){
   this.startTimeHours = 0;
@@ -40,7 +42,8 @@ endRule.dayOfWeek = [0,1,2,3,4,5,6];
 
 var sessionJob;  // Schedule this job using startRule to conduct the daily standup session
 var reportJob;   // Schedule this job using endRule to trigger reporting
-
+var answers = [];
+var standupuser = [];
 var controller = Botkit.slackbot({
   debug: false,
   interactive_replies: true, // tells botkit to send button clicks into conversations
@@ -105,7 +108,11 @@ controller.on('create_bot',function(bot, bot_config) {
       sessionJob = schedule.scheduleJob(startRule, startStandupWithParticipants);
 
       //TODO: // schedule the report job at the configured end time
-
+      endRule.hour = standupConfig.endTimeHours;
+      endRule.minute = standupConfig.endTimeMins+1;
+      console.log("#####################################NIRAV: Configured the Report for time = "+standupConfig.endTimeHours+":"+standupConfig.endTimeMins ) 
+      reportJob = schedule.scheduleJob(endRule, reportingCall);
+     
       bot.startPrivateConversation({user: standupConfig.creator},function(err,convo) {
         if (err) {
           console.log(err);
@@ -261,15 +268,28 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
       console.log('New standup config complete');
       writeToConfigFile();
 
+      // Create a google sheet for storing standup questions and answers
+      db.createSheet(addNewSheetToConfigfile);
+
       startRule.hour = standupConfig.startTimeHours;
       startRule.minute = standupConfig.startTimeMins;
 
       // schedule the standup job, if not already scheduled
-      if(typeof sessionJob == 'undefined')
-        sessionJob = schedule.scheduleJob(startRule, startStandupWithParticipants);
-      else
-        sessionJob.reschedule(startRule);
 
+      endRule.hour = standupConfig.endTimeHours;
+      endRule.minute = standupConfig.endTimeMins;
+
+      if(typeof sessionJob == 'undefined'){
+        console.log("NIRAV: Pre ShareReport")
+        sessionJob = schedule.scheduleJob(startRule, startStandupWithParticipants);
+        reportJob = schedule.scheduleJob(endRule, reportingCall);
+      }
+      else
+        {
+        console.log("NIRAV: Modifying ShareReport")
+        sessionJob.reschedule(startRule);
+        reportJob.reschedule(endRule);
+      }
       //TODO: schedule the report job
       next();
     });
@@ -280,6 +300,18 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
   }); // startConversation Ends
 }); // hears 'schedule' ends
 
+
+function addNewSheetToConfigfile(sheet_id){
+  // Create a new google sheet first
+  console.log("New Google Sheet has been created and set as the default storage for the standup answers. The gsheet Id is=");
+  standupConfig.gSheetId = sheet_id;
+  console.log(standupConfig.gSheetId);
+  // Store the standup questions in the sheet's first(header) row
+  db.storeQuestions(standupConfig.gSheetId,'Whatbot',standupConfig.questions,function(response){
+    //console.log('The standup Questions have been updated in the google sheet');
+  });
+  writeToConfigFile();
+}
 /*
 ************************ Show an existing standup configuration***********************
 */
@@ -369,7 +401,6 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
         startRule.hour = standupConfig.startTimeHours;
         startRule.minute = standupConfig.startTimeMins;
         sessionJob.reschedule(startRule);
-
         writeToConfigFile();
         convo.next();
       }
@@ -395,7 +426,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
         // TODO: reschedule the report job after the end time is modified
         endRule.hour = standupConfig.endTimeHours;
         endRule.minute = standupConfig.endTimeMins;
-        //reportJob.reschedule(endRule);
+        reportJob.reschedule(endRule);
 
         writeToConfigFile();
         convo.next();
@@ -457,7 +488,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
         default: true,
         callback: function(response, convo) {
           console.log('questions entered =', response.text);
-          config.parseQuestions(response.text, standupConfig);
+          config.parseQuestions(response.text, standupConfig); // TODO: report the existing stored answers and call storequestions method in sheets.js again
           convo.silentRepeat();
         }
       }
@@ -517,9 +548,10 @@ function startStandupWithParticipants(){
         convo.ask( startStandupButtons, function (response, convo) {
           switch (response.text) {
             case "start":
+            var answers = [];
                 var attachment = {text: `:white_check_mark: Awesome! Let's start the standup.`, title: "Select one option."};
                 _bot.replyInteractive(response, {text: "We are starting with the standup.", attachments: [attachment]});
-                var answers = [];
+                
 
                 for(var i = 0; i < standupConfig.questions.length; i++) {
                   convo.addQuestion(standupConfig.questions[i], function (response, convo) {
@@ -544,13 +576,12 @@ function startStandupWithParticipants(){
                             callback: function(response, convo) {
                               convo.addMessage(" Thanks for your responses! We are done with today's standup.", 'askQuestion');
                               convo.next();
-
+                              standupuser.push(response.user);
+                              console.log(response.user + " has completed standup.")
+                              db.storeAnswers(standupConfig.gSheetId,response.user,answers,function(res){console.log("Stored standup answers for user "+response.user);}); 
+                              console.log(response);
                               // TODO: Remove Reporting from here and trigger it at standup close time.
                               // Change the function arguments - send the compiled report instead of a single user's answers
-                              report.postReportToChannel(_bot, {"channel_id":standupConfig.reportChannel,
-                                "user_name":"<@"+response.user+">",
-                                "questions":standupConfig.questions,
-                                "answers":answers});
                             }
                         }
                       ], {}, 'askQuestion');
@@ -579,6 +610,31 @@ function startStandupWithParticipants(){
   }
 }
 
+function reportingCall(){
+  db.retrieveAllAnswersList(standupConfig.gSheetId,false,processReportToSend);
+}
+
+function processReportToSend(stored_answers){
+  //console.log(JSON.stringify(stored_answers));
+  for (var i = 0;i<standupuser.length;i++){
+    answers.push(stored_answers[standupuser[i]]);
+  }
+  shareReportWithParticipants();
+}
+
+function shareReportWithParticipants(){
+  console.log("In ShareReport")
+  console.log("###############################")
+  console.log(standupuser)
+  console.log("###############################")
+  console.log(standupConfig.questions)
+  console.log("###############################")
+  console.log(answers);
+  report.postReportToChannel(_bot, {"channel_id":standupConfig.reportChannel,
+  "user_name":standupuser,
+  "questions":standupConfig.questions,
+  "answers":answers});
+}
 
 //TODO: move this to config.js
 var writeToConfigFile = function() {
