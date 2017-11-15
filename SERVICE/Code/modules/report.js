@@ -6,14 +6,14 @@ module.exports = {
     var users = channel_json["user_name"];
     var j = 0;
     var report = "The Consolidated Report is as follows\n\n";
-    for(var i = 0; i < answers.length; i++){
-      if (i%questions.length==0){
-        report += ` ${users[j]} has completed the standup. The reponses are as follows-\n\n`
-        j+=1;
-      }
-        report += `Q: ${questions[i%questions.length]}\n`;
-        report += `A: ${answers[i]}\n`;
+    for (var j = 0;j<answers.length;j++){
+      report += ` ${users[j]} has completed the standup. The reponses are as follows-\n\n`;
+    for(var i = 0; i < answers[j].length; i++){
+      
+        report += `Q: ${questions[i]}\n`;
+        report += `A: ${answers[j][i]}\n`;
     }
+  }
 
     console.log('REPORT:/n',report);
     console.log("Channel_id " + channel_json["channel_id"]);
