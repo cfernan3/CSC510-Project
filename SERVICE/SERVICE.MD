@@ -59,4 +59,7 @@ Please find the screen casts below:
    b. [Snooze Standup session with a user](https://youtu.be/JSIq8RkqGSU)  
    c. [Ignore Standup session with a user](https://youtu.be/m4XMA-Sq9R8)  
 
+Note: We have configured the start and end times prior to recording the standup session video.   
+There are periods of no activity in the video. That's because we are waiting for the standup session and reporting to be triggered at the configured times. 
+
 3. [Editing an existing standup](https://youtu.be/8IjT-hRskKg)  
