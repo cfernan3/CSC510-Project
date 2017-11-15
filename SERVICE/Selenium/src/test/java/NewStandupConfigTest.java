@@ -40,8 +40,8 @@ public class NewStandupConfigTest
 	@AfterClass
 	public static void  tearDown() throws Exception
 	{
-		driver.close();
-		driver.quit();
+		// driver.close();
+		// driver.quit();
 	}
 
 
@@ -155,13 +155,55 @@ public class NewStandupConfigTest
 		Thread.sleep(3000);
 
 		// Look for the buttons
-  	wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@class='btn btn_attachment'and contains(., 'channel')]")));
-  	List<WebElement> reportButton = driver.findElements(By.xpath("//button[@class='btn btn_attachment'and contains(., 'channel')]"));
-  	reportButton.get(reportButton.size()-1).click();
+	  	wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@class='btn btn_attachment'and contains(., 'channel')]")));
+	  	List<WebElement> reportButton = driver.findElements(By.xpath("//button[@class='btn btn_attachment'and contains(., 'channel')]"));
+	  	reportButton.get(reportButton.size()-1).click();
 
-    	// Configure channel name
-    wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[contains(@class,'message_body') and text() = 'Which slack channel do you want to use? E.g. #general']")));
+    	// Configure channel name that doesn't exist.
+	  	wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[contains(@class,'message_body') and text() = 'Which slack channel do you want to use? E.g. #general']")));
 		WebElement channelName = driver.findElement(
+				By.xpath("//span[contains(@class,'message_body') and text() = 'Which slack channel do you want to use? E.g. #general']"));
+		assertNotNull(channelName);
+		Thread.sleep(3000);
+
+		bot = driver.findElement(By.xpath("//div[@id='msg_input']/div")); // ("msg_input").);
+		bot.sendKeys("#abrade");
+		bot.sendKeys(Keys.RETURN);
+		Thread.sleep(5000);
+
+		// Validate error message for invalid channel.
+		wait.until(ExpectedConditions.visibilityOfElementLocated(
+				By.xpath("//span[contains(@class,'message_body') and text() = 'This channel does not exist.']")));
+		
+		// Look for the buttons
+	  	wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@class='btn btn_attachment'and contains(., 'channel')]")));
+	  	reportButton = driver.findElements(By.xpath("//button[@class='btn btn_attachment'and contains(., 'channel')]"));
+	  	reportButton.get(reportButton.size()-1).click();
+
+    	// Configure channel name in which the bot is not present.
+	  	wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[contains(@class,'message_body') and text() = 'Which slack channel do you want to use? E.g. #general']")));
+		channelName = driver.findElement(
+				By.xpath("//span[contains(@class,'message_body') and text() = 'Which slack channel do you want to use? E.g. #general']"));
+		assertNotNull(channelName);
+		Thread.sleep(3000);
+
+		bot = driver.findElement(By.xpath("//div[@id='msg_input']/div")); // ("msg_input").);
+		bot.sendKeys("#random");
+		bot.sendKeys(Keys.RETURN);
+		Thread.sleep(8000);
+
+		// Validate error message for channel in which bot is not present.
+		wait.until(ExpectedConditions.visibilityOfElementLocated(
+				By.xpath("//span[contains(@class,'message_body') and text() = 'I am not a member of this channel.']")));
+
+		// Look for the buttons
+	  	wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@class='btn btn_attachment'and contains(., 'channel')]")));
+	  	reportButton = driver.findElements(By.xpath("//button[@class='btn btn_attachment'and contains(., 'channel')]"));
+	  	reportButton.get(reportButton.size()-1).click();
+
+    	// Configure valid channel name.
+	  	wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[contains(@class,'message_body') and text() = 'Which slack channel do you want to use? E.g. #general']")));
+		channelName = driver.findElement(
 				By.xpath("//span[contains(@class,'message_body') and text() = 'Which slack channel do you want to use? E.g. #general']"));
 		assertNotNull(channelName);
 		Thread.sleep(3000);
@@ -169,7 +211,7 @@ public class NewStandupConfigTest
 		bot = driver.findElement(By.xpath("//div[@id='msg_input']/div")); // ("msg_input").);
 		bot.sendKeys("#general");
 		bot.sendKeys(Keys.RETURN);
-    Thread.sleep(3000);
+		Thread.sleep(3000);
 
 		// Type show
 		bot = driver.findElement(By.xpath("//div[@id='msg_input']/div"));

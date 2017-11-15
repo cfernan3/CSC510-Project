@@ -69,6 +69,7 @@ addParticipants: function(bot, participants, standupConfig) {
 
 
 removeParticipants: function(participants, standupConfig) {
+  var reg = /<(.*?)>/g;
   while((result = reg.exec(participants)) !== null) {
       if (result[1].charAt(0) == '@') { // This is a user
         for (i in standupConfig.participants) {
