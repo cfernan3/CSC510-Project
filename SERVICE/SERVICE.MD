@@ -41,7 +41,7 @@ The standup parameters persist on file, and can be used to restore the config.
 * For report generation, all responses are retreived from gsheets and sent to the reporting module. 
 
 ### Selenium Testing  
-The [Selenium](Selenium) folder contains tests for the 3 use cases:   
+The [Selenium](https://github.ncsu.edu/nedsouza/CSC510-Project/tree/master/SERVICE/Selenium) folder contains tests for the 3 use cases:   
 1. Initiate a new standup configuration     
 2. Standup session and reporting  
 3. Edit standup configuration    
