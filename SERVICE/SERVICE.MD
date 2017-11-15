@@ -1,5 +1,3 @@
-CODE -> https://github.ncsu.edu/nedsouza/CSC510-Project/tree/master/SERVICE/Code
-
 ### Services  
 
 Modules:
