@@ -53,8 +53,10 @@ https://github.ncsu.edu/nedsouza/CSC510-Project/blob/master/SERVICE/WORKSHEET.md
 
 ### Screencast
 Please find the screen casts below:
-1. [Creating a new standup]()  
+1. [Creating a new standup](https://youtu.be/SMFj6qsHhmY)  
 
-2. [Standup session with a user]()
+2. a. [Start Standup session with a user](https://youtu.be/3HFTdG7vf5k)  
+   b. [Snooze Standup session with a user](https://youtu.be/JSIq8RkqGSU)  
+   c. [Ignore Standup session with a user](https://youtu.be/m4XMA-Sq9R8)  
 
-3. [Editing an existing standup]()
+3. [Editing an existing standup](https://youtu.be/8IjT-hRskKg)  
