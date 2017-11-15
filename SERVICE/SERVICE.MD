@@ -6,9 +6,9 @@ Modules:
 
 1. New standup
 * Once the node process is started and the slack app is verified, whatbot greets the user who created the slack app,
-and informs them that they can now configure a standup from scratch. 
-* Alternatively, if the bot finds a valid json config file, it uses it to configure the standup 
-and informs the user that it has configured the standup parameters from the json file.
+and informs him that he can now configure a standup from scratch. 
+* Alternatively, if the bot finds a valid json config file, it auto-configures the standup 
+and informs the user that the standup parameters have been populated from the json file.
 The user can still configure a fresh standup and overwrite the entire config, or modify individual parameters.  
 This is helpful if the node process needs to be restarted. 
 The standup parameters persist on file, and can be used to restore the config.
