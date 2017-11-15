@@ -28,7 +28,7 @@
 |   |                | Modify conversation to loop over all configured questions |  | Sharmin, Ronald | 8th Nov | 9th Nov |
 |   |                | Trigger the standup scheduling function after the standup is configured or after loading config from config file. Reschedule it whenever the standup start time is modified. |  | Sharmin, Ronald | 10th Nov | 10th Nov |
 | 3 | Reporting      | Trigger report generation at standup end time. Reschedule it whenever the standup end time is modified. | [Trigger schedule task](https://trello.com/c/m9lFRoJF) |  Nirav, Calvin     | 10th Nov | 10th Nov |
-|   |                | Retrieve standup answers from google sheets and compile standup report |  | | | |
+|   |                | Retrieve standup answers from google sheets and compile standup report | [Report compilation task](https://trello.com/c/IOCjJiZR) | Calvin, Bharat| 9th Nov | 9th Nov |
 | 4 | Code Integration | Integrate index.js and main.js and divide code modules into different files |  | Sharmin, Ronald, Nirav | 7th Nov | 9th Nov |
 | 5 | Reporting      | Email standup report        | [Email Task](https://trello.com/c/dlNQMDKT) | Calvin, Nirav  | | |
 |   |  | Email report to all participants.         | [Email Task 2](https://trello.com/c/JfeU3Inr) | Calvin, Nirav, Bharat  | 5th Nov | 8th Nov|
