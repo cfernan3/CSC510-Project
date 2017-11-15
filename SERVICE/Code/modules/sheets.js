@@ -175,7 +175,7 @@ sheet.retrieveAllAnswersList = function(spreadsheet_id,flush,callback) {
     }
   }
     //Print the response after clearing the sheet 
-    console.log(JSON.stringify(output, null, 2));
+    //console.log(JSON.stringify(output, null, 2));
     callback(output); 
   }); 
 } 
