@@ -37,7 +37,7 @@
 |   | Deliverable    | Tasks | Issues | Team Members  | Estimated Date | Actual Date |
 |---|----------------|-------|--------|---------------|----------------|-------------|
 | 1 | Selenium testing | Add show and help commands to use case 1. Add cases for invalid channel and participants. | [Modify use case for show](https://trello.com/c/ixA9LBYA) |Sharmin, Ronald | 13th Nov | 13th Nov |
-|   |                  | Modify use case 2 to show google sheets integration |  | | | |
+|   |                  | Modify use case 2 |  | | | |
 | 2 | Screen cast      | Use case 1                                  |  |   |  |   |
 |   |                  | Use case 2                                  |  |   |  |   |
 |   |                  | Use case 3                                  |  |   |  |   |
