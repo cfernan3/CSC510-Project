@@ -10,7 +10,7 @@
 |   | Deliverable    | Tasks | Issues | Team Members  | Estimated Date | Actual Date |
 |---|----------------|-------|--------|---------------|----------------|-------------|
 | 1 | Standup config | Add help feature, so the user understands how to interact with the bot | [Help feature](https://trello.com/c/lS9wjEh4) | Sharmin, Ronald | 5th Nov | 5th Nov |
-|   |                | Add show feature, so the user can see the configured standup parameters | [Show parameters task](https://trello.com/c/112gmjST) | Sharmin, Ronald | 5th Nov | 5th Nov |
+|   |                | Add show feature, so the user can see the configured standup parameters | [Show parameters task](https://trello.com/c/112gmjST) , [#10](https://github.ncsu.edu/nedsouza/CSC510-Project/issues/10) | Sharmin, Ronald | 5th Nov | 5th Nov |
 | 2  | Standup session| Fetch standup parameters from config object instead of mock file | [Fetch from config object](https://trello.com/c/wzRrIRZA) | Sharmin, Ronald | 4th Nov | 5th Nov |
 | 3 | Reporting      | Email report to all participants. | [Emailing Report](https://trello.com/c/JfeU3Inr) | Nirav, Calvin, Bharat | 4th Nov | 5th Nov |
 
@@ -20,8 +20,8 @@
 |---|----------------|-------|--------|---------------|----------------|-------------|
 | 1 | Standup config | Fetch config from the config file when the bot is restarted | [Restart fetch](https://trello.com/c/cf8pmFxC) | Sharmin, Ronald | 8th Nov | 9th Nov |
 |   |                | Create Google Sheet for the bot and save the access info in the config | [Google Sheet Task](https://trello.com/c/nRSCJR7M) | Bharat, Calvin | 8th Nov |  |
-|   |                | Verify that the standup participants configured are valid users, and fetch all users if a channel name is given (Replace mocking with slack API calls) | [Verify users](https://trello.com/c/2KpQC6uY) | Sharmin, Ronald | 9th Nov | 10th Nov |
-|   |                | Verify that the reporting channel is valid, and that the bot is a member of the channel | [Verify channel](https://trello.com/c/WQYUNeRQ) | Sharmin, Ronald | 9th Nov | 10th Nov |
+|   |                | Verify that the standup participants configured are valid users, and fetch all users if a channel name is given (Replace mocking with slack API calls) | [Verify users](https://trello.com/c/2KpQC6uY), [#11](https://github.ncsu.edu/nedsouza/CSC510-Project/issues/11) , [#13](https://github.ncsu.edu/nedsouza/CSC510-Project/issues/13) | Sharmin, Ronald | 9th Nov | 10th Nov |
+|   |                | Verify that the reporting channel is valid, and that the bot is a member of the channel | [Verify channel](https://trello.com/c/WQYUNeRQ) , [#12](https://github.ncsu.edu/nedsouza/CSC510-Project/issues/12) | Sharmin, Ronald | 9th Nov | 10th Nov |
 | 2 | Standup session| Store the standup answers on google sheets | [Storing task](https://trello.com/c/uJDoxu4c) | Bharat  | 5th Nov | 6th Nov |
 |   |                | Retreive the standup answers from google sheets | [Retreival task](https://trello.com/c/IOCjJiZR) | Bharat,Calvin  | 5th Nov | 8th Nov |
 |   |                | Modify conversation to loop over all configured questions | [Loop task](https://trello.com/c/eWI1puWX) | Sharmin, Ronald | 8th Nov | 9th Nov |
