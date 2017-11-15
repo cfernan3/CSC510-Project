@@ -111,7 +111,7 @@ controller.on('create_bot',function(bot, bot_config) {
       endRule.hour = standupConfig.endTimeHours;
       endRule.minute = standupConfig.endTimeMins+1;
       console.log("#####################################NIRAV: Configured the Report for time = "+standupConfig.endTimeHours+":"+standupConfig.endTimeMins ) 
-      reportJob = schedule.scheduleJob(endRule, db.retrieveAllAnswersList(standupConfig.gSheetId,false,processReportToSend));
+      reportJob = schedule.scheduleJob(endRule, reportingCall);
      
       bot.startPrivateConversation({user: standupConfig.creator},function(err,convo) {
         if (err) {
@@ -282,7 +282,7 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
       if(typeof sessionJob == 'undefined'){
         console.log("NIRAV: Pre ShareReport")
         sessionJob = schedule.scheduleJob(startRule, startStandupWithParticipants);
-        reportJob = schedule.scheduleJob(endRule, db.retrieveAllAnswersList(standupConfig.gSheetId,false,processReportToSend));
+        reportJob = schedule.scheduleJob(endRule, reportingCall);
       }
       else
         {
@@ -401,7 +401,6 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
         startRule.hour = standupConfig.startTimeHours;
         startRule.minute = standupConfig.startTimeMins;
         sessionJob.reschedule(startRule);
-
         writeToConfigFile();
         convo.next();
       }
@@ -577,8 +576,9 @@ function startStandupWithParticipants(){
                             callback: function(response, convo) {
                               convo.addMessage(" Thanks for your responses! We are done with today's standup.", 'askQuestion');
                               convo.next();
-                              standupuser[response.user_id] = response.user;
-                              db.storeAnswers(standupConfig.gSheetId,response.user_name,answers,function(res){console.log("Stored standup answers for user "+response.user);}); 
+                              standupuser.push(response.user);
+                              console.log(response.user + " has completed standup.")
+                              db.storeAnswers(standupConfig.gSheetId,response.user,answers,function(res){console.log("Stored standup answers for user "+response.user);}); 
                               console.log(response);
                               // TODO: Remove Reporting from here and trigger it at standup close time.
                               // Change the function arguments - send the compiled report instead of a single user's answers
@@ -610,8 +610,12 @@ function startStandupWithParticipants(){
   }
 }
 
+function reportingCall(){
+  db.retrieveAllAnswersList(standupConfig.gSheetId,false,processReportToSend);
+}
+
 function processReportToSend(stored_answers){
-  console.log(JSON.stringify(stored_answers));
+  //console.log(JSON.stringify(stored_answers));
   for (var i = 0;i<standupuser.length;i++){
     answers.push(stored_answers[standupuser[i]]);
   }
