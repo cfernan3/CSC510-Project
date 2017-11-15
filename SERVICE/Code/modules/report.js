@@ -32,7 +32,7 @@ module.exports = {
 
     // TODO: This needs to be fixed and remove nock and remove hardcoded username and password.
     // Trigger thiss function at standup end time
-/*
+
     var api = nock("https://sheets.googleapis.com")
     .get("/v4/spreadsheets/abcdefgh/")
     .reply(200, {
@@ -48,7 +48,7 @@ module.exports = {
     var string = str
     //var string = JSON.stringify(str);
 
-*/
+
     'use strict';
 
     var answers = channel_json["answers"];
@@ -79,7 +79,6 @@ module.exports = {
                         console.log('PARTICIPANT#########################',participant)
                     var user_name = response.user.real_name;
                     console.log('USRNAMEJWQLRJEQJ#######', user_name)
-                    
     */
     console.log('REPORT:/n',report);
     const nodemailer = require('nodemailer');
@@ -95,12 +94,11 @@ module.exports = {
     }else{
     console.log("Message sent: " + response.message);
     }
-//});
    smtpTransport.close(); // shut down the connection pool, no more messages.  Comment this line out to continue sending emails.
     });
 
- //   });
-  //  });
+    });
+   });
 
   }
 }
