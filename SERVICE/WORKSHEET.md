@@ -18,8 +18,8 @@
 
 |   | Deliverable    | Tasks | Issues | Team Members  | Estimated Date | Actual Date |
 |---|----------------|-------|--------|---------------|----------------|-------------|
-| 1 | Standup config | Fetch config from the config file when the bot is restarted |  | Sharmin, Ronald | 8th Nov | 9th Nov |
-|   |                | Create Google Sheet for the bot and save the access info in the config | | Bharat, Calvin | 8th Nov |  |
+| 1 | Standup config | Fetch config from the config file when the bot is restarted | | Sharmin, Ronald | 8th Nov | 9th Nov |
+|   |                | Create Google Sheet for the bot and save the access info in the config | [Google Sheet Task](https://trello.com/c/nRSCJR7M) | Bharat, Calvin | 8th Nov |  |
 |   |                | Verify that the standup participants configured are valid users, and fetch all users if a channel name is given (Replace mocking with slack API calls) |  | Sharmin, Ronald | 9th Nov | 10th Nov |
 |   |                | Verify that the reporting channel is valid, and that the bot is a member of the channel |  | Sharmin, Ronald | 9th Nov | 10th Nov |
 | 2 | Standup session| Store the standup answers on google sheets |  | Calvin, Nirav  | | |
@@ -28,7 +28,7 @@
 | 3 | Reporting      | Trigger report generation at standup end time. Reschedule it whenever the standup end time is modified. |  |  Bharat     | | |
 |   |                | Retrieve standup answers from google sheets and compile standup report |  | | | |
 | 4 | Code Integration | Integrate index.js and main.js and divide code modules into different files |  | Sharmin, Ronald, Nirav | 7th Nov | 9th Nov |
-| 5 | Reporting      | Email standup report        |  | Calvin, Nirav  | | |
+| 5 | Reporting      | Email standup report        | [Email Task](https://trello.com/c/dlNQMDKT) | Calvin, Nirav  | | |
 
 ### Week 3 : 12th Nov to 14th Nov   
 
