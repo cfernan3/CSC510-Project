@@ -154,7 +154,7 @@ validateConfigFile: function() {
 },
 
 
-getHourIn12HourFormat: function(hour, min) {
+getTimeIn12HourFormat: function(hour, min) {
     var timeStr = hour % 12;
     if(timeStr == 0)
       timeStr = 12;

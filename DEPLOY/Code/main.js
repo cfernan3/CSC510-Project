@@ -24,11 +24,13 @@ function StandupConfig(){
 
 var botId; // Contains the bot's user id.
 var standupConfig = new StandupConfig();
+var isStandupSetup = 0;
 
 var defaultQuestions = "\t" + standupConfig.questions[0];
 for(var i = 1; i < standupConfig.questions.length; i++)
   defaultQuestions += "\n\t" + standupConfig.questions[i];
 
+// TODO: change this later to 10
 var snoozeDelayMins = 0.5; // Snooze delay in minutes
 
 var startRule = new schedule.RecurrenceRule();
@@ -110,13 +112,13 @@ controller.on('create_bot',function(bot, bot_config) {
       //TODO: // schedule the report job at the configured end time
       endRule.hour = standupConfig.endTimeHours;
       endRule.minute = standupConfig.endTimeMins+1;
-      console.log("#####################################NIRAV: Configured the Report for time = "+standupConfig.endTimeHours+":"+standupConfig.endTimeMins )
       reportJob = schedule.scheduleJob(endRule, shareReportWithParticipants);
 
       bot.startPrivateConversation({user: standupConfig.creator},function(err,convo) {
         if (err) {
           console.log(err);
         } else {
+          isStandupSetup = 1;
           convo.say("Hello! I found a config file and have configured the standup parameters using it.\nYou can modify individual parameters or do a fresh setup if you want.");
         }
       });
@@ -181,10 +183,10 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
     }, {}, 'askEndTime');
 
 
-    convo.addQuestion('Who would you like to invite for the standup session?\n You may enter it in the following ways:\n\
-          1. list of users: @<user1>, ..., @<userN>\n \
-          2. specific user group: @<user-group-name> \n \
-          3. specific channel: #<channel-name>', function (response, convo) {
+    convo.addQuestion('Who would you like to invite for the standup session?\n You may enter it as a combination of the following:\n\
+          1. List of users: @<user1> ... @<userN>\n \
+          2. Specific channel: #<channel-name>\n \
+          E.g. @jack #general @john', function (response, convo) {
 
       console.log('participants=', response.text);
       standupConfig.participants = [];
@@ -273,24 +275,20 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
 
       startRule.hour = standupConfig.startTimeHours;
       startRule.minute = standupConfig.startTimeMins;
-
-      // schedule the standup job, if not already scheduled
-
       endRule.hour = standupConfig.endTimeHours;
       endRule.minute = standupConfig.endTimeMins;
 
+      // schedule the standup jand reporting jobs, if not already scheduled
       if(typeof sessionJob == 'undefined'){
-        console.log("NIRAV: Pre ShareReport")
         sessionJob = schedule.scheduleJob(startRule, startStandupWithParticipants);
         reportJob = schedule.scheduleJob(endRule, shareReportWithParticipants);
+        isStandupSetup = 1;
       }
       else
         {
-        console.log("NIRAV: Modifying ShareReport")
         sessionJob.reschedule(startRule);
         reportJob.reschedule(endRule);
       }
-      //TODO: schedule the report job
       next();
     });
 
@@ -316,35 +314,37 @@ function addNewSheetToConfigfile(sheet_id){
 */
 controller.hears(['show', 'display', 'view', 'see', 'check'],['direct_mention', 'direct_message'], function(bot,message) {
   bot.startConversation(message, function(err, convo) {
-
-    convo.say('Let me show you the current configuration...');
-    // Start time
-    convo.say("Start time: " + config.getHourIn12HourFormat(standupConfig.startTimeHours, standupConfig.startTimeMins));
-
-    // End time
-    convo.say("End time: " + config.getHourIn12HourFormat(standupConfig.endTimeHours, standupConfig.endTimeMins));
-
-    // participants
-    var participantsStr = "";
-    standupConfig.participants.forEach(function(val) {
-     participantsStr += " <@" + val + ">";
-    });
-    convo.say(`Participants:${participantsStr}`);
-
-    // Question set
-    convo.say("Question Set: ");
-    var i = 1;
-    standupConfig.questions.forEach(function(val) {
-      convo.say(i++ + ".  " + val);
-    });
-
-    // Reporting medium
-    if (standupConfig.reportMedium == "channel") {
-      convo.say("Reporting Medium: " + standupConfig.reportMedium + " (<#" + standupConfig.reportChannel + ">)");
+    if(isStandupSetup == 0) {
+      convo.say("Standup has not been setup yet.")
     } else {
-      convo.say("Reporting Medium: " + standupConfig.reportMedium);
-    }
+      convo.say('Let me show you the current configuration...');
+      // Start time
+      convo.say("Start time: " + config.getTimeIn12HourFormat(standupConfig.startTimeHours, standupConfig.startTimeMins));
 
+      // End time
+      convo.say("End time: " + config.getTimeIn12HourFormat(standupConfig.endTimeHours, standupConfig.endTimeMins));
+
+      // participants
+      var participantsStr = "";
+      standupConfig.participants.forEach(function(val) {
+       participantsStr += " <@" + val + ">";
+      });
+      convo.say(`Participants:${participantsStr}`);
+
+      // Question set
+      convo.say("Question Set: ");
+      var i = 1;
+      standupConfig.questions.forEach(function(val) {
+        convo.say(i++ + ".  " + val);
+      });
+
+      // Reporting medium
+      if (standupConfig.reportMedium == "channel") {
+        convo.say("Reporting Medium: " + standupConfig.reportMedium + " (<#" + standupConfig.reportChannel + ">)");
+      } else {
+        convo.say("Reporting Medium: " + standupConfig.reportMedium);
+      }
+    }
   });
 });
 
@@ -352,12 +352,14 @@ controller.hears(['show', 'display', 'view', 'see', 'check'],['direct_mention', 
 ************************ Editing an existing standup**********************************
 */
 
-controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_mention', 'direct_message'], function(bot,message) {
-  // TODO: check that standup exists
+controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_mention', 'direct_message'], function(bot, message) {
+  // check that standup exists
+  if(isStandupSetup == 0) {
+    bot.reply(message, "You need to setup a standup before modifying individual parameters.");
+    return;
+  }
 
   bot.startConversation(message, function(err, convo) {
-
-  // TODO: check that the user is allowed to modify config
     convo.ask(config.modifyStandupButtons,
 
     function (response, convo) {
@@ -394,7 +396,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
         console.log("Start time = " + standupConfig.startTimeHours + ":" + standupConfig.startTimeMins);
 
         convo.addMessage("All set! I have updated the start time to " +
-                        config.getHourIn12HourFormat(standupConfig.startTimeHours, standupConfig.startTimeMins) + ".", 'editStartTime');
+                        config.getTimeIn12HourFormat(standupConfig.startTimeHours, standupConfig.startTimeMins) + ".", 'editStartTime');
 
         // reschedule the standup session job after the start time is modified
         startRule.hour = standupConfig.startTimeHours;
@@ -420,7 +422,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
         standupConfig.endTimeMins = endTime.getMinutes();
         console.log("End time = " + standupConfig.endTimeHours + ":" + standupConfig.endTimeMins);
         convo.addMessage("All set! I have updated the end time to " +
-                        config.getHourIn12HourFormat(standupConfig.endTimeHours, standupConfig.endTimeMins) + ".", 'editEndTime');
+                        config.getTimeIn12HourFormat(standupConfig.endTimeHours, standupConfig.endTimeMins) + ".", 'editEndTime');
 
         // TODO: reschedule the report job after the end time is modified
         endRule.hour = standupConfig.endTimeHours;
@@ -440,11 +442,11 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
 
     convo.addQuestion(config.modifyUserButtons, function (response, convo) {
       switch (response.text) {
-        case "addUsers":  // TODO: let the user know which users were successfully added.
-          convo.addQuestion('Who would you like to invite for the standup session?\n You may enter it in the following ways:\n\
-                1. list of users: @<user1>, ..., @<userN>\n \
-                2. specific user group: @<user-group-name> \n \
-                3. specific channel: #<channel-name>', function (response, convo) {
+        case "addUsers":
+          convo.addQuestion('Who would you like to invite for the standup session?\n You may enter it as a combination of the following:\n\
+                1. List of users: @<user1> ... @<userN>\n \
+                2. Specific channel: #<channel-name>\n \
+                E.g. @jack #general @john', function (response, convo) {
             console.log('participants to add =', response.text);
             config.addParticipants(bot, response.text, standupConfig);
 
@@ -455,7 +457,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
           convo.next();
           break;
         case "removeUsers":
-          convo.addQuestion('Who would you like to remove from the standup session?\n You may enter it as a list of users: @<user1>, ..., @<userN>',
+          convo.addQuestion('Who would you like to remove from the standup session?\n You may enter it as a list of users: @<user1> ... @<userN>',
           function (response, convo) {
             console.log('participants to remove =', response.text);
             config.removeParticipants(response.text, standupConfig);
@@ -511,7 +513,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
                 case 0: // Success
                   standupConfig.reportMedium = "channel";
                   writeToConfigFile();
-                  convo.addMessage("All set! Standup reports will now be posted to your channel.", 'editReportMedium');  //TODO: print channel name
+                  convo.addMessage("All set! Standup reports will now be posted to <#" + standupConfig.reportChannel + ">.", 'editReportMedium');
                   convo.next();
                   break;
                 case 1: // Channel id is invalid
@@ -578,9 +580,6 @@ function startStandupWithParticipants(){
                       convo.next();
 
                       //db.storeAnswers(standupConfig.gSheetId,response.user,answers,function(res){console.log("Stored standup answers for user "+response.user);});
-
-                      // TODO: Remove Reporting from here and trigger it at standup close time.
-                      // Change the function arguments - send the compiled report instead of a single user's answers
                     }
                 }
               ], {}, 'askQuestion');
@@ -624,6 +623,7 @@ function shareReportWithParticipants(){
   }
 }
 
+// TODO: fetch questions and answers from sheets
 function generateReport(answers) {
   var standupReport = "Here's the consolidated report for today's standup.\n";
   for (var user in answers) {
