@@ -17,6 +17,7 @@ function StandupConfig(){
   this.questions = ["What did you accomplish yesterday?", "What will you work on today?",
                     "Is there anything blocking your progress?"];  // TODO: should have aleast 1 question
   this.participants = [];  // TODO: makse sure atleast one participant
+  this.participantNames = {};
   this.reportMedium = "";
   this.reportChannel = "";
   this.creator = "";
@@ -627,7 +628,8 @@ function shareReportWithParticipants(){
 function generateReport(answers) {
   var standupReport = "Here's the consolidated report for today's standup.\n";
   for (var user in answers) {
-    report += `\n${user}'s responses:\n`;
+    var userName = standupConfig.participantNames[user];
+    standupReport += `\n${userName}'s responses:\n`;
     for(var i = 0; i < standupConfig.questions.length; i++) {
       standupReport += `${standupConfig.questions[i]}\n`;
       standupReport += `${answers[user][i]}\n`;
