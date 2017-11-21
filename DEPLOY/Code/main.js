@@ -17,7 +17,7 @@ function StandupConfig(){
   this.questions = ["What did you accomplish yesterday?", "What will you work on today?",
                     "Is there anything blocking your progress?"];  // TODO: should have aleast 1 question
   this.participants = [];  // TODO: makse sure atleast one participant
-  this.reportMedium = "email";  // default medium is email
+  this.reportMedium = "";
   this.reportChannel = "";
   this.creator = "";
 }
@@ -41,8 +41,9 @@ endRule.dayOfWeek = [0,1,2,3,4,5,6];
 
 var sessionJob;  // Schedule this job using startRule to conduct the daily standup session
 var reportJob;   // Schedule this job using endRule to trigger reporting
-var answers = [];
-var standupuser = [];
+
+var standupAnswers = {}; // TODO: storing responses locally, fetch from sheets later
+
 var controller = Botkit.slackbot({
   debug: false,
   interactive_replies: true, // tells botkit to send button clicks into conversations
@@ -110,7 +111,7 @@ controller.on('create_bot',function(bot, bot_config) {
       endRule.hour = standupConfig.endTimeHours;
       endRule.minute = standupConfig.endTimeMins+1;
       console.log("#####################################NIRAV: Configured the Report for time = "+standupConfig.endTimeHours+":"+standupConfig.endTimeMins )
-      reportJob = schedule.scheduleJob(endRule, reportingCall);
+      reportJob = schedule.scheduleJob(endRule, shareReportWithParticipants);
 
       bot.startPrivateConversation({user: standupConfig.creator},function(err,convo) {
         if (err) {
@@ -281,7 +282,7 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
       if(typeof sessionJob == 'undefined'){
         console.log("NIRAV: Pre ShareReport")
         sessionJob = schedule.scheduleJob(startRule, startStandupWithParticipants);
-        reportJob = schedule.scheduleJob(endRule, reportingCall);
+        reportJob = schedule.scheduleJob(endRule, shareReportWithParticipants);
       }
       else
         {
@@ -292,7 +293,6 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
       //TODO: schedule the report job
       next();
     });
-
 
     convo.addMessage('Awesome! Your Standup is configured successfully!', 'lastStatement');
 
@@ -536,7 +536,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
 ************************ standup session **********************************
 */
 function startStandupWithParticipants(){
-  for (var i=0; i < standupConfig.participants.length; i++){
+  for (var i = 0; i < standupConfig.participants.length; i++){
     _bot.startPrivateConversation({user: standupConfig.participants[i]},function(err,convo) {
       if (err) {
         console.log(err);
@@ -547,47 +547,48 @@ function startStandupWithParticipants(){
         convo.ask( startStandupButtons, function (response, convo) {
           switch (response.text) {
             case "start":
-            var answers = [];
-                var attachment = {text: `:white_check_mark: Awesome! Let's start the standup.`, title: "Select one option."};
-                _bot.replyInteractive(response, {text: "We are starting with the standup.", attachments: [attachment]});
+              standupAnswers[response.user] = [];
+              var attachment = {text: `:white_check_mark: Awesome! Let's start the standup.`, title: "Select one option."};
+              _bot.replyInteractive(response, {text: "We are starting with the standup.", attachments: [attachment]});
 
 
-                for(var i = 0; i < standupConfig.questions.length; i++) {
-                  convo.addQuestion(standupConfig.questions[i], function (response, convo) {
-                    console.log('Question answered =', response.text);
-                    answers.push(response.text);
-                    convo.next();
-                  }, {}, 'askQuestion');
+              for(var j = 0; j < standupConfig.questions.length; j++) {
+                convo.addQuestion(standupConfig.questions[j], function (response, convo) {
+                  console.log('Question answered =', response.text);
+                  standupAnswers[response.user].push(response.text);
+                  convo.next();
+                }, {}, 'askQuestion');
+              }
+
+              convo.addQuestion("We are done with the standup. Do you want to redo?", [
+                {
+                    pattern: _bot.utterances.yes,
+                    callback: function(response, convo) {
+                      standupConfig.questions = [];
+                      console.log('Redoing');
+                      standupAnswers[response.user] = [];
+                      convo.gotoThread('askQuestion');
+                    }
+                },
+                {
+                    pattern: _bot.utterances.no,
+                    default: true,
+                    callback: function(response, convo) {
+                      convo.addMessage(" Thanks for your responses! We are done with today's standup.", 'askQuestion');
+                      convo.next();
+
+                      //db.storeAnswers(standupConfig.gSheetId,response.user,answers,function(res){console.log("Stored standup answers for user "+response.user);});
+
+                      // TODO: Remove Reporting from here and trigger it at standup close time.
+                      // Change the function arguments - send the compiled report instead of a single user's answers
+                    }
                 }
+              ], {}, 'askQuestion');
 
-                convo.addQuestion("We are done with the standup. Do you want to redo?", [
-                        {
-                            pattern: _bot.utterances.yes,
-                            callback: function(response, convo) {
-                              standupConfig.questions = [];
-                              console.log('Redoing');
-                              convo.gotoThread('askQuestion');
-                            }
-                        },
-                        {
-                            pattern: _bot.utterances.no,
-                            default: true,
-                            callback: function(response, convo) {
-                              convo.addMessage(" Thanks for your responses! We are done with today's standup.", 'askQuestion');
-                              convo.next();
-                              standupuser.push(response.user);
-                              console.log(response.user + " has completed standup.")
-                              //db.storeAnswers(standupConfig.gSheetId,response.user,answers,function(res){console.log("Stored standup answers for user "+response.user);});
-                              console.log(response);
-                              // TODO: Remove Reporting from here and trigger it at standup close time.
-                              // Change the function arguments - send the compiled report instead of a single user's answers
-                            }
-                        }
-                      ], {}, 'askQuestion');
-
-                convo.addMessage({text:"Here are your questions.", action:'askQuestion'}, 'default');
-                convo.next();
+              convo.addMessage({text:"Here are your questions.", action:'askQuestion'}, 'default');
+              convo.next();
               break;
+
             case "snooze":
               var attachment = {text: `:white_check_mark: I will remind you in ${snoozeDelayMins} minutes`, title: "Select one option."};
               _bot.replyInteractive(response, {text: "We are starting with the standup.", attachments: [attachment]});
@@ -597,6 +598,7 @@ function startStandupWithParticipants(){
                 convo.gotoThread('default');
               });
               break;
+
             case "ignore":
               var attachment = {text: `:white_check_mark: See you tomorrow`, title: "Select one option."};
               _bot.replyInteractive(response, {text: "We are starting with the standup.", attachments: [attachment]});
@@ -609,31 +611,43 @@ function startStandupWithParticipants(){
   }
 }
 
-function reportingCall(){
-  //db.retrieveAllAnswersList(standupConfig.gSheetId,false,processReportToSend);
-}
-
-function processReportToSend(stored_answers){
-  //console.log(JSON.stringify(stored_answers));
-  for (var i = 0;i<standupuser.length;i++){
-    answers.push(stored_answers[standupuser[i]]);
-  }
-  shareReportWithParticipants();
-}
-
 function shareReportWithParticipants(){
-  console.log("In ShareReport")
-  console.log("###############################")
-  console.log(standupuser)
-  console.log("###############################")
-  console.log(standupConfig.questions)
-  console.log("###############################")
-  console.log(answers);
-  report.postReportToChannel(_bot, {"channel_id":standupConfig.reportChannel,
-  "user_name":standupuser,
-  "questions":standupConfig.questions,
-  "answers":answers});
+  //db.retrieveAllAnswersList(standupConfig.gSheetId,false,processReportToSend);
+
+  var rep = generateReport(standupAnswers);
+  console.log('REPORT:\n',rep);
+
+  if(standupConfig.reportMedium == "email") {
+    report.emailReport(rep);
+  } else if(standupConfig.reportMedium == "channel") {
+    report.postReportToChannel(_bot, rep, standupConfig.reportChannel);
+  }
 }
+
+function generateReport(answers) {
+  var standupReport = "Here's the consolidated report for today's standup.\n";
+  for (var user in answers) {
+    report += `\n${user}'s responses:\n`;
+    for(var i = 0; i < standupConfig.questions.length; i++) {
+      standupReport += `${standupConfig.questions[i]}\n`;
+      standupReport += `${answers[user][i]}\n`;
+    }
+  }
+
+  return standupReport;
+}
+
+/*
+    bot.api.users.info({"user": users[j]},function(err,response) {
+            console.log(response)
+            var participant = response.user.profile.email
+            console.log('PARTICIPANT#########################',participant)
+        var user_name = response.user.real_name;
+        console.log('USRNAMEJWQLRJEQJ#######', user_name)
+        report += user_name+"has completed the standup. The reponses are as follows-\n\n"
+    });
+*/
+
 
 //TODO: move this to config.js
 var writeToConfigFile = function() {
