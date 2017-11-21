@@ -26,22 +26,23 @@ module.exports = {
   },
 
 
-  emailReport: function(report) {
+  emailReport: function(report, emails) {
     var smtpTransport = nodemailer.createTransport("smtps://whatbot.ncsu%40gmail.com:"+encodeURIComponent('12345ABCDE') + "@smtp.gmail.com:465");
-    smtpTransport.sendMail({
-      from: "whatbot.ncsu@gmail.com",
-      to: participant,
-      subject: "Report",
-      text: report
-    },
 
-    function(error, response){
-      if(error){
-        console.log(error);
-      }else{
-        console.log("Message sent: " + response.message);
-      }
-      smtpTransport.close(); // shut down the connection pool. Comment this line out to continue sending emails.
-    });
+    // Send email to each participant
+    for (var user in emails) {
+      smtpTransport.sendMail({
+        from: "whatbot.ncsu@gmail.com",
+        to: emails[user],
+        subject: "Report",
+        text: report
+      },
+      function(error, response){
+        if(error){
+          console.log(error);
+        }
+      });
+    }
+    smtpTransport.close(); // shut down the connection pool. Comment this line out to continue sending emails.
   }
 }

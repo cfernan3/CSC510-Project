@@ -18,6 +18,7 @@ function StandupConfig(){
                     "Is there anything blocking your progress?"];  // TODO: should have aleast 1 question
   this.participants = [];  // TODO: makse sure atleast one participant
   this.participantNames = {};
+  this.participantEmails = {};
   this.reportMedium = "";
   this.reportChannel = "";
   this.creator = "";
@@ -617,7 +618,7 @@ function shareReportWithParticipants(){
   console.log('REPORT:\n',rep);
 
   if(standupConfig.reportMedium == "email") {
-    report.emailReport(rep);
+    report.emailReport(rep, standupConfig.participantEmails);
   } else if(standupConfig.reportMedium == "channel") {
     report.postReportToChannel(_bot, rep, standupConfig.reportChannel);
   }
