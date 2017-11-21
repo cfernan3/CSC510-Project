@@ -609,10 +609,11 @@ function startStandupWithParticipants(){
   }
 }
 
+
 function shareReportWithParticipants(){
   //db.retrieveAllAnswersList(standupConfig.gSheetId,false,processReportToSend);
 
-  var rep = generateReport(standupAnswers);
+  var rep = report.generateReport(standupConfig, standupAnswers);
   console.log('REPORT:\n',rep);
 
   if(standupConfig.reportMedium == "email") {
@@ -621,32 +622,6 @@ function shareReportWithParticipants(){
     report.postReportToChannel(_bot, rep, standupConfig.reportChannel);
   }
 }
-
-// TODO: fetch questions and answers from sheets
-function generateReport(answers) {
-  var standupReport = "Here's the consolidated report for today's standup.\n";
-  for (var user in answers) {
-    var userName = standupConfig.participantNames[user];
-    standupReport += `\n${userName}'s responses:\n`;
-    for(var i = 0; i < standupConfig.questions.length; i++) {
-      standupReport += `${standupConfig.questions[i]}\n`;
-      standupReport += `${answers[user][i]}\n`;
-    }
-  }
-
-  return standupReport;
-}
-
-/*
-    bot.api.users.info({"user": users[j]},function(err,response) {
-            console.log(response)
-            var participant = response.user.profile.email
-            console.log('PARTICIPANT#########################',participant)
-        var user_name = response.user.real_name;
-        console.log('USRNAMEJWQLRJEQJ#######', user_name)
-        report += user_name+"has completed the standup. The reponses are as follows-\n\n"
-    });
-*/
 
 
 //TODO: move this to config.js
