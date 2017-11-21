@@ -2,6 +2,7 @@ var fs = require('fs');
 var Validator = require('jsonschema').Validator;
 var v = new Validator();
 var result;
+var configFile = './config.json';
 
 var configSchema = {
   type: 'object',
@@ -17,8 +18,8 @@ var configSchema = {
     reportChannel: { type: 'string', maxLength: 9 },
     creator: { type: 'string', minLength: 9, maxLength: 9 }
   },
-  required: ['startTimeHours', 'startTimeMins', 'endTimeHours', 'endTimeMins',
-              'questions', 'participants', 'reportMedium', 'reportChannel', 'creator']
+  required: ['startTimeHours', 'startTimeMins', 'endTimeHours', 'endTimeMins', 'questions',
+            'participants', 'participantNames', 'participantEmails', 'reportMedium', 'reportChannel', 'creator',]
 }
 
 function addParticipantName(bot, participant, standupConfig) {
@@ -162,6 +163,13 @@ validateConfigFile: function() {
       console.log(e);
       return null;
     }
+},
+
+
+writeToConfigFile: function(standupConfig) {
+  fs.writeFile(configFile, JSON.stringify(standupConfig), (err) => {
+     if (err) console.log(err);
+   });
 },
 
 

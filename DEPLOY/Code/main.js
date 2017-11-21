@@ -267,7 +267,7 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
 
     convo.beforeThread('lastStatement', function(convo, next) {
       console.log('New standup config complete');
-      writeToConfigFile();
+      config.writeToConfigFile(standupConfig);
 
       // Create a google sheet for storing standup questions and answers
       //db.createSheet(addNewSheetToConfigfile);
@@ -306,7 +306,7 @@ function addNewSheetToConfigfile(sheet_id){
   /*db.storeQuestions(standupConfig.gSheetId,'Whatbot',standupConfig.questions,function(response){
     //console.log('The standup Questions have been updated in the google sheet');
   });*/
-  writeToConfigFile();
+  config.writeToConfigFile(standupConfig);
 }
 /*
 ************************ Show an existing standup configuration***********************
@@ -401,7 +401,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
         startRule.hour = standupConfig.startTimeHours;
         startRule.minute = standupConfig.startTimeMins;
         sessionJob.reschedule(startRule);
-        writeToConfigFile();
+        config.writeToConfigFile(standupConfig);
         convo.next();
       }
       else {
@@ -428,7 +428,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
         endRule.minute = standupConfig.endTimeMins;
         reportJob.reschedule(endRule);
 
-        writeToConfigFile();
+        config.writeToConfigFile(standupConfig);
         convo.next();
       }
       else {
@@ -450,7 +450,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
             config.addParticipants(bot, response.text, standupConfig);
 
             convo.addMessage("All set! I have updated the participants", 'editParticipants');
-            writeToConfigFile();
+            config.writeToConfigFile(standupConfig);
             convo.next();
           }, {}, 'editParticipants');
           convo.next();
@@ -462,7 +462,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
             config.removeParticipants(response.text, standupConfig);
 
             convo.addMessage("All set! I have updated the participants.", 'editParticipants');
-            writeToConfigFile();
+            config.writeToConfigFile(standupConfig);
             convo.next();
           }, {}, 'editParticipants');
           convo.next();
@@ -480,7 +480,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
           console.log("Finished receiving questions");
           convo.addMessage("All set! I have updated the standup questions.", 'editQuestionSet');
 
-          writeToConfigFile();
+          config.writeToConfigFile(standupConfig);
           convo.next();
         }
       },
@@ -502,7 +502,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
           standupConfig.reportChannel = "";
           convo.addMessage("All set! Standup reports will now be emailed to all participants.", 'editReportMedium');
 
-          writeToConfigFile();
+          config.writeToConfigFile(standupConfig);
           convo.next();
         } else {
           convo.addQuestion('Which slack channel do you want to use? E.g. #general', function (response, convo) {
@@ -511,7 +511,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
               switch (rsp) {
                 case 0: // Success
                   standupConfig.reportMedium = "channel";
-                  writeToConfigFile();
+                  config.writeToConfigFile(standupConfig);
                   convo.addMessage("All set! Standup reports will now be posted to <#" + standupConfig.reportChannel + ">.", 'editReportMedium');
                   convo.next();
                   break;
@@ -623,13 +623,6 @@ function shareReportWithParticipants(){
   }
 }
 
-
-//TODO: move this to config.js
-var writeToConfigFile = function() {
-  fs.writeFile('./config.json', JSON.stringify(standupConfig), (err) => {
-     if (err) throw err;
-   });
-}
 
 /*
 ************************ Help on how to configure a standup**********************************
