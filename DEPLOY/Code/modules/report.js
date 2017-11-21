@@ -6,8 +6,7 @@ module.exports = {
     {
       text: report,
       channel: channelId
-    }
-    );
+    });
   },
 
   emailReport: function(report) {

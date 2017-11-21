@@ -12,6 +12,7 @@ var configSchema = {
     endTimeMins: { type: 'number', minimum: 0, maximum: 59 },
     questions: { type: 'array', items: { type: 'string' }, minItems: 1 },
     participants: { type: 'array', items: { type: 'string', minLength: 9, maxLength: 9 }, minItems: 1 },
+    // participantNames: { type: 'array', items: { type: 'string', minLength: 1 }, minItems: 1 },
     reportMedium: { type: 'string', enum: ['email', 'channel'] },
     reportChannel: { type: 'string', maxLength: 9 },
     creator: { type: 'string', minLength: 9, maxLength: 9 }
@@ -20,6 +21,14 @@ var configSchema = {
               'questions', 'participants', 'reportMedium', 'reportChannel', 'creator']
 }
 
+function addParticipantName(bot, participant, standupConfig) {
+  bot.api.users.info({"user": participant},function(err,response) {
+    // console.log(response)
+    var name = response.user.real_name;
+    console.log('PARTICIPANT: ',participant, ' Name: ', name);
+    standupConfig.participantNames[participant] = name;
+  });
+}
 
 module.exports = {
 
@@ -31,9 +40,10 @@ addParticipants: function(bot, participants, standupConfig) {
     if (result[1].charAt(0) == '@') { // This is a user
 
       // Add this user to the json file.
-      if (standupConfig.participants.indexOf(result[1].substr(1)) < 0) {
+      if (standupConfig.participants.indexOf(result[1].substr(1)) < 0) { // Not present in json
         console.log("Adding ", result[1].substr(1));
         standupConfig.participants.push(result[1].substr(1));
+        addParticipantName(bot, result[1].substr(1), standupConfig);
       }
       console.log("Participants " + standupConfig.participants);
 
@@ -54,9 +64,10 @@ addParticipants: function(bot, participants, standupConfig) {
             if (response["user"]["is_bot"] == false) { // This is a user
 
               // Add this participant
-              if (standupConfig.participants.indexOf(response["user"]["id"]) < 0) {
+              if (standupConfig.participants.indexOf(response["user"]["id"]) < 0) { // Not present in json
                 console.log("Adding ", response["user"]["id"]);
                 standupConfig.participants.push(response["user"]["id"]);
+                addParticipantName(bot, response["user"]["id"], standupConfig);
               }
             }
             console.log("Participants " + standupConfig.participants);
