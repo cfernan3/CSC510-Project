@@ -21,12 +21,14 @@ var configSchema = {
               'questions', 'participants', 'reportMedium', 'reportChannel', 'creator']
 }
 
-function addParticipantName(bot, participant, standupConfig) {
+function addParticipantNameEmails(bot, participant, standupConfig) {
   bot.api.users.info({"user": participant},function(err,response) {
-    // console.log(response)
+    console.log(response);
     var name = response.user.real_name;
-    console.log('PARTICIPANT: ',participant, ' Name: ', name);
+    var email = response.user.profile.email;
+    console.log('PARTICIPANT: ',participant, ' Name: ', name, ' Email: ', email);
     standupConfig.participantNames[participant] = name;
+    standupConfig.participantEmails[participant] = email;
   });
 }
 
@@ -43,7 +45,7 @@ addParticipants: function(bot, participants, standupConfig) {
       if (standupConfig.participants.indexOf(result[1].substr(1)) < 0) { // Not present in json
         console.log("Adding ", result[1].substr(1));
         standupConfig.participants.push(result[1].substr(1));
-        addParticipantName(bot, result[1].substr(1), standupConfig);
+        addParticipantNameEmails(bot, result[1].substr(1), standupConfig);
       }
       console.log("Participants " + standupConfig.participants);
 
