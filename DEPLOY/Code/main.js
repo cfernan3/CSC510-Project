@@ -36,8 +36,6 @@ var snoozeDelayMins = 0.5; // Snooze delay in minutes
 var startRule = new schedule.RecurrenceRule();
 startRule.dayOfWeek = [0,1,2,3,4,5,6];
 
-// TODO: start the reporting job after standup is configured
-// TODO: modify the endRule and reschedule the reporting job whenever end time is modified
 var endRule = new schedule.RecurrenceRule();
 endRule.dayOfWeek = [0,1,2,3,4,5,6];
 
@@ -109,7 +107,7 @@ controller.on('create_bot',function(bot, bot_config) {
       startRule.minute = standupConfig.startTimeMins;
       sessionJob = schedule.scheduleJob(startRule, startStandupWithParticipants);
 
-      //TODO: // schedule the report job at the configured end time
+      // schedule the report job at the configured end time
       endRule.hour = standupConfig.endTimeHours;
       endRule.minute = standupConfig.endTimeMins+1;
       reportJob = schedule.scheduleJob(endRule, shareReportWithParticipants);
@@ -424,7 +422,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
         convo.addMessage("All set! I have updated the end time to " +
                         config.getTimeIn12HourFormat(standupConfig.endTimeHours, standupConfig.endTimeMins) + ".", 'editEndTime');
 
-        // TODO: reschedule the report job after the end time is modified
+        // reschedule the report job after the end time is modified
         endRule.hour = standupConfig.endTimeHours;
         endRule.minute = standupConfig.endTimeMins;
         reportJob.reschedule(endRule);
