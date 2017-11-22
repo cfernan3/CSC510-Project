@@ -207,13 +207,13 @@ sheet.storeQuestions = function(spreadsheet_id,first_cell,question_list,callback
   sheets.spreadsheets.values.update({ 
     auth: sheet.auth, 
     spreadsheetId: spreadsheet_id, 
-    range: 'Sheet1!A1:Z', 
+    range: 'Sheet1!A1:Z1', 
     valueInputOption:"USER_ENTERED", 
     resource: { 
     values: [value]}, 
   }, function(err, response) { 
     if (err) { 
-      console.error('Store Answers: The API returned an error: ' + err); 
+      console.error('Add Questions: The API returned an error: ' + err); 
       return; 
     } else {
       var updates = response;
@@ -222,6 +222,36 @@ sheet.storeQuestions = function(spreadsheet_id,first_cell,question_list,callback
   }); 
 } 
 
+sheet.modifyQuestions = function(spreadsheet_id,first_cell,question_list,callback) { 
+  var sheets = google.sheets('v4'); 
+  var value = [first_cell,...question_list]; 
+  sheets.spreadsheets.values.clear({
+    auth: sheet.auth, 
+    spreadsheetId: spreadsheet_id, 
+    range: 'Sheet1!A1:Z1',  
+  }, function(err, response) { 
+    if (err) { 
+      console.error('Clear Questions: The API returned an error: ' + err); 
+      return; 
+    } else {
+  sheets.spreadsheets.values.update({ 
+    auth: sheet.auth, 
+    spreadsheetId: spreadsheet_id, 
+    range: 'Sheet1!A1:Z1', 
+    valueInputOption:"USER_ENTERED", 
+    resource: { 
+    values: [value]}, 
+  }, function(err, response) { 
+    if (err) { 
+      console.error('Update Questions: The API returned an error: ' + err); 
+      return; 
+    } else {
+      console.log(response);
+      var updates = response;
+    callback(updates); 
+    }
+  }); }});
+} 
 sheet.createSheet = function(callback) { 
   var sheets = google.sheets('v4'); 
   sheets.spreadsheets.create({ 
