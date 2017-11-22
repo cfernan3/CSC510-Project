@@ -481,7 +481,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
           console.log("Finished receiving questions");
           convo.addMessage("All set! I have updated the standup questions.", 'editQuestionSet');
 
-          config.writeToConfigFile(standupConfig);
+          //config.writeToConfigFile(standupConfig);
           convo.next();
         }
       },
@@ -489,7 +489,8 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
         default: true,
         callback: function(response, convo) {
           console.log('questions entered =', response.text);
-          config.parseQuestions(response.text, standupConfig); // TODO: report the existing stored answers and call storequestions method in sheets.js again
+          config.parseQuestions(response.text, standupConfig); 
+          addNewSheetToConfigfile(standupConfig.gSheetId);
           convo.silentRepeat();
         }
       }
