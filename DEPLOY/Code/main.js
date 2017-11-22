@@ -585,7 +585,7 @@ function startStandupWithParticipants(){
                       convo.addMessage(" Thanks for your responses! We are done with today's standup.", 'askQuestion');
                       convo.next();
 
-                      db.storeAnswers(standupConfig.gSheetId,standupConfig.participantNames[response.user],standupAnswers[response.user],function(res){console.log("Stored standup answers for user "+response.user);});
+                      db.storeAnswers(standupConfig.gSheetId,response.user,standupAnswers[response.user],function(res){console.log("Stored standup answers for user "+response.user);});
                     }
                 }
               ], {}, 'askQuestion');
@@ -616,11 +616,13 @@ function startStandupWithParticipants(){
   }
 }
 
-
 function shareReportWithParticipants(){
-  //db.retrieveAllAnswersList(standupConfig.gSheetId,false,processReportToSend);
+  db.retrieveAllAnswersList(standupConfig.gSheetId,false,processReportToSend);
+}
 
-  var rep = report.generateReport(standupConfig, standupAnswers);
+
+function processReportToSend(answers){
+  var rep = report.generateReport(standupConfig, answers);
   console.log('REPORT:\n',rep);
 
   if(standupConfig.reportMedium == "email") {
