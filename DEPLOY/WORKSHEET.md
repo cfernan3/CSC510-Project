@@ -1,9 +1,9 @@
-#### All our tasks are being tracked through the Trello platform. [Here](https://trello.com/b/xPCqntUz/milestone3) is the link to the Trello Cards.
+#### All our tasks are being tracked through the Trello platform. [Here](https://trello.com/b/Ksha77GG/milestone4) is the link to the Trello Cards.
 
 
 # Worksheet
 
-## Milestone 3 : SERVICE
+## Milestone 4 : DEPLOY
 
 ### Week 1 : 15th Nov to 19th Nov  
   
@@ -11,6 +11,7 @@
 |---|----------------|-------|--------|---------------|----------------|-------------|
 | 1 | Edge cases for config modification | Individual parameters can be modified only if the standup exists. | [Config feature](https://trello.com/c/QGVKl6Bn/) | Sharmin, Ronald | 16th Nov | 18th Nov |
 |   |                | After any successful modification, inform the user exactly what was updated. | [Config feature](https://trello.com/c/QGVKl6Bn/) | Sharmin, Ronald | 17th Nov | 19th Nov |
+|   |                | For parameters modified during the standup window, let user know that changes will take effect from next day. | [Config feature](https://trello.com/c/QGVKl6Bn/) | Sharmin, Ronald | 17th Nov | 19th Nov |
 
 ### Week 2 : 20th Nov to 26th Nov   
 
