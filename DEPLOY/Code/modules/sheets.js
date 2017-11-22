@@ -246,7 +246,6 @@ sheet.modifyQuestions = function(spreadsheet_id,first_cell,question_list,callbac
       console.error('Update Questions: The API returned an error: ' + err); 
       return; 
     } else {
-      console.log(response);
       var updates = response;
     callback(updates); 
     }
