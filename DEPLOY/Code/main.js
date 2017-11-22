@@ -299,10 +299,7 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
 
 
 function addNewSheetToConfigfile(sheet_id){
-  // Create a new google sheet first
-  console.log("New Google Sheet has been created and set as the default storage for the standup answers. The gsheet Id is=");
   standupConfig.gSheetId = sheet_id;
-  console.log(standupConfig.gSheetId);
   // Store the standup questions in the sheet's first(header) row
   db.storeQuestions(standupConfig.gSheetId,'Whatbot',standupConfig.questions,function(response){
     //console.log('The standup Questions have been updated in the google sheet');
