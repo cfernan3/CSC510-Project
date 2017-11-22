@@ -268,10 +268,10 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
 
     convo.beforeThread('lastStatement', function(convo, next) {
       console.log('New standup config complete');
-      config.writeToConfigFile(standupConfig);
+      //config.writeToConfigFile(standupConfig);
 
       // Create a google sheet for storing standup questions and answers
-      //db.createSheet(addNewSheetToConfigfile);
+      db.createSheet(addNewSheetToConfigfile);
 
       startRule.hour = standupConfig.startTimeHours;
       startRule.minute = standupConfig.startTimeMins;
@@ -579,7 +579,7 @@ function startStandupWithParticipants(){
                       convo.addMessage(" Thanks for your responses! We are done with today's standup.", 'askQuestion');
                       convo.next();
 
-                      //db.storeAnswers(standupConfig.gSheetId,response.user,answers,function(res){console.log("Stored standup answers for user "+response.user);});
+                      db.storeAnswers(standupConfig.gSheetId,standupConfig.participantNames[response.user],standupAnswers[response.user],function(res){console.log("Stored standup answers for user "+response.user);});
                     }
                 }
               ], {}, 'askQuestion');
