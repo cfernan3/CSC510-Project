@@ -271,7 +271,7 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
       //config.writeToConfigFile(standupConfig);
 
       // Create a google sheet for storing standup questions and answers
-      db.createSheet(addNewSheetToConfigfile);
+      db.createSheet(addQuestionsToGoogleSheet);
 
       startRule.hour = standupConfig.startTimeHours;
       startRule.minute = standupConfig.startTimeMins;
@@ -298,11 +298,19 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
 }); // hears 'schedule' ends
 
 
-function addNewSheetToConfigfile(sheet_id){
+function addQuestionsToGoogleSheet(sheet_id){
   standupConfig.gSheetId = sheet_id;
   // Store the standup questions in the sheet's first(header) row
   db.storeQuestions(standupConfig.gSheetId,'Whatbot',standupConfig.questions,function(response){
-    //console.log('The standup Questions have been updated in the google sheet');
+    console.log(response);
+  });
+  config.writeToConfigFile(standupConfig);
+}
+function modifyQuestionsInGoogleSheet(sheet_id){
+  standupConfig.gSheetId = sheet_id;
+  // Store the standup questions in the sheet's first(header) row
+  db.modifyQuestions(standupConfig.gSheetId,'Whatbot',standupConfig.questions,function(response){
+    console.log(response);
   });
   config.writeToConfigFile(standupConfig);
 }
@@ -487,7 +495,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
         callback: function(response, convo) {
           console.log('questions entered =', response.text);
           config.parseQuestions(response.text, standupConfig); 
-          addNewSheetToConfigfile(standupConfig.gSheetId);
+          modifyQuestionsInGoogleSheet(standupConfig.gSheetId);
           convo.silentRepeat();
         }
       }
