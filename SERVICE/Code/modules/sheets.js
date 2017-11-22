@@ -233,6 +233,8 @@ sheet.createSheet = function(callback) {
       return; 
     } 
     var spreadsheetId = response.spreadsheetId; 
+    console.log("New Google Sheet has been created and set as the default storage for the standup answers. The gsheet Id is=");
+    console.log(spreadsheetId);
     callback(spreadsheetId); 
   }); 
 } 

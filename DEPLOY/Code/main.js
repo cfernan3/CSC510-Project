@@ -7,7 +7,7 @@ var schedule = require('node-schedule')
 var util = require('util')
 var report = require('./modules/report.js')
 var delay = require('delay');
-//var db = require('./modules/sheets.js');
+var db = require('./modules/sheets.js');
 
 function StandupConfig(){
   this.startTimeHours = 0;
@@ -268,10 +268,10 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
 
     convo.beforeThread('lastStatement', function(convo, next) {
       console.log('New standup config complete');
-      config.writeToConfigFile(standupConfig);
+      //config.writeToConfigFile(standupConfig);
 
       // Create a google sheet for storing standup questions and answers
-      //db.createSheet(addNewSheetToConfigfile);
+      db.createSheet(addQuestionsToGoogleSheet);
 
       startRule.hour = standupConfig.startTimeHours;
       startRule.minute = standupConfig.startTimeMins;
@@ -298,15 +298,20 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
 }); // hears 'schedule' ends
 
 
-function addNewSheetToConfigfile(sheet_id){
-  // Create a new google sheet first
-  console.log("New Google Sheet has been created and set as the default storage for the standup answers. The gsheet Id is=");
+function addQuestionsToGoogleSheet(sheet_id){
   standupConfig.gSheetId = sheet_id;
-  console.log(standupConfig.gSheetId);
   // Store the standup questions in the sheet's first(header) row
-  /*db.storeQuestions(standupConfig.gSheetId,'Whatbot',standupConfig.questions,function(response){
-    //console.log('The standup Questions have been updated in the google sheet');
-  });*/
+  db.storeQuestions(standupConfig.gSheetId,'Whatbot',standupConfig.questions,function(response){
+    console.log(response);
+  });
+  config.writeToConfigFile(standupConfig);
+}
+function modifyQuestionsInGoogleSheet(sheet_id){
+  standupConfig.gSheetId = sheet_id;
+  // Store the standup questions in the sheet's first(header) row
+  db.modifyQuestions(standupConfig.gSheetId,'Whatbot',standupConfig.questions,function(response){
+    console.log(response);
+  });
   config.writeToConfigFile(standupConfig);
 }
 /*
@@ -481,7 +486,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
           console.log("Finished receiving questions");
           convo.addMessage("All set! I have updated the standup questions.", 'editQuestionSet');
 
-          config.writeToConfigFile(standupConfig);
+          //config.writeToConfigFile(standupConfig);
           convo.next();
         }
       },
@@ -489,7 +494,8 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
         default: true,
         callback: function(response, convo) {
           console.log('questions entered =', response.text);
-          config.parseQuestions(response.text, standupConfig); // TODO: report the existing stored answers and call storequestions method in sheets.js again
+          config.parseQuestions(response.text, standupConfig); 
+          modifyQuestionsInGoogleSheet(standupConfig.gSheetId);
           convo.silentRepeat();
         }
       }
@@ -579,7 +585,7 @@ function startStandupWithParticipants(){
                       convo.addMessage(" Thanks for your responses! We are done with today's standup.", 'askQuestion');
                       convo.next();
 
-                      //db.storeAnswers(standupConfig.gSheetId,response.user,answers,function(res){console.log("Stored standup answers for user "+response.user);});
+                      db.storeAnswers(standupConfig.gSheetId,standupConfig.participantNames[response.user],standupAnswers[response.user],function(res){console.log("Stored standup answers for user "+response.user);});
                     }
                 }
               ], {}, 'askQuestion');
