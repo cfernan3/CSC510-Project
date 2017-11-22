@@ -7,7 +7,7 @@ var schedule = require('node-schedule')
 var util = require('util')
 var report = require('./modules/report.js')
 var delay = require('delay');
-//var db = require('./modules/sheets.js');
+var db = require('./modules/sheets.js');
 
 function StandupConfig(){
   this.startTimeHours = 0;
@@ -304,9 +304,9 @@ function addNewSheetToConfigfile(sheet_id){
   standupConfig.gSheetId = sheet_id;
   console.log(standupConfig.gSheetId);
   // Store the standup questions in the sheet's first(header) row
-  /*db.storeQuestions(standupConfig.gSheetId,'Whatbot',standupConfig.questions,function(response){
+  db.storeQuestions(standupConfig.gSheetId,'Whatbot',standupConfig.questions,function(response){
     //console.log('The standup Questions have been updated in the google sheet');
-  });*/
+  });
   config.writeToConfigFile(standupConfig);
 }
 /*
