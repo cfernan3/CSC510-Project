@@ -19,7 +19,7 @@ Authorization
               input text  //*[@id="domain"]   parkwoodgang
               click button   //*[@id="submit_team_domain"]
               input text    //*[@id="email"]   whatbot.ncsu@gmail.com
-              input text    //*[@id="password"]   12345ABCDE
+              input text    //*[@id="password"]   <Appropraite Password>
               click button  //*[@id="signin_btn"]
               click button   //*[@id="oauth_authorizify"]
           
