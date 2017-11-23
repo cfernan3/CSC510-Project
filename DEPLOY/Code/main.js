@@ -637,7 +637,7 @@ function startStandupWithParticipants(){
                       convo.addMessage(" Thanks for your responses! We are done with today's standup.", 'askQuestion');
                       convo.next();
 
-                      db.storeAnswers(standupConfig.gSheetId,response.user,standupAnswers[response.user],function(res){console.log("Stored standup answers for user "+response.user);});
+                      db.storeAnswers(standupConfig.gSheetId,standupConfig.participantNames[response.user],standupAnswers[response.user],function(res){console.log("Stored standup answers for user "+response.user);});
                     }
                 }
               ], {}, 'askQuestion');

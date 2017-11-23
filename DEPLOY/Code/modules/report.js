@@ -5,8 +5,7 @@ module.exports = {
   generateReport: function(standupConfig, answers) {
     var standupReport = "Here's the consolidated report for today's standup.\n";
     for (var user in answers) {
-      var userName = standupConfig.participantNames[user];
-      standupReport += `\n${userName}'s responses:\n`;
+      standupReport += `\n${user}'s responses:\n`;
       for(var i = 0; i < standupConfig.questions.length; i++) {
         standupReport += `${standupConfig.questions[i]}\n`;
         standupReport += `${answers[user][i]}\n`;
