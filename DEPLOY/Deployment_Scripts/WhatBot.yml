@@ -1,0 +1,66 @@
+---
+- hosts: all
+  vars:
+    packages:
+      - nodejs      - git
+
+  tasks:
+    - name: update      become: yes
+      apt:
+        update_cache: yes
+    - name: Setting timezone of server to EST
+      become: yes
+      command: timedatectl set-timezone EST
+    - name: Installing nodejs by doing curl to a repo
+      shell: curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+
+    - name: Install packages      become: yes
+      apt:
+        pkg: "{{ item }}"
+        state: present      with_items: "{{ packages }}"
+        
+
+#    - name: upgrade dist
+ #     become: yes  #    apt:
+   #     upgrade: dist
+    #  register: upgrade
+
+    - name: install pm2  module
+      become: yes
+      npm:
+       name: pm2
+       global: yes
+
+    - name: cloning repo
+      git:
+        repo: https://github.com/cfernan3/WhatBot.git
+        dest: /home/ubuntu/WhatBot
+        version: master
+
+    - name: Copying the environment file to the server
+      become: yes
+      copy:
+        src: /home/vagrant/.env
+        dest: /etc/environment
+        
+    - name: Creating a .credentials directory
+      file:
+        path: /home/ubuntu/.credentials
+        state: directory
+
+    - name: Copying json file related to sheets
+      copy:
+        src: /home/vagrant/sheets.googleapis.com-nodejs-quickstart.json
+        dest: /home/ubuntu/.credentials/sheets.googleapis.com-nodejs-quickstart.json
+
+    - name: Running npm install
+      #become: yes
+      npm:
+        path: /home/ubuntu/WhatBot/DEPLOY/Code
+
+    - name: Copying main.js to appropriate path
+      command: cp /home/ubuntu/WhatBot/DEPLOY/Code/main.js .
+
+    - name: Running App
+     # become: yes
+      command: pm2 -f start /home/ubuntu/WhatBot/DEPLOY/Code main.js
