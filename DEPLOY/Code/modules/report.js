@@ -34,7 +34,7 @@ module.exports = {
       smtpTransport.sendMail({
         from: "whatbot.ncsu@gmail.com",
         to: emails[user],
-        subject: "Report",
+        subject: "Standup Report",
         text: report
       },
       function(error, response){

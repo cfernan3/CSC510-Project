@@ -12,19 +12,20 @@ var configSchema = {
     endTimeHours: { type: 'number', minimum: 0, maximum: 23 },
     endTimeMins: { type: 'number', minimum: 0, maximum: 59 },
     questions: { type: 'array', items: { type: 'string' }, minItems: 1 },
-    participants: { type: 'array', items: { type: 'string', minLength: 9, maxLength: 9 }, minItems: 1 },
-    // participantNames: { type: 'array', items: { type: 'string', minLength: 1 }, minItems: 1 },
+    participants: { type: 'array', items: { type: 'string', minLength: 9, maxLength: 9 } },
+    participantNames: { type: 'object' },
+    participantEmails: { type: 'object' },
     reportMedium: { type: 'string', enum: ['email', 'channel'] },
     reportChannel: { type: 'string', maxLength: 9 },
-    creator: { type: 'string', minLength: 9, maxLength: 9 }
+    creator: { type: 'string', minLength: 9, maxLength: 9 },
+    gSheetId: { type: 'string'}
   },
   required: ['startTimeHours', 'startTimeMins', 'endTimeHours', 'endTimeMins', 'questions',
-            'participants', 'participantNames', 'participantEmails', 'reportMedium', 'reportChannel', 'creator',]
+            'participants', 'participantNames', 'participantEmails', 'reportMedium', 'reportChannel', 'creator', 'gSheetId']
 }
 
 function addParticipantNameEmails(bot, participant, standupConfig) {
   bot.api.users.info({"user": participant},function(err,response) {
-    console.log(response);
     var name = response.user.real_name;
     var email = response.user.profile.email;
     console.log('PARTICIPANT: ',participant, ' Name: ', name, ' Email: ', email);
@@ -148,13 +149,30 @@ validateConfigFile: function() {
   try {
       var config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
       var results = v.validate(config, configSchema);
-      //console.log(results["errors"];
+      //console.log(results["errors"]);
 
       if(Object.keys(results["errors"]).length === 0) {
         //console.log("no errors");
 
-        //TODO: add other checks for time
         if(config.reportMedium == "channel" && config.reportChannel == "")
+          return null;
+
+        var windowSize = (config.endTimeHours - config.startTimeHours) * 60 +
+                            (config.endTimeMins - config.startTimeMins);
+
+        var minDuration = 3;
+        if(windowSize >= 0 && windowSize < minDuration) // standup duration needs to be longer
+          return null;
+
+        var error = 0;
+        config.participants.forEach(function(p) {
+          if(config.participantNames[p] == undefined || config.participantEmails[p] == undefined) {
+            error = 1;
+            return false; // this line just breaks the for loop, does not exit the function
+          }
+        });
+
+        if(error == 1)
           return null;
 
         return config;

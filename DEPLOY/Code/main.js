@@ -15,13 +15,14 @@ function StandupConfig(){
   this.endTimeHours = 0;
   this.endTimeMins = 0;
   this.questions = ["What did you accomplish yesterday?", "What will you work on today?",
-                    "Is there anything blocking your progress?"];  // TODO: should have aleast 1 question
-  this.participants = [];  // TODO: makse sure atleast one participant
+                    "Is there anything blocking your progress?"];
+  this.participants = [];
   this.participantNames = {};
   this.participantEmails = {};
   this.reportMedium = "";
   this.reportChannel = "";
   this.creator = "";
+  this.gSheetId  = "";
 }
 
 var botId; // Contains the bot's user id.
@@ -32,8 +33,9 @@ var defaultQuestions = "\t" + standupConfig.questions[0];
 for(var i = 1; i < standupConfig.questions.length; i++)
   defaultQuestions += "\n\t" + standupConfig.questions[i];
 
-// TODO: change this later to 10
-var snoozeDelayMins = 0.5; // Snooze delay in minutes
+var snoozeDelayMins = 1; // Snooze delay in minutes // TODO: change this later to 10
+// set this value in config file validation too
+var minDuration = 3; // Minimum standup duration in minutes // TODO: change this later to 15
 
 var startRule = new schedule.RecurrenceRule();
 startRule.dayOfWeek = [0,1,2,3,4,5,6];
@@ -167,13 +169,23 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
     convo.addQuestion('When would you like the standup to end?', function (response, convo) {
       console.log('End time entered =', response.text);
 
-      // TODO: check that end time - start time > 15 mins
+      // check that end time - start time > min standup duration
       var endTime = chrono.parseDate(response.text)
       if (endTime != null) {
         standupConfig.endTimeHours = endTime.getHours();
         standupConfig.endTimeMins = endTime.getMinutes();
-        console.log("End time = " + standupConfig.endTimeHours + ":" + standupConfig.endTimeMins);
-        convo.gotoThread('askParticipants');
+
+        var windowSize = (standupConfig.endTimeHours - standupConfig.startTimeHours) * 60 +
+                          (standupConfig.endTimeMins - standupConfig.startTimeMins);
+
+        if(windowSize >= 0 && windowSize < minDuration) {// standup duration needs to be longer
+          console.log('Window size too small. Taking different value from user.');
+          convo.transitionTo('askEndTime', 'Standup duration should be atleast ' + minDuration + ' mins. Give me another value.');
+
+        } else {
+          console.log("End time = " + standupConfig.endTimeHours + ":" + standupConfig.endTimeMins);
+          convo.gotoThread('askParticipants');
+        }
       }
       else {
         console.log("End time not entered correctly");
@@ -216,12 +228,18 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
     ], {}, 'askQuestionSet');
 
 
-    convo.addQuestion('Ok! Give me all the questions, each on a new line, and say DONE to finish.', [
+    convo.addQuestion('Give me all the questions, each on a new line, and say DONE to finish.', [
       {
         pattern: 'done',
         callback: function(response, convo) {
-          console.log("Finished receiving questions");
-          convo.gotoThread('askReportMedium');
+          // check that atleast 1 question has been given
+          if(standupConfig.questions.length > 0) {
+            console.log("Finished receiving questions");
+            convo.gotoThread('askReportMedium');
+          } else {
+            console.log("No questions entered.");
+            convo.transitionTo('askNewSet', 'The question set cannot be empty. I need atleast 1 question. Give me the questions again.');
+          }
         }
       },
       {
@@ -393,22 +411,35 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
     convo.addQuestion('What time would you like to start the standup?', function (response, convo) {
       console.log('Start time entered =', response.text);
 
-      //TODO: check that end time - new start time > 15 mins
-      var startTime = chrono.parseDate(response.text)
+      var startTime = chrono.parseDate(response.text);
       if (startTime != null) {
-        standupConfig.startTimeHours = startTime.getHours();
-        standupConfig.startTimeMins = startTime.getMinutes();
-        console.log("Start time = " + standupConfig.startTimeHours + ":" + standupConfig.startTimeMins);
+        var hrs = startTime.getHours();
+        var mins = startTime.getMinutes();
 
-        convo.addMessage("All set! I have updated the start time to " +
-                        config.getTimeIn12HourFormat(standupConfig.startTimeHours, standupConfig.startTimeMins) + ".", 'editStartTime');
+        var windowSize = (standupConfig.endTimeHours - hrs) * 60 +
+                          (standupConfig.endTimeMins - mins);
 
-        // reschedule the standup session job after the start time is modified
-        startRule.hour = standupConfig.startTimeHours;
-        startRule.minute = standupConfig.startTimeMins;
-        sessionJob.reschedule(startRule);
-        config.writeToConfigFile(standupConfig);
-        convo.next();
+        //check that end time - new start time > minDuration
+        if(windowSize >= 0 && windowSize < minDuration) {// standup duration needs to be longer
+          console.log('Window size too small. Taking different value from user.');
+          convo.transitionTo('editStartTime', 'Standup duration should be atleast ' + minDuration + ' mins. Give me another value.');
+
+        } else {
+          standupConfig.startTimeHours = hrs;
+          standupConfig.startTimeMins = mins;
+
+          console.log("Start time = " + standupConfig.startTimeHours + ":" + standupConfig.startTimeMins);
+
+          convo.addMessage("All set! I have updated the start time to " +
+                          config.getTimeIn12HourFormat(standupConfig.startTimeHours, standupConfig.startTimeMins) + ".", 'editStartTime');
+
+          // reschedule the standup session job after the start time is modified
+          startRule.hour = standupConfig.startTimeHours;
+          startRule.minute = standupConfig.startTimeMins;
+          sessionJob.reschedule(startRule);
+          config.writeToConfigFile(standupConfig);
+          convo.next();
+        }
       }
       else {
         console.log("Start time not entered correctly");
@@ -421,21 +452,35 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
     convo.addQuestion('When would you like the standup to end?', function (response, convo) {
       console.log('End time entered =', response.text);
 
-      var endTime = chrono.parseDate(response.text)  // TODO: check that new end time - start time > 15 mins
+      var endTime = chrono.parseDate(response.text);
       if (endTime != null) {
-        standupConfig.endTimeHours = endTime.getHours();
-        standupConfig.endTimeMins = endTime.getMinutes();
-        console.log("End time = " + standupConfig.endTimeHours + ":" + standupConfig.endTimeMins);
-        convo.addMessage("All set! I have updated the end time to " +
-                        config.getTimeIn12HourFormat(standupConfig.endTimeHours, standupConfig.endTimeMins) + ".", 'editEndTime');
+        var hrs = endTime.getHours();
+        var mins = endTime.getMinutes();
 
-        // reschedule the report job after the end time is modified
-        endRule.hour = standupConfig.endTimeHours;
-        endRule.minute = standupConfig.endTimeMins;
-        reportJob.reschedule(endRule);
+        var windowSize = (hrs - standupConfig.startTimeHours) * 60 +
+                          (mins - standupConfig.startTimeMins);
 
-        config.writeToConfigFile(standupConfig);
-        convo.next();
+        //check that end time - new start time > minDuration
+        if(windowSize >= 0 && windowSize < minDuration) {// standup duration needs to be longer
+          console.log('Window size too small. Taking different value from user.');
+          convo.transitionTo('editEndTime', 'Standup duration should be atleast ' + minDuration + ' mins. Give me another value.');
+
+        } else {
+          standupConfig.endTimeHours = hrs;
+          standupConfig.endTimeMins = mins;
+
+          console.log("End time = " + standupConfig.endTimeHours + ":" + standupConfig.endTimeMins);
+          convo.addMessage("All set! I have updated the end time to " +
+                          config.getTimeIn12HourFormat(standupConfig.endTimeHours, standupConfig.endTimeMins) + ".", 'editEndTime');
+
+          // reschedule the report job after the end time is modified
+          endRule.hour = standupConfig.endTimeHours;
+          endRule.minute = standupConfig.endTimeMins;
+          reportJob.reschedule(endRule);
+
+          config.writeToConfigFile(standupConfig);
+          convo.next();
+        }
       }
       else {
         console.log("End time not entered correctly");
@@ -465,6 +510,7 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
           convo.addQuestion('Who would you like to remove from the standup session?\n You may enter it as a list of users: @<user1> ... @<userN>',
           function (response, convo) {
             console.log('participants to remove =', response.text);
+            // note: participant list can be empty. This is how the standup can be cancelled until participants are added.
             config.removeParticipants(response.text, standupConfig);
 
             convo.addMessage("All set! I have updated the participants.", 'editParticipants');
@@ -479,23 +525,29 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
     }, {}, 'editParticipants');
 
 
-    convo.addQuestion('Ok! Give me all the questions, each on a new line, and say DONE to finish.', [
+    convo.addQuestion('Give me all the questions, each on a new line, and say DONE to finish.', [
       {
         pattern: 'done',
         callback: function(response, convo) {
-          console.log("Finished receiving questions");
-          convo.addMessage("All set! I have updated the standup questions.", 'editQuestionSet');
-
-          //config.writeToConfigFile(standupConfig);
-          convo.next();
+          // check that atleast 1 question has been given
+          if(standupConfig.questions.length > 0) {
+            console.log("Finished receiving questions");
+            modifyQuestionsInGoogleSheet(standupConfig.gSheetId);
+            convo.addMessage("All set! I have updated the standup questions.", 'editQuestionSet');
+            convo.next();
+          } else {
+            console.log("No questions entered.");
+            convo.transitionTo('editQuestionSet', 'The question set cannot be empty. I need atleast 1 question. Give me the questions again.');
+            //convo.next();
+            convo.next();
+          }
         }
       },
       {
         default: true,
         callback: function(response, convo) {
           console.log('questions entered =', response.text);
-          config.parseQuestions(response.text, standupConfig); 
-          modifyQuestionsInGoogleSheet(standupConfig.gSheetId);
+          config.parseQuestions(response.text, standupConfig);
           convo.silentRepeat();
         }
       }
