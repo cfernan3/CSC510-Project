@@ -38,8 +38,36 @@ The user needs to login to our slack team by visiting the [Slack page](https://p
 ![Success](./UAT/PreUseCase-Auth5.jpg)  
   
 ##### Use Case 1:
-* Login to the slack team [website](https://parkwoodgang.slack.com/).
-*
+* Login to the slack team [website](https://parkwoodgang.slack.com/).  
+  
+  ![Login Image](./UAT/PreTest-login.jpg)
+  
+* You will see a new message from Whatbot
+    
+![Post Authentication](./UAT/UseCase1-PostAuth.jpg)
+  
+* You can go ahear and begin the setup  
+  
+![Setup](./UAT/UseCase1-Setup.jpg)  
+  
+* Select the time you want the standup to begin
+  
+![Start Time](./UAT/UseCase1-StartTime.jpg)
+  
+* Select the time you want the standup to end
+  
+![End Time](./UAT/UseCase1-EndTime.jpg)
 
+* Select the users you want to participate in the standup
+    
+![Users](./UAT/UseCase1-User.jpg)
+
+* Select the questions. You can cheeose the default question set or make your own.
+
+![Own Question Set](./UAT/UseCase1-questions.jpg)
+  
+* Select the reporting method
+  
+![Slack Channel](./UAT/UseCase1-Report.jpg)
 
 
