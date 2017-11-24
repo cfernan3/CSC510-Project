@@ -1,3 +1,3 @@
-# DEployment
+# Deployment
 
-#### Screencast https://youtu.be/nzw_MOhp124
+#### Screencast https://youtu.be/QSpcJWYnb5A
