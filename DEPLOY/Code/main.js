@@ -8,6 +8,7 @@ var util = require('util')
 var report = require('./modules/report.js')
 var delay = require('delay');
 var db = require('./modules/sheets.js');
+var auth = {};
 
 function StandupConfig(){
   this.startTimeHours = 0;
@@ -140,9 +141,50 @@ controller.on('create_bot',function(bot, bot_config) {
 });
 
 /*
-************************ Configuring a new standup**********************************
+************************ Authenticate Google Sheets **********************************
 */
+controller.hears(['auth'], function(bot,message) {
+  bot.startConversation(message, function(err, convo) {
+    var google = require('googleapis'); 
+    var googleAuth = require('google-auth-library'); 
+    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 
+    var content = JSON.parse(fs.readFileSync('client_secret.json'));
+    
+    var clientSecret = credentials.installed.client_secret; 
+    var clientId = credentials.installed.client_id; 
+    var redirectUrl = credentials.installed.redirect_uris[0]; 
+    auth = new googleAuth(); 
+    var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
+    var authUrl = oauth2Client.generateAuthUrl({
+      access_type: 'offline',
+      scope: SCOPES
+    });
+
+    convo.addMessage({text:"Let's configure Google sheets for you. Authorize this app by visiting this url:",action:'auth'}, 'default');
+
+    convo.addQuestion("Enter the code from the page here: ", function (response, convo) {
+      console.log('Authorization code entered =', response.text);
+
+      oauth2Client.getToken(code, function(err, token) {
+      if (err) {
+        console.log('Error while trying to retrieve access token', err);// TO DO : Stop the server if authentication failed, or try 3 times.
+      }
+      oauth2Client.credentials = token;
+      auth = oauth2Client;
+      var db = require('./modules/sheets.js');
+      convo.gotoThread('authCompleted');
+    }, {}, 'auth');
+    });
+    convo.addMessage('Awesome! The bot is now setup with Google based storage for standup activities.!', 'authCompleted');
+
+  }); // startConversation Ends
+});
+
+
+/*
+************************ Configure a new standup **********************************
+*/
 controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_message'], function(bot,message) {
   bot.startConversation(message, function(err, convo) {
 
@@ -289,7 +331,7 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
       //config.writeToConfigFile(standupConfig);
 
       // Create a google sheet for storing standup questions and answers
-      db.createSheet(addQuestionsToGoogleSheet);
+      db.createSheet(auth, addQuestionsToGoogleSheet);
 
       startRule.hour = standupConfig.startTimeHours;
       startRule.minute = standupConfig.startTimeMins;
@@ -319,7 +361,7 @@ controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_m
 function addQuestionsToGoogleSheet(sheet_id){
   standupConfig.gSheetId = sheet_id;
   // Store the standup questions in the sheet's first(header) row
-  db.storeQuestions(standupConfig.gSheetId,'Whatbot',standupConfig.questions,function(response){
+  db.storeQuestions(auth, standupConfig.gSheetId,'Whatbot',standupConfig.questions,function(response){
     console.log(response);
   });
   config.writeToConfigFile(standupConfig);
@@ -327,7 +369,7 @@ function addQuestionsToGoogleSheet(sheet_id){
 function modifyQuestionsInGoogleSheet(sheet_id){
   standupConfig.gSheetId = sheet_id;
   // Store the standup questions in the sheet's first(header) row
-  db.modifyQuestions(standupConfig.gSheetId,'Whatbot',standupConfig.questions,function(response){
+  db.modifyQuestions(auth, standupConfig.gSheetId,'Whatbot',standupConfig.questions,function(response){
     console.log(response);
   });
   config.writeToConfigFile(standupConfig);
@@ -637,7 +679,7 @@ function startStandupWithParticipants(){
                       convo.addMessage(" Thanks for your responses! We are done with today's standup.", 'askQuestion');
                       convo.next();
 
-                      db.storeAnswers(standupConfig.gSheetId,standupConfig.participantNames[response.user],standupAnswers[response.user],function(res){console.log("Stored standup answers for user "+response.user);});
+                      db.storeAnswers(auth, standupConfig.gSheetId,standupConfig.participantNames[response.user],standupAnswers[response.user],function(res){console.log("Stored standup answers for user "+response.user);});
                     }
                 }
               ], {}, 'askQuestion');
@@ -669,7 +711,7 @@ function startStandupWithParticipants(){
 }
 
 function shareReportWithParticipants(){
-  db.retrieveAllAnswersList(standupConfig.gSheetId,false,processReportToSend);
+  db.retrieveAllAnswersList(auth, standupConfig.gSheetId,false,processReportToSend);
 }
 
 
