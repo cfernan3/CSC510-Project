@@ -143,36 +143,36 @@ controller.on('create_bot',function(bot, bot_config) {
 /*
 ************************ Authenticate Google Sheets **********************************
 */
-controller.hears(['auth'], function(bot,message) {
+controller.hears(['auth'], ['direct_mention', 'direct_message'], function(bot,message) {
   bot.startConversation(message, function(err, convo) {
     var google = require('googleapis'); 
     var googleAuth = require('google-auth-library'); 
     var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 
-    var content = JSON.parse(fs.readFileSync('client_secret.json'));
+    var credentials = JSON.parse(fs.readFileSync('client_secret.json'));
     
     var clientSecret = credentials.installed.client_secret; 
     var clientId = credentials.installed.client_id; 
     var redirectUrl = credentials.installed.redirect_uris[0]; 
-    auth = new googleAuth(); 
-    var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
+    var auth2 = new googleAuth(); 
+    var oauth2Client = new auth2.OAuth2(clientId, clientSecret, redirectUrl);
     var authUrl = oauth2Client.generateAuthUrl({
       access_type: 'offline',
       scope: SCOPES
     });
 
-    convo.addMessage({text:"Let's configure Google sheets for you. Authorize this app by visiting this url:",action:'auth'}, 'default');
+    convo.addMessage({text:"Let's configure Google sheets for you. Authorize this app by visiting this url:"}, 'default');
+    convo.addMessage({text:authUrl,action:'auth'}, 'default');
 
     convo.addQuestion("Enter the code from the page here: ", function (response, convo) {
       console.log('Authorization code entered =', response.text);
 
-      oauth2Client.getToken(code, function(err, token) {
+      oauth2Client.getToken(response.text, function(err, token) {
       if (err) {
         console.log('Error while trying to retrieve access token', err);// TO DO : Stop the server if authentication failed, or try 3 times.
       }
       oauth2Client.credentials = token;
-      auth = oauth2Client;
-      var db = require('./modules/sheets.js');
+      setAuthCred(oauth2Client);
       convo.gotoThread('authCompleted');
     }, {}, 'auth');
     });
@@ -181,7 +181,12 @@ controller.hears(['auth'], function(bot,message) {
   }); // startConversation Ends
 });
 
-
+function setAuthCred(cred){
+  console.log("Authentication credentials now set.")
+  console.log(cred);
+  console.log("####Creds")
+  auth = cred;
+}
 /*
 ************************ Configure a new standup **********************************
 */

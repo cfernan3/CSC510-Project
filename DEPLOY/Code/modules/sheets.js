@@ -13,11 +13,11 @@ var TOKEN_PATH = TOKEN_DIR + 'sheets.googleapis.com-nodejs-quickstart.json';
 
  
 //------Synchronous version of readFile----// 
-var content = process.env.client_secret;
+//var content = process.env.client_secret;
 // Authorize a client with the loaded credentials, then call the 
 // Google Sheets API. 
 //sheet.auth = authorize(JSON.parse(content)); 
-authorize(JSON.parse(content));
+//authorize(JSON.parse(content));
  
 /** 
  * Create an OAuth2 client with the given credentials, and then execute the 
