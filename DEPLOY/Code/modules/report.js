@@ -26,7 +26,7 @@ module.exports = {
 
 
   emailReport: function(auth,report, emails) {
-    //var smtpTransport = nodemailer.createTransport("smtps://whatbot.ncsu%40gmail.com:"+encodeURIComponent('12345ABCDE') + "@smtp.gmail.com:465");
+  
     //const xoauth2 = require('xoauth2');
     var smtpTransport = nodemailer.createTransport({
             service:"Gmail",
