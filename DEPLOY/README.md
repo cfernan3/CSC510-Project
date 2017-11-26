@@ -1,6 +1,6 @@
 # Deployment
 
-### Environment
+#### Environment
 
 ![image](https://media.github.ncsu.edu/user/6391/files/3ee4b664-d238-11e7-8640-20c53ac9515b)
 
@@ -26,9 +26,15 @@
 
 ***The WhatBot.yml ansible playbook will install all the dependencies and packages required to run WhatBot application onto EC2 instance at port 4500. The inventory file of WhatBot consists of the elastic Ip address of the Ec2 instance and the .pem file.***
 
-* run **
+* run **BotAuthorization.robot** as below
 
-### Screencast 
+            pybot BotAuthorization.robot            or
+            robot BotAuthorization.robot            or
+            Run it directly form PyCharm IDE after having Robot Framework integrated with it
+
+***The BotAuthorization.robot consists of a Selenium test that does authorization of the bot***
+
+#### Screencast 
 
 Deploy : https://youtu.be/QSpcJWYnb5A
 
