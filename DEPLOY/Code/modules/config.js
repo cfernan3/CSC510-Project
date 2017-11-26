@@ -71,7 +71,7 @@ addParticipants: function(bot, participants, standupConfig) {
               if (standupConfig.participants.indexOf(response["user"]["id"]) < 0) { // Not present in json
                 console.log("Adding ", response["user"]["id"]);
                 standupConfig.participants.push(response["user"]["id"]);
-                addParticipantName(bot, response["user"]["id"], standupConfig);
+                addParticipantNameEmails(bot, response["user"]["id"], standupConfig);
               }
             }
             console.log("Participants " + standupConfig.participants);
