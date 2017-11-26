@@ -20,6 +20,8 @@
              
 ***The provisionAws.yml ansible playbook will check if the EC2 instance with the reserved Elastic IP address exists. If it does, it will terminate the instance and launch a new instance(Ubuntu Trusty 14.04). Attach the resered elastic Ip address to the new EC2 instance and try to do ssh to verify and confirm if the new EC2 instance has been baked successfully.*** 
 
+* run **WhatBot.yml** ansible playbook as below
+
 #### 
 
 ### Screencast 
