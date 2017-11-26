@@ -28,8 +28,9 @@ function StandupConfig(){
 var botId; // Contains the bot's user id.
 var standupConfig = new StandupConfig();
 var isStandupSetup = 0;
-
+var isStandupRunning = 0;
 var defaultQuestions = "\t" + standupConfig.questions[0];
+
 for(var i = 1; i < standupConfig.questions.length; i++)
   defaultQuestions += "\n\t" + standupConfig.questions[i];
 
@@ -50,6 +51,7 @@ var standupAnswers = {}; // TODO: storing responses locally, fetch from sheets l
 
 var controller = Botkit.slackbot({
   debug: false,
+  retry: 'Infinity',
   interactive_replies: true, // tells botkit to send button clicks into conversations
 }).configureSlackApp(
   {
@@ -87,6 +89,18 @@ function trackBot(bot) {
 /*
 ************************ Launching the slack app**********************************
 */
+
+// Handle RTM timeout
+controller.on('rtm_close', function(bot) {
+  console.log('RTM connection is closed');
+  bot.startRTM(function(err) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log("Restarted RTM connection");
+    }
+  });
+});
 
 controller.on('create_bot',function(bot, bot_config) {
   bot.startRTM(function(err) {
@@ -144,6 +158,13 @@ controller.on('create_bot',function(bot, bot_config) {
 */
 
 controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_message'], function(bot,message) {
+  if (isStandupRunning === 1) {
+    console.log("Sorry! The standup cannot be configured when a session is active");
+    bot.reply(message, "Sorry! The standup cannot be configured when a session is active.\n Try after "
+      + config.getTimeIn12HourFormat(standupConfig.endTimeHours, standupConfig.endTimeMins) + ".");
+    return;
+  }
+
   bot.startConversation(message, function(err, convo) {
 
     convo.addMessage({text:"Let's begin configuring a new standup.", action:'askStartTime'}, 'default');
@@ -382,6 +403,13 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
     return;
   }
 
+  if (isStandupRunning === 1) {
+    console.log("Sorry! The standup cannot be modified when a session is active");
+    bot.reply(message, "Sorry! The standup cannot be modified when a session is active.\n Try after "
+      + config.getTimeIn12HourFormat(standupConfig.endTimeHours, standupConfig.endTimeMins) + ".");
+    return;
+  }
+
   bot.startConversation(message, function(err, convo) {
     convo.ask(config.modifyStandupButtons,
 
@@ -447,7 +475,6 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
         You can say things like 10 AM or 12:15pm.");
       }
     }, {}, 'editStartTime');
-
 
     convo.addQuestion('When would you like the standup to end?', function (response, convo) {
       console.log('End time entered =', response.text);
@@ -595,14 +622,31 @@ controller.hears(['modify', 'change', 'update', 'edit', 'reschedule'],['direct_m
 /*
 ************************ standup session **********************************
 */
+var convoList = [];
 function startStandupWithParticipants(){
+
+  // standup session should not be continued if the the window closes in between.
+  // If a user clicks snooze multiple times, session should terminate once standup end time is reached.
+  // Making sure the conversation does not go beyond the Session time.
+  schedule.scheduleJob(endRule, function() {
+    for (var i = 0; i < convoList.length; i++) {
+      console.log("status = " + convoList[i].status);
+      if (typeof convoList[i] !== 'undefined' && convoList[i] && convoList[i].status === 'active')
+        convoList[i].gotoThread('convoTimeout');
+    }
+  });
+
+  isStandupRunning = 1; // The standup is ongoing.
   for (var i = 0; i < standupConfig.participants.length; i++){
+    convoList = []; // Flush the list before use.
     _bot.startPrivateConversation({user: standupConfig.participants[i]},function(err,convo) {
       if (err) {
         console.log(err);
       } else {
-        //TODO: standup session should not be continued if the the window closes in between.
-        // If a user clicks snooze multiple times, session should terminate once standup end time is reached.
+
+        // Set a timer and end the conversations before Reporting time.
+        convoList.push(convo);
+        convo.addMessage({text:"Sorry! The Standup Session has ended for today.", action: 'timeout'}, 'convoTimeout');
 
         convo.ask( startStandupButtons, function (response, convo) {
           switch (response.text) {
@@ -669,6 +713,7 @@ function startStandupWithParticipants(){
 }
 
 function shareReportWithParticipants(){
+  isStandupRunning = 0; // The standup has ended.
   db.retrieveAllAnswersList(standupConfig.gSheetId,false,processReportToSend);
 }
 
