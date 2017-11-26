@@ -147,7 +147,7 @@ controller.hears(['auth'], ['direct_mention', 'direct_message'], function(bot,me
   bot.startConversation(message, function(err, convo) {
     var google = require('googleapis'); 
     var googleAuth = require('google-auth-library'); 
-    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
+    var SCOPES = ['https://www.googleapis.com/auth/spreadsheets','https://mail.google.com/'];
 
     var credentials = JSON.parse(fs.readFileSync('client_secret.json'));
     
@@ -720,7 +720,7 @@ function processReportToSend(answers){
   console.log('REPORT:\n',rep);
 
   if(standupConfig.reportMedium == "email") {
-    report.emailReport(rep, standupConfig.participantEmails);
+    report.emailReport(auth,rep, standupConfig.participantEmails);
   } else if(standupConfig.reportMedium == "channel") {
     report.postReportToChannel(_bot, rep, standupConfig.reportChannel);
   }
