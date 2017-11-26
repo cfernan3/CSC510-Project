@@ -32,7 +32,7 @@ module.exports = {
             service:"Gmail",
             auth:{
                 type: 'OAuth2',
-                    user: 'bkmukhej@ncsu.edu',
+                    user: 'whatbot.ncsu@gmail.com',
                     clientId: auth._clientId,
                     clientSecret: auth._clientSecret,
                     refreshToken: auth.credentials.refresh_token,
