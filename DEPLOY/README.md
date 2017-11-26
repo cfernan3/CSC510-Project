@@ -7,7 +7,7 @@
 ### Pre-requisite
 * Ubuntu trusty 14.04 Vagrant VM(192.168.33.10) that acts as Configuration Manager
 * The Configuration Manager has ansible 2.4.1.0 installed
-* Aws account
+* AWS account
 * 1 elastic Ip address reserved
 * The .pem file (required for ssh into EC2) has been chmod 600
 * Robot Framework 3.0.2 installed on host machine(in this case windows 10). This is required to automate the bot authorization after the two playbooks have been executed
