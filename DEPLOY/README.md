@@ -1,5 +1,10 @@
 # Deployment
 
+### Environment
+
+![image](https://media.github.ncsu.edu/user/6391/files/3ee4b664-d238-11e7-8640-20c53ac9515b)
+
+
 ### Screencast 
 
 Deploy : https://youtu.be/QSpcJWYnb5A
