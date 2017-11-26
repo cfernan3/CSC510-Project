@@ -1,10 +1,10 @@
 # Deployment
 
-#### Environment
+### Environment
 
 ![image](https://media.github.ncsu.edu/user/6391/files/3ee4b664-d238-11e7-8640-20c53ac9515b)
 
-#### Pre-requisite
+### Pre-requisite
 * Ubuntu trusty 14.04 Vagrant VM(192.168.33.10) that acts as Configuration Manager
 * The Configuration Manager has ansible 2.4.1.0 installed
 * Aws account
@@ -13,7 +13,7 @@
 * Robot Framework 3.0.2 installed on host machine(in this case windows 10). This is required to automate the bot authorization after the two playbooks have been executed
 * Has Selenium2 library imported
 
-#### Steps to deploy the slack bot onto an EC2 instance
+### Steps to deploy the slack bot onto an EC2 instance
 * run **provisionAws.yml** ansible playbook as below
               
              ansible-playbook provisionAws.yml
@@ -34,9 +34,12 @@
 
 ***The BotAuthorization.robot consists of a Selenium test that does authorization of the bot***
 
-#### Screencast 
+### Screencast 
 
 Deploy : https://youtu.be/QSpcJWYnb5A
+
+
+**********************************************************************************************************************
 
 # User Acceptance Tests
 
