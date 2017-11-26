@@ -1,10 +1,38 @@
 # Deployment
 
+### Environment
+
+![image](https://media.github.ncsu.edu/user/6391/files/3ee4b664-d238-11e7-8640-20c53ac9515b)
+
+#### Pre-requisite
+* Ubuntu trusty 14.04 Vagrant VM(192.168.33.10) that acts as Configuration Manager
+* The Configuration Manager has ansible 2.4.1.0 installed
+* Aws account
+* 1 elastic Ip address reserved
+* The .pem file (required for ssh into EC2) has been chmod 600
+* Robot Framework 3.0.2 installed on host machine(in this case windows 10). This is required to automate the bot authorization after the two playbooks have been executed
+* Has Selenium2 library imported
+
+#### Steps to deploy the slack bot onto an EC2 instance
+* run **provisionAws.yml** ansible playbook as below
+              
+             ansible-playbook provisionAws.yml
+             
+***The provisionAws.yml ansible playbook will check if the EC2 instance with the reserved Elastic IP address exists. If it does, it will terminate the instance and launch a new instance(Ubuntu Trusty 14.04). Attach the resered elastic Ip address to the new EC2 instance and try to do ssh to verify and confirm if the new EC2 instance has been baked successfully.*** 
+
+* run **WhatBot.yml** ansible playbook as below
+
+            ansible-playbook -i inventory WhatBot.yml
+
+***The WhatBot.yml ansible playbook will install all the dependencies and packages required to run WhatBot application onto EC2 instance at port 4500. The inventory file of WhatBot consists of the elastic Ip address of the Ec2 instance and the .pem file.***
+
+* run **
+
 ### Screencast 
 
 Deploy : https://youtu.be/QSpcJWYnb5A
 
-### User Acceptance Tests
+# User Acceptance Tests
 
 ##### Test Requirements
 
