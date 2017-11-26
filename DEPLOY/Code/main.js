@@ -172,7 +172,7 @@ controller.hears(['auth'], ['direct_mention', 'direct_message'], function(bot,me
         console.log('Error while trying to retrieve access token', err);// TO DO : Stop the server if authentication failed, or try 3 times.
       }
       oauth2Client.credentials = token;
-      setAuthCred(oauth2Client);
+      auth = oauth2Client;
       convo.gotoThread('authCompleted');
     }, {}, 'auth');
     });
@@ -181,12 +181,7 @@ controller.hears(['auth'], ['direct_mention', 'direct_message'], function(bot,me
   }); // startConversation Ends
 });
 
-function setAuthCred(cred){
-  console.log("Authentication credentials now set.")
-  console.log(cred);
-  console.log("####Creds")
-  auth = cred;
-}
+
 /*
 ************************ Configure a new standup **********************************
 */

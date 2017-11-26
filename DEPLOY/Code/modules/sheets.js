@@ -141,7 +141,7 @@ sheet.retrieveAllAnswers = function(auth, spreadsheet_id,flush,questions_list,ca
   }); 
 } 
 
-sheet.retrieveAllAnswersList = function(spreadsheet_id,flush,callback) { 
+sheet.retrieveAllAnswersList = function(auth, spreadsheet_id,flush,callback) { 
   var sheets = google.sheets('v4'); 
   var output = {}; 
   sheets.spreadsheets.values.get({ 
@@ -182,7 +182,7 @@ sheet.retrieveAllAnswersList = function(spreadsheet_id,flush,callback) {
   }); 
 } 
  
-sheet.storeAnswers = function(spreadsheet_id,user_id,answers_list,callback) { 
+sheet.storeAnswers = function(auth, spreadsheet_id,user_id,answers_list,callback) { 
   var sheets = google.sheets('v4'); 
   var value = [user_id,...answers_list]; 
   sheets.spreadsheets.values.append({ 
@@ -203,7 +203,7 @@ sheet.storeAnswers = function(spreadsheet_id,user_id,answers_list,callback) {
   }); 
 } 
 
-sheet.storeQuestions = function(spreadsheet_id,first_cell,question_list,callback) { 
+sheet.storeQuestions = function(auth, spreadsheet_id,first_cell,question_list,callback) { 
   var sheets = google.sheets('v4'); 
   var value = [first_cell,...question_list]; 
   sheets.spreadsheets.values.update({ 
@@ -224,7 +224,7 @@ sheet.storeQuestions = function(spreadsheet_id,first_cell,question_list,callback
   }); 
 } 
 
-sheet.modifyQuestions = function(spreadsheet_id,first_cell,question_list,callback) { 
+sheet.modifyQuestions = function(auth, spreadsheet_id,first_cell,question_list,callback) { 
   var sheets = google.sheets('v4'); 
   var value = [first_cell,...question_list]; 
   sheets.spreadsheets.values.clear({
@@ -253,7 +253,7 @@ sheet.modifyQuestions = function(spreadsheet_id,first_cell,question_list,callbac
     }
   }); }});
 } 
-sheet.createSheet = function(callback) { 
+sheet.createSheet = function(auth, callback) { 
   var sheets = google.sheets('v4'); 
   sheets.spreadsheets.create({ 
     auth: auth, 
