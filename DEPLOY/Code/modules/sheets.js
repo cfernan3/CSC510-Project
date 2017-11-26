@@ -13,10 +13,11 @@ var TOKEN_PATH = TOKEN_DIR + 'sheets.googleapis.com-nodejs-quickstart.json';
 
  
 //------Synchronous version of readFile----// 
-var content = process.env.client_secret;
+//var content = process.env.client_secret;
 // Authorize a client with the loaded credentials, then call the 
 // Google Sheets API. 
-sheet.auth = authorize(JSON.parse(content)); 
+//sheet.auth = authorize(JSON.parse(content)); 
+//authorize(JSON.parse(content));
  
 /** 
  * Create an OAuth2 client with the given credentials, and then execute the 
@@ -32,9 +33,11 @@ function authorize(credentials) {
   var auth = new googleAuth(); 
   var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl); 
   // Check if we have previously stored a token. 
-  var token = fs.readFileSync(TOKEN_PATH); 
-  oauth2Client.credentials = JSON.parse(token); 
-  return oauth2Client; 
+  //var token = fs.readFileSync(TOKEN_PATH);
+  getNewToken(oauth2Client, function(token){
+    oauth2Client.credentials = JSON.parse(token);
+    sheet.auth = oauth2Client;
+  })
 } 
  
 /** 
@@ -45,30 +48,29 @@ function authorize(credentials) {
  * @param {getEventsCallback} callback The callback to call with the authorized 
  *     client. 
  */ 
-function getNewToken(oauth2Client) { 
-  var authUrl = oauth2Client.generateAuthUrl({ 
-    access_type: 'offline', 
-    scope: SCOPES 
-  }); 
-  console.log('Authorize this app by visiting this url: ', authUrl); 
-  var rl = readline.createInterface({ 
-    input: process.stdin, 
-    output: process.stdout 
-  }); 
-  rl.question('Enter the code from that page here: ', function(code) { 
-    rl.close(); 
-    oauth2Client.getToken(code, function(err, token) { 
-      if (err) { 
-        console.log('Error while trying to retrieve access token', err); 
-        return; 
-      } 
-      oauth2Client.credentials = token; 
-      storeToken(token); 
-      return token; 
- 
-    }); 
-  }); 
-} 
+function getNewToken(oauth2Client, callback) {
+  var authUrl = oauth2Client.generateAuthUrl({
+    access_type: 'offline',
+    scope: SCOPES
+  });
+  console.log('Authorize this app by visiting this url: ', authUrl);
+  var rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+  rl.question('Enter the code from that page here: ', function(code) {
+    rl.close();
+    oauth2Client.getToken(code, function(err, token) {
+      if (err) {
+        console.log('Error while trying to retrieve access token', err);
+        return;
+      }
+      oauth2Client.credentials = token;
+      storeToken(token);
+      callback(oauth2Client);
+    });
+  });
+}
  
 /** 
  * Store token to disk be used in later program executions. 
@@ -93,11 +95,11 @@ function storeAuthCreds(authToken) {
   console.log('authToken stored to authCreds.json'); 
 } 
  
-sheet.retrieveAllAnswers = function(spreadsheet_id,flush,questions_list,callback) { 
+sheet.retrieveAllAnswers = function(auth, spreadsheet_id,flush,questions_list,callback) { 
   var sheets = google.sheets('v4'); 
   var output = {}; 
   sheets.spreadsheets.values.get({ 
-    auth: sheet.auth, 
+    auth: auth, 
     spreadsheetId: spreadsheet_id, 
     range: 'Sheet1!A2:Z', 
   }, function(err, response) { 
@@ -124,7 +126,7 @@ sheet.retrieveAllAnswers = function(spreadsheet_id,flush,questions_list,callback
     sheets.spreadsheets.values.clear({ 
       spreadsheetId: spreadsheet_id, 
       range: 'Sheet1!A2:Z',   
-      auth: sheet.auth, 
+      auth: auth, 
     }, function(err, response) { 
       if (err) { 
         console.error('Flushing Answers: The API returned an error: ' + err); 
@@ -139,11 +141,11 @@ sheet.retrieveAllAnswers = function(spreadsheet_id,flush,questions_list,callback
   }); 
 } 
 
-sheet.retrieveAllAnswersList = function(spreadsheet_id,flush,callback) { 
+sheet.retrieveAllAnswersList = function(auth, spreadsheet_id,flush,callback) { 
   var sheets = google.sheets('v4'); 
   var output = {}; 
   sheets.spreadsheets.values.get({ 
-    auth: sheet.auth, 
+    auth: auth, 
     spreadsheetId: spreadsheet_id, 
     range: 'Sheet1!A2:Z', 
   }, function(err, response) { 
@@ -165,7 +167,7 @@ sheet.retrieveAllAnswersList = function(spreadsheet_id,flush,callback) {
     sheets.spreadsheets.values.clear({ 
       spreadsheetId: spreadsheet_id, 
       range: 'Sheet1!A2:Z',   
-      auth: sheet.auth, 
+      auth: auth, 
     }, function(err, response) { 
       if (err) { 
         console.error('Flushing Answers: The API returned an error: ' + err); 
@@ -180,11 +182,11 @@ sheet.retrieveAllAnswersList = function(spreadsheet_id,flush,callback) {
   }); 
 } 
  
-sheet.storeAnswers = function(spreadsheet_id,user_id,answers_list,callback) { 
+sheet.storeAnswers = function(auth, spreadsheet_id,user_id,answers_list,callback) { 
   var sheets = google.sheets('v4'); 
   var value = [user_id,...answers_list]; 
   sheets.spreadsheets.values.append({ 
-    auth: sheet.auth, 
+    auth: auth, 
     spreadsheetId: spreadsheet_id, 
     range: 'Sheet1!A2:Z', 
     valueInputOption:"USER_ENTERED", 
@@ -201,11 +203,11 @@ sheet.storeAnswers = function(spreadsheet_id,user_id,answers_list,callback) {
   }); 
 } 
 
-sheet.storeQuestions = function(spreadsheet_id,first_cell,question_list,callback) { 
+sheet.storeQuestions = function(auth, spreadsheet_id,first_cell,question_list,callback) { 
   var sheets = google.sheets('v4'); 
   var value = [first_cell,...question_list]; 
   sheets.spreadsheets.values.update({ 
-    auth: sheet.auth, 
+    auth: auth, 
     spreadsheetId: spreadsheet_id, 
     range: 'Sheet1!A1:Z1', 
     valueInputOption:"USER_ENTERED", 
@@ -222,11 +224,11 @@ sheet.storeQuestions = function(spreadsheet_id,first_cell,question_list,callback
   }); 
 } 
 
-sheet.modifyQuestions = function(spreadsheet_id,first_cell,question_list,callback) { 
+sheet.modifyQuestions = function(auth, spreadsheet_id,first_cell,question_list,callback) { 
   var sheets = google.sheets('v4'); 
   var value = [first_cell,...question_list]; 
   sheets.spreadsheets.values.clear({
-    auth: sheet.auth, 
+    auth: auth, 
     spreadsheetId: spreadsheet_id, 
     range: 'Sheet1!A1:Z1',  
   }, function(err, response) { 
@@ -235,7 +237,7 @@ sheet.modifyQuestions = function(spreadsheet_id,first_cell,question_list,callbac
       return; 
     } else {
   sheets.spreadsheets.values.update({ 
-    auth: sheet.auth, 
+    auth: auth, 
     spreadsheetId: spreadsheet_id, 
     range: 'Sheet1!A1:Z1', 
     valueInputOption:"USER_ENTERED", 
@@ -251,10 +253,10 @@ sheet.modifyQuestions = function(spreadsheet_id,first_cell,question_list,callbac
     }
   }); }});
 } 
-sheet.createSheet = function(callback) { 
+sheet.createSheet = function(auth, callback) { 
   var sheets = google.sheets('v4'); 
   sheets.spreadsheets.create({ 
-    auth: sheet.auth, 
+    auth: auth, 
     resource: {}, 
   }, function(err, response) { 
     if (err) { 
