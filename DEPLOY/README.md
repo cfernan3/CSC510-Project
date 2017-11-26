@@ -4,12 +4,19 @@
 
 ![image](https://media.github.ncsu.edu/user/6391/files/3ee4b664-d238-11e7-8640-20c53ac9515b)
 
+#### Pre-requisite
+* The Configuration Manager has ansible 2.4.1.0 installed
+* Aws account
+* 1 elastic Ip address reserved
+* The .pem file (required for ssh into EC2) has been chmod 600
+
+#### 
 
 ### Screencast 
 
 Deploy : https://youtu.be/QSpcJWYnb5A
 
-### User Acceptance Tests
+# User Acceptance Tests
 
 ##### Test Requirements
 
