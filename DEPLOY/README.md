@@ -22,7 +22,11 @@
 
 * run **WhatBot.yml** ansible playbook as below
 
-#### 
+            ansible-playbook -i inventory WhatBot.yml
+
+***The WhatBot.yml ansible playbook will install all the dependencies and packages required to run WhatBot application onto EC2 instance at port 4500. The inventory file of WhatBot consists of the elastic Ip address of the Ec2 instance and the .pem file.***
+
+* run **
 
 ### Screencast 
 
