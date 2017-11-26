@@ -2,19 +2,24 @@
 - hosts: all
   vars:
     packages:
-      - nodejs      - git
+      - nodejs      
+      - git
 
   tasks:
-    - name: update      become: yes
+    - name: update      
+      become: yes
       apt:
         update_cache: yes
+        
     - name: Setting timezone of server to EST
       become: yes
       command: timedatectl set-timezone EST
+      
     - name: Installing nodejs by doing curl to a repo
       shell: curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 
-    - name: Install packages      become: yes
+    - name: Install packages      
+      become: yes
       apt:
         pkg: "{{ item }}"
         state: present      with_items: "{{ packages }}"
@@ -58,9 +63,6 @@
       npm:
         path: /home/ubuntu/WhatBot/DEPLOY/Code
 
-    - name: Copying main.js to appropriate path
-      command: cp /home/ubuntu/WhatBot/DEPLOY/Code/main.js .
-
     - name: Running App
      # become: yes
-      command: pm2 -f start /home/ubuntu/WhatBot/DEPLOY/Code main.js
+      command: pm2 start /home/ubuntu/WhatBot/DEPLOY/Code/main.js
