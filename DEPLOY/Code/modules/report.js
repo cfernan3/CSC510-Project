@@ -25,14 +25,14 @@ module.exports = {
   },
 
 
-  emailReport: function(auth,report, emails) {
-  
+  emailReport: function(auth, botEmailId, report, emails) {
+
     //const xoauth2 = require('xoauth2');
     var smtpTransport = nodemailer.createTransport({
             service:"Gmail",
             auth:{
                 type: 'OAuth2',
-                    user: 'whatbot.ncsu@gmail.com',
+                    user: botEmailId,
                     clientId: auth._clientId,
                     clientSecret: auth._clientSecret,
                     refreshToken: auth.credentials.refresh_token,
@@ -44,7 +44,7 @@ module.exports = {
     // Send email to each participant
     for (var user in emails) {
       smtpTransport.sendMail({
-        from: "whatbot.ncsu@gmail.com",
+        from: botEmailId,
         to: emails[user],
         subject: "Standup Report",
         text: report

@@ -18,10 +18,12 @@ var configSchema = {
     reportMedium: { type: 'string', enum: ['email', 'channel'] },
     reportChannel: { type: 'string', maxLength: 9 },
     creator: { type: 'string', minLength: 9, maxLength: 9 },
-    gSheetId: { type: 'string'}
+    gSheetId: { type: 'string'},
+    emailAddress: { type: 'string'}
   },
   required: ['startTimeHours', 'startTimeMins', 'endTimeHours', 'endTimeMins', 'questions',
-            'participants', 'participantNames', 'participantEmails', 'reportMedium', 'reportChannel', 'creator', 'gSheetId']
+            'participants', 'participantNames', 'participantEmails', 'reportMedium', 'reportChannel',
+            'creator', 'gSheetId', 'emailAddress']
 }
 
 function addParticipantNameEmails(bot, participant, standupConfig) {
@@ -306,6 +308,8 @@ attachments:[
 
 helpMsg: helpMsg = "Heya! I'm here to organize your standup.\n\
 You can tell me to configure a new standup, and I'll guide you through the setup.\n\
-All I need is the standup window, participant list, question set, and reporting medium (Slack channel / Email).\n\
+First you need to authenticate Google APIs and then configure the standup.\n \
+Please go through the documentation for help in setting up the Google permissions.\n \
+To configure the standup, I need the standup window, participant list, question set, and reporting medium (Slack channel / Email).\n\
 Don't worry if you make a mistake. You can always view and modify the config later. :)"
 } // module.exports ends

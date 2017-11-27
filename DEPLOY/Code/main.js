@@ -8,7 +8,6 @@ var util = require('util')
 var report = require('./modules/report.js')
 var delay = require('delay');
 var db = require('./modules/sheets.js');
-var auth = {};
 
 function StandupConfig(){
   this.startTimeHours = 0;
@@ -24,8 +23,10 @@ function StandupConfig(){
   this.reportChannel = "";
   this.creator = "";
   this.gSheetId  = "";
+  this.emailAddress = "";
 }
 
+var auth = {} // Object to obtain Google Auth details.
 var botId; // Contains the bot's user id.
 var standupConfig = new StandupConfig();
 var isStandupSetup = 0;
@@ -136,7 +137,9 @@ controller.on('create_bot',function(bot, bot_config) {
           console.log(err);
         } else {
           isStandupSetup = 1;
-          convo.say("Hello! I found a config file and have configured the standup parameters using it.\nYou can modify individual parameters or do a fresh setup if you want.");
+          convo.addMessage({text:"Hello! I'm here to organise your standup. \n"}, 'default');
+          obtainGoogleAuthCreds(convo);
+          convo.addMessage("I found a config file and have configured the standup parameters using it.\nYou can modify individual parameters or do a fresh setup if you want.", 'authCompleted');
         }
       });
 
@@ -147,7 +150,9 @@ controller.on('create_bot',function(bot, bot_config) {
         if (err) {
           console.log(err);
         } else {
-          convo.say("Hello! I'm here to organise your standup. Let me know when you want to schedule one.");
+          convo.addMessage({text:"Hello! I'm here to organise your standup. \n"}, 'default');
+          obtainGoogleAuthCreds(convo);
+          convo.addMessage("Let me know when you want to schedule a standup meeting.", 'authCompleted');
         }
       });
     }
@@ -155,10 +160,9 @@ controller.on('create_bot',function(bot, bot_config) {
 });
 
 /*
-************************ Authenticate Google Sheets **********************************
+************************ Authenticate Google Sheets and Gmail**********************************
 */
-controller.hears(['auth'], ['direct_mention', 'direct_message'], function(bot,message) {
-  bot.startConversation(message, function(err, convo) {
+function obtainGoogleAuthCreds(convo) {
     var google = require('googleapis');
     var googleAuth = require('google-auth-library');
     var SCOPES = ['https://www.googleapis.com/auth/spreadsheets','https://mail.google.com/'];
@@ -176,22 +180,39 @@ controller.hears(['auth'], ['direct_mention', 'direct_message'], function(bot,me
     });
 
     convo.addMessage({text:"Let's configure Google sheets for you. Authorize this app by visiting this url:"}, 'default');
-    convo.addMessage({text:authUrl,action:'auth'}, 'default');
+    convo.addMessage({text:authUrl, action:'auth'}, 'default');
 
     convo.addQuestion("Enter the code from the page here: ", function (response, convo) {
       console.log('Authorization code entered =', response.text);
 
       oauth2Client.getToken(response.text, function(err, token) {
       if (err) {
-        console.log('Error while trying to retrieve access token', err);// TO DO : Stop the server if authentication failed, or try 3 times.
+        console.log('Error while trying to retrieve access token', err);
+        convo.addMessage("Invalid Credentials. Please try \'auth\' again.", 'authError');
+        convo.gotoThread('authError');
+        return;
       }
       oauth2Client.credentials = token;
       auth = oauth2Client;
+      console.log(require('util').inspect(auth, { depth: null }));
+
+      var gmail = google.gmail({ auth: auth, version: 'v1' });
+      gmail.users.getProfile({ auth: auth, userId: 'me' }, function(err, res) {
+         if (err) { console.log(err);
+         } else {
+           standupConfig.emailAddress = res.emailAddress;
+           console.log("My EmailAddress: " + standupConfig.emailAddress);
+         }
+      });
       convo.gotoThread('authCompleted');
     }, {}, 'auth');
-    });
-    convo.addMessage('Awesome! The bot is now setup with Google based storage for standup activities.!', 'authCompleted');
+  });
+  convo.addMessage({text: 'Awesome! The bot is now setup with Google based storage and Email for standup activities.!'}, 'authCompleted');
+}
 
+controller.hears(['auth', 'authenticate', 'authorize'], ['direct_mention', 'direct_message'], function(bot,message) {
+  bot.startConversation(message, function(err, convo) {
+      obtainGoogleAuthCreds(convo);
   }); // startConversation Ends
 });
 
@@ -200,6 +221,12 @@ controller.hears(['auth'], ['direct_mention', 'direct_message'], function(bot,me
 ************************ Configure a new standup **********************************
 */
 controller.hears(['schedule', 'setup', 'configure'],['direct_mention', 'direct_message'], function(bot,message) {
+  if (Object.keys(auth).length == 0 ) { //Auth is not configured yet.
+    console.log('Auth is not configured yet');
+    bot.reply(message, "Sorry! Please authenticate the Google APIs before configuring standup.");
+    return;
+  }
+
   if (isStandupRunning === 1) {
     console.log("Sorry! The standup cannot be configured when a session is active");
     bot.reply(message, "Sorry! The standup cannot be configured when a session is active.\n Try after "
@@ -428,7 +455,7 @@ controller.hears(['show', 'display', 'view', 'see', 'check'],['direct_mention', 
       if (standupConfig.reportMedium == "channel") {
         convo.say("Reporting Medium: " + standupConfig.reportMedium + " (<#" + standupConfig.reportChannel + ">)");
       } else {
-        convo.say("Reporting Medium: " + standupConfig.reportMedium);
+        convo.say("Reporting Medium: " + standupConfig.reportMedium + " (Bot's Email Id: " + standupConfig.emailAddress + ")");
       }
     }
   });
@@ -762,10 +789,10 @@ function shareReportWithParticipants(){
 
 function processReportToSend(answers){
   var rep = report.generateReport(standupConfig, answers);
-  console.log('REPORT:\n',rep);
+  console.log('REPORT:\n', rep);
 
   if(standupConfig.reportMedium == "email") {
-    report.emailReport(auth,rep, standupConfig.participantEmails);
+    report.emailReport(auth, standupConfig.emailAddress, rep, standupConfig.participantEmails);
   } else if(standupConfig.reportMedium == "channel") {
     report.postReportToChannel(_bot, rep, standupConfig.reportChannel);
   }
