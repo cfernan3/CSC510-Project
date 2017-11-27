@@ -60,10 +60,8 @@ Whatbot will then prompt for entering the duration, participants, question set, 
 Modify participants: add/remove participant [participant-list]
 The participant-list can be a combination of the following:
 	1. list of users: @<user1>, ..., @<userN>
-	2. specific user group: @<user-group-name> 
-	3. specific channel: #<channel-name>
-	4. all users from the slack group: all
-If the user has not supplied the partcipant-list, Whatbot will prompt for it.
+	2. specific channel: #<channel-name>
+	3. all users from the slack group: #general
 
 Cancel/Ignore the standup for today.
 (for deleting the standup, delete the bot)	 
@@ -228,7 +226,6 @@ The bot conducts standups through direct messages to the users. The bot can only
 * The bot needs to be a part of atmost one channel (report delivery channel). There isn't a need to invite it to multiple channels. 
 * A single bot handles a single standup.
 * Every user interacts with the bot through direct messages.
-* Only the creator of the bot can modify the configurations of the bot.
 * A Google account needs to be created for the bot, so it can send the report email via gmail and store the standup updates on google sheets.
 
 #### References
