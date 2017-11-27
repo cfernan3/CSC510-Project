@@ -26,5 +26,5 @@
 
 |   | Deliverable    | Tasks | Issues | Team Members  | Estimated Date | Actual Date |
 |---|----------------|-------|--------|---------------|----------------|-------------|
-| 1 | Incorrect sender email issue | Configure valid Sender's Email ID | [Issue 16] (https://github.ncsu.edu/nedsouza/CSC510-Project/issues/16) | Sharmin, Ronald | 27th Nov | 27th Nov |
-| 2 | Whatbot Use case demo | Demo showing functionality of the bot | [Functionality Demo] (https://trello.com/c/AH4fi8Nn) | Sharmin, Ronald | 28th Nov | 28th Nov |
+| 1 | Incorrect sender email issue | Configure valid Sender's Email ID | [Issue 16](https://github.ncsu.edu/nedsouza/CSC510-Project/issues/16) | Sharmin, Ronald | 27th Nov | 27th Nov |
+| 2 | Whatbot Use case demo | Demo showing functionality of the bot | [Functionality Demo](https://trello.com/c/AH4fi8Nn) | Sharmin, Ronald | 28th Nov | 28th Nov |
