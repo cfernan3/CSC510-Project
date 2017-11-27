@@ -188,7 +188,7 @@ function obtainGoogleAuthCreds(convo) {
       oauth2Client.getToken(response.text, function(err, token) {
       if (err) {
         console.log('Error while trying to retrieve access token', err);
-        convo.addMessage("Invalid Credentials. Please try \'auth\' again.", 'authError');
+        convo.addMessage("Invalid Credentials. Please try typing \'auth\' again.", 'authError');
         convo.gotoThread('authError');
         return;
       }
