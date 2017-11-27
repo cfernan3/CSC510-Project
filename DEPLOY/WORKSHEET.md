@@ -18,10 +18,13 @@
 |   | Deliverable    | Tasks | Issues | Team Members  | Estimated Date | Actual Date |
 |---|----------------|-------|--------|---------------|----------------|-------------|
 | 1 | Stale RTM Issue | Resolve issue leading to stale RTM connections on prolonged uptime | [RTM Issue](https://trello.com/c/8oRAK3XQ) | Sharmin, Ronald | 20th Nov | 21st Nov |
+| 2 | Modification Window Issue | Modification should be disabled when standup session is active | [Issue 17](https://github.ncsu.edu/nedsouza/CSC510-Project/issues/17) | Sharmin, Ronald | 26th Nov | 26th Nov |
+
 
 
 ### Week 3 : 27th Nov to 28th Nov   
 
 |   | Deliverable    | Tasks | Issues | Team Members  | Estimated Date | Actual Date |
 |---|----------------|-------|--------|---------------|----------------|-------------|
-| 1 |  |  |  | |  |  |
+| 1 | Incorrect sender email issue | Configure valid Sender's Email ID | [Issue 16] (https://github.ncsu.edu/nedsouza/CSC510-Project/issues/16) | Sharmin, Ronald | 27th Nov | 27th Nov |
+| 2 | Whatbot Use case demo | Demo showing functionality of the bot | [Functionality Demo] (https://trello.com/c/AH4fi8Nn) | Sharmin, Ronald | 28th Nov | 28th Nov |
