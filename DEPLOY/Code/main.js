@@ -36,9 +36,9 @@ var defaultQuestions = "\t" + standupConfig.questions[0];
 for(var i = 1; i < standupConfig.questions.length; i++)
   defaultQuestions += "\n\t" + standupConfig.questions[i];
 
-var snoozeDelayMins = 1; // Snooze delay in minutes // TODO: change this later to 10
+var snoozeDelayMins = 10; // Snooze delay in minutes
 // set this value in config file validation too
-var minDuration = 3; // Minimum standup duration in minutes // TODO: change this later to 15
+var minDuration = 15; // Minimum standup duration in minutes
 
 var startRule = new schedule.RecurrenceRule();
 startRule.dayOfWeek = [0,1,2,3,4,5,6];
@@ -179,8 +179,7 @@ function obtainGoogleAuthCreds(convo) {
       scope: SCOPES
     });
 
-    convo.addMessage({text:"Let's configure Google sheets for you. Authorize this app by visiting this url:"}, 'default');
-    convo.addMessage({text:authUrl, action:'auth'}, 'default');
+    convo.addMessage({text:"Let's configure Google Apps for you. Click this <"+authUrl+"|link> to authorize it.", attachments: [], action:'auth'}, 'default');
 
     convo.addQuestion("Enter the code from the page here: ", function (response, convo) {
       console.log('Authorization code entered =', response.text);
