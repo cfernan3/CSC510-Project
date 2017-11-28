@@ -36,7 +36,7 @@ Store the following environment variables in /home/vagrant/.env.
 * Goto the Features tab and Enable Interactive Components:
 * Provide the Request URL which contains the public ip of the machine on which the bot would be running. For example, if the bot would be deployed on 54.156.253.240 with port 4500 then the URL would be "http://54.156.253.240:4500/slack/receive".
 * Goto the Features tab and click on "OAuth and Permissions":
-* Provide the Redirect URL which contains the public ip of the machine on which the bot would be running. For example, if the bot would be deployed on 54.156.253.240 with port 4500 then the URL would be "http://54.156.253.240:4500/login".
+* Provide the Redirect URL which contains the public ip of the machine on which the bot would be running. For example, if the bot would be deployed on 54.156.253.240 with port 4500 then the URL would be "http://54.156.253.240:4500/oauth".
 * On the same page add the below Scopes so that the App has all the required permissions:
 ![image](Permissions.jpeg) 
 
