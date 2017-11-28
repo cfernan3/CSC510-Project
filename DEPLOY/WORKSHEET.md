@@ -9,7 +9,7 @@
   
 |   | Deliverable    | Tasks | Issues | Team Members  | Estimated Date | Actual Date |
 |---|----------------|-------|--------|---------------|----------------|-------------|
-| 1 | Edge cases for config modification | Individual parameters can be modified only if the standup exists. After any successful modification, inform the user exactly what was updated. For parameters modified during the standup window, let user know that changes will take effect from next day. In 'Show config' let the user know if the standup is not yet configured. | [Config feature](https://trello.com/c/QGVKl6Bn/) | Sharmin, Ronald | 16th Nov | 18th Nov |
+| 1 | Edge cases for config modification | Individual parameters can be modified only if the standup exists. After any successful modification, inform the user exactly what was updated. Don't allow config modification during the standup window. In 'Show config' let the user know if the standup is not yet configured. | [Config feature](https://trello.com/c/QGVKl6Bn/) | Sharmin, Ronald | 16th Nov | 18th Nov |
 | 2 | Deployment | Deploy the bot on EC2. | |  | |  |
 | 3 | Reporting issues | Fix gsheets integration issues. | |  | |  |
 
