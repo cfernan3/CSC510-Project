@@ -7,8 +7,8 @@ module.exports = {
     for (var user in answers) {
       standupReport += `\n${user}'s responses:\n`;
       for(var i = 0; i < standupConfig.questions.length; i++) {
-        standupReport += `${standupConfig.questions[i]}\n`;
-        standupReport += `${answers[user][i]}\n`;
+        standupReport += `Q: ${standupConfig.questions[i]}\n`;
+        standupReport += `A: ${answers[user][i]}\n`;
       }
     }
 

@@ -782,7 +782,7 @@ function startStandupWithParticipants(){
 
 function shareReportWithParticipants(){
   isStandupRunning = 0; // The standup has ended.
-  db.retrieveAllAnswersList(auth, standupConfig.gSheetId,false,processReportToSend);
+  db.retrieveAllAnswersList(auth, standupConfig.gSheetId,true,processReportToSend);
 }
 
 
