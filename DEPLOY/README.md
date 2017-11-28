@@ -34,11 +34,11 @@ Store the following environment variables in /home/vagrant/.env.
 * Click on "Create a New App to create the Slack App on https://api.slack.com/apps
 * Give an App name and select appropriate workspace to be used by the bot.
 * Goto the Features tab and Enable Interactive Components:
-* Provide the Request URL which contains the public ip of the machine on which the bot would be running. For example, if the bot would be deployed on 54.156.253.240 with 4500 then the URL would be "http://54.156.253.240:4500/slack/receive".
+* Provide the Request URL which contains the public ip of the machine on which the bot would be running. For example, if the bot would be deployed on 54.156.253.240 with port 4500 then the URL would be "http://54.156.253.240:4500/slack/receive".
 * Goto the Features tab and click on "OAuth and Permissions":
-* Provide the Redirect URL which contains the public ip of the machine on which the bot would be running. For example, if the bot would be deployed on 54.156.253.240 with 4500 then the URL would be "http://54.156.253.240:4500/login".
+* Provide the Redirect URL which contains the public ip of the machine on which the bot would be running. For example, if the bot would be deployed on 54.156.253.240 with port 4500 then the URL would be "http://54.156.253.240:4500/login".
 * On the same page add the below Scopes so that the App has all the required permissions:
-![image](Permissions.jpeg)  
+![image](Permissions.jpeg) 
 
 ### Steps to deploy the slack bot onto an EC2 instance
 * run **provisionAws.yml** ansible playbook as below
